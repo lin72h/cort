@@ -2,9 +2,8 @@
 
 Date: 2026-04-16
 
-Status: bounded MX validation exists on the original 1B surface; bounded FX
-implementation exists locally; final tightened-surface MX rerun is still
-pending.
+Status: MX validation is clean on the tightened 1B surface; compare workflow is
+packaged; bounded FX implementation exists locally.
 
 This document defines the next narrow slice after validated Subset 1A:
 minimal immutable `CFString` semantics required by future bplist and
@@ -164,15 +163,15 @@ Required interpretation rules:
 
 | Subset | API or behavior | MX observation artifact | FX implementation status | Match level | Known variance | Test name | Migration status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1B | ASCII `CFStringCreateWithCString` roundtrip | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json` | Not implemented | `unknown` | type/hash numerics diagnostic | `cfstring_ascii_cstring_roundtrip` | MX run pending |
-| 1B | zero-length string creation and roundtrip across tested creation APIs | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json` | Not implemented | `unknown` | type/hash numerics diagnostic | `cfstring_empty_roundtrip` | MX run pending |
-| 1B | UTF-8 `CFStringCreateWithCString` roundtrip | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json` | Not implemented | `unknown` | type/hash numerics diagnostic | `cfstring_utf8_cstring_roundtrip` | MX run pending |
-| 1B | ASCII `CFStringCreateWithBytes` plus ASCII `CFStringGetBytes` full-range extraction | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json` | Not implemented | `unknown` | type/hash numerics diagnostic | `cfstring_bytes_ascii_roundtrip` | MX run pending |
-| 1B | UTF-16 `CFStringCreateWithCharacters` roundtrip | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json` | Not implemented | `unknown` | type/hash numerics diagnostic | `cfstring_utf16_characters_roundtrip` | MX run pending |
-| 1B | `CFStringCreateCopy` ownership, equality, and hash coherence | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json` | Not implemented | `unknown` | copy pointer identity diagnostic only | `cfstring_copy_equality_hash` | MX run pending |
-| 1B | `CFStringGetCString` exact-fit success and buffer-too-small failure | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json` | Not implemented | `unknown` | buffer contents outside success contract | `cfstring_getcstring_small_buffer` | MX run pending |
-| 1B | malformed UTF-8 rejection via `CFStringCreateWithBytes` | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json` | Not implemented | `unknown` | error wording not relevant | `cfstring_bytes_invalid_utf8_rejected` | MX run pending |
-| 1B | malformed UTF-8 rejection via `CFStringCreateWithCString` | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json` | Not implemented | `unknown` | error wording not relevant | `cfstring_cstring_invalid_utf8_rejected` | MX run pending |
+| 1B | ASCII `CFStringCreateWithCString` roundtrip | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json` | Not implemented | `unknown` | type/hash numerics diagnostic | `cfstring_ascii_cstring_roundtrip` | MX run clean; FX compare pending |
+| 1B | zero-length string creation and roundtrip across tested creation APIs | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json` | Not implemented | `unknown` | type/hash numerics diagnostic | `cfstring_empty_roundtrip` | MX run clean; FX compare pending |
+| 1B | UTF-8 `CFStringCreateWithCString` roundtrip | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json` | Not implemented | `unknown` | type/hash numerics diagnostic | `cfstring_utf8_cstring_roundtrip` | MX run clean; FX compare pending |
+| 1B | ASCII `CFStringCreateWithBytes` plus ASCII `CFStringGetBytes` full-range extraction | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json` | Not implemented | `unknown` | type/hash numerics diagnostic | `cfstring_bytes_ascii_roundtrip` | MX run clean; FX compare pending |
+| 1B | UTF-16 `CFStringCreateWithCharacters` roundtrip | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json` | Not implemented | `unknown` | type/hash numerics diagnostic | `cfstring_utf16_characters_roundtrip` | MX run clean; FX compare pending |
+| 1B | `CFStringCreateCopy` ownership, equality, and hash coherence | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json` | Not implemented | `unknown` | copy pointer identity diagnostic only | `cfstring_copy_equality_hash` | MX run clean; FX compare pending |
+| 1B | `CFStringGetCString` exact-fit success and buffer-too-small failure | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json` | Not implemented | `unknown` | buffer contents outside success contract | `cfstring_getcstring_small_buffer` | MX run clean; FX compare pending |
+| 1B | malformed UTF-8 rejection via `CFStringCreateWithBytes` | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json` | Not implemented | `unknown` | error wording not relevant | `cfstring_bytes_invalid_utf8_rejected` | MX run clean; FX compare pending |
+| 1B | malformed UTF-8 rejection via `CFStringCreateWithCString` | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json` | Not implemented | `unknown` | error wording not relevant | `cfstring_cstring_invalid_utf8_rejected` | MX run clean; FX compare pending |
 
 ## MX Probe Assets
 
@@ -188,7 +187,15 @@ Run script:
 
 - `cort-mx/scripts/run_subset1b_cfstring_core.sh`
 
-Future FX-vs-MX compare tool:
+MX compare wrapper:
+
+- `cort-mx/scripts/run_subset1b_cfstring_compare.sh`
+
+MX suite wrapper:
+
+- `cort-mx/scripts/run_subset1b_suite.sh`
+
+FX-vs-MX compare tool:
 
 - `tools/compare_subset1b_cfstring_json.exs`
 
@@ -211,6 +218,13 @@ The MX run should preserve:
 - `out/subset1b_cfstring_core.stdout`
 - `out/subset1b_cfstring_core.stderr`
 
+The MX compare wrapper should preserve when an FX JSON is available:
+
+- `summary.md`
+- `out/subset1b_cfstring_fx_vs_mx_report.md`
+- `out/subset1b_cfstring_fx.json`
+- `out/subset1b_cfstring_mx.json`
+
 ## Exact MX Command
 
 ```sh
@@ -221,6 +235,17 @@ scripts/run_subset1b_cfstring_core.sh
 Default output:
 
 - `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/`
+
+Preferred coordination command once FX publishes `subset1b_cfstring_fx.json`:
+
+```sh
+cd /Users/me/wip-launchx/wip-cort-gpt/cort-mx
+scripts/run_subset1b_suite.sh
+```
+
+Default suite output:
+
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-suite/`
 
 ## Exit Gate
 
@@ -233,3 +258,9 @@ Subset 1B is ready for FX implementation when:
 - malformed UTF-8 rejection is recorded explicitly
 - ASCII fast-path extraction semantics are recorded explicitly
 - excluded behaviors remain excluded instead of leaking into the slice
+
+Current MX report status for the artifact above:
+
+- blockers: `0`
+- warnings: `0`
+- verdict: no blocking issues found against the current manifest

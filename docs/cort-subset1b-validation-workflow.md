@@ -29,14 +29,18 @@ Explicitly excluded:
 
 MX status:
 
-- bounded macOS validation completed cleanly on the original 1B probe surface
-- tightened `08db786` probe additions still need a fresh MX rerun for final
-  acceptance of the empty-string and malformed-UTF-8 `CString` rows
+- probe source, expectations, fixture, run script, compare wrapper, and suite
+  wrapper exist
+- bounded macOS validation is clean on the tightened 1B surface: `0` blockers,
+  `0` warnings
+- MX artifact path:
+  `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json`
 
 FX status:
 
 - bounded 1B `CFString` implementation exists locally in `cort-fx`
 - local FX tests, installed-consumer test, and FX JSON probe are green
+- no shared `subset1b_cfstring_fx.json` is published in-repo yet
 - MX comparison against the tightened 1B surface is still pending
 
 ## MX Run
@@ -63,6 +67,11 @@ Primary MX outputs:
 - `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/summary.md`
 - `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json`
 
+Current MX result:
+
+- blockers: `0`
+- warnings: `0`
+
 ## MX Manifest Report
 
 The MX script reports against:
@@ -79,7 +88,47 @@ The report should be treated the same way as earlier bounded slices:
 - warnings indicate coordination or classification cleanup work
 - artifacts must still be preserved even on non-zero exit
 
-## FX vs MX Comparison
+## MX Compare Run
+
+Compare an FX Subset 1B JSON artifact against the MX JSON with:
+
+```sh
+cd /Users/me/wip-launchx/wip-cort-gpt/cort-mx
+scripts/run_subset1b_cfstring_compare.sh
+```
+
+Default inputs:
+
+- FX JSON: `../subset1b_cfstring_fx.json`
+- MX JSON:
+  `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json`
+
+Default output:
+
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core-compare/summary.md`
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core-compare/out/subset1b_cfstring_fx_vs_mx_report.md`
+
+## MX Suite
+
+Run the full MX Subset 1B suite with:
+
+```sh
+cd /Users/me/wip-launchx/wip-cort-gpt/cort-mx
+scripts/run_subset1b_suite.sh
+```
+
+Default output:
+
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-suite/summary.md`
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-suite/cfstring-core/summary.md`
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-suite/cfstring-core/out/subset1b_cfstring_core.json`
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-suite/cfstring-core-compare/summary.md`
+
+This is the preferred coordination path on MX once FX publishes a real
+`subset1b_cfstring_fx.json`. Before that artifact exists, the suite still
+preserves a compare summary that says the FX input is not available yet.
+
+## FX vs MX Direct Comparison
 
 Compare the FX JSON artifact against the MX JSON with:
 
@@ -156,19 +205,20 @@ cd /Users/me/wip-launchx/wip-cort-gpt
 tools/run_elixir.sh tools/workflow_selfcheck.exs
 ```
 
-What it should cover after the Subset 1B assets land:
+What it covers:
 
-- shell syntax for the new MX script
+- shell syntax for the new MX scripts
 - the generic manifest reporter against the Subset 1B sample fixture
 - the Subset 1B FX-vs-MX compare tool against sample JSON fixtures
+- the MX Subset 1B compare artifact wrapper against sample JSON fixtures
 - on Darwin hosts only, actual execution of
-  `cort-mx/scripts/run_subset1b_cfstring_core.sh` under a temporary artifact
-  root
+  `cort-mx/scripts/run_subset1b_cfstring_core.sh` and
+  `cort-mx/scripts/run_subset1b_suite.sh` under a temporary artifact root
 
 ## Recommended Order
 
 1. Run `scripts/run_subset1b_cfstring_core.sh` on MX.
-2. Review `summary.md` for blockers or warnings.
-3. Record the artifact path in the Subset 1B contract ledger.
-4. Classify zero-length creation and malformed UTF-8 rejection explicitly.
-5. Only then start the FX `CFString` implementation.
+2. Record the MX artifact path and current clean result in the Subset 1B contract ledger.
+3. Publish or provide `subset1b_cfstring_fx.json` when FX is ready to compare.
+4. Run `scripts/run_subset1b_suite.sh` on MX.
+5. Only then decide whether FX `CFString` is semantically aligned for this slice.

@@ -2,8 +2,8 @@
 
 Date: 2026-04-16
 
-Status: source audit complete; MX probe assets prepared; FX implementation has
-not started.
+Status: source audit complete; MX validation is clean; compare workflow is
+packaged; FX implementation has not started.
 
 This document is the extraction and implementation-readiness note for CORT
 Subset 1B: minimal immutable `CFString` support for future bplist and
@@ -196,3 +196,11 @@ FX Subset 1B implementation should not start until:
 - ASCII `CFStringGetBytes` full-range behavior is recorded explicitly
 - the team accepts that the first implementation is a clean rewrite, not an
   extraction project
+
+Current readiness note:
+
+- MX validation is now clean for `subset1b_cfstring_core`: `0` blockers,
+  `0` warnings
+- the MX compare wrapper and suite wrapper are now packaged in the repo
+- what remains pending is a real shared FX artifact at
+  `subset1b_cfstring_fx.json` so MX can run the preserved FX-vs-MX compare path

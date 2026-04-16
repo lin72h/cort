@@ -33,6 +33,8 @@ Subset 1B:
 
 - `src/cort_mx_subset1b_cfstring_core.c`
 - `scripts/run_subset1b_cfstring_core.sh`
+- `scripts/run_subset1b_cfstring_compare.sh`
+- `scripts/run_subset1b_suite.sh`
 - `expectations/subset1b_cfstring_core_expected.json`
 - `fixtures/subset1b_cfstring_core_sample.json`
 
@@ -144,6 +146,7 @@ Portable checks covered by `../tools/run_elixir.sh ../tools/workflow_selfcheck.e
 - Subset 1A FX-vs-MX compare behavior against sample JSON fixtures
 - Subset 1B FX-vs-MX compare behavior against sample JSON fixtures
 - MX-side Subset 1A compare artifact wrapper against preserved sample artifacts
+- MX-side Subset 1B compare artifact wrapper against preserved sample artifacts
 - FX-side Subset 1A compare wrappers against preserved sample artifacts
 
 Additional checks performed by the same selfcheck on Darwin hosts:
@@ -155,6 +158,8 @@ Additional checks performed by the same selfcheck on Darwin hosts:
   root with the shared repo-local FX JSON
 - actual `scripts/run_subset1b_cfstring_core.sh` execution under a temporary
   artifact root
+- actual `scripts/run_subset1b_suite.sh` execution under a temporary artifact
+  root with preserved sample FX JSON
 - preservation of MX run directories, summaries, and hashes
 
 On non-Darwin hosts, the selfcheck skips those macOS-only MX script checks.
@@ -242,7 +247,41 @@ Default output:
 
 - `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/`
 
-When FX later emits a Subset 1B JSON artifact, compare it against MX with:
+Compare an FX Subset 1B JSON artifact against MX with:
+
+```sh
+cd cort-mx
+scripts/run_subset1b_cfstring_compare.sh
+```
+
+Default output:
+
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core-compare/`
+
+This defaults to:
+
+- FX JSON: `../subset1b_cfstring_fx.json`
+- MX JSON:
+  `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json`
+
+Run the full MX Subset 1B suite with:
+
+```sh
+cd cort-mx
+scripts/run_subset1b_suite.sh
+```
+
+Default output:
+
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-suite/`
+
+This reruns the MX CFString probe and then:
+
+- compares against the shared in-repo `subset1b_cfstring_fx.json` when it is
+  present
+- or preserves a compare summary that says the FX artifact is not available yet
+
+Direct compare invocation is still available with:
 
 ```sh
 cd ..
