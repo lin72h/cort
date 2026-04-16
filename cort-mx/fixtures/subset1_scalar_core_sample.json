@@ -1,0 +1,53 @@
+{
+  "probe": "subset1_scalar_core",
+  "results": [
+    {
+      "name": "cfboolean_true_singleton",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "success": true
+    },
+    {
+      "name": "cfboolean_false_singleton",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "success": true
+    },
+    {
+      "name": "cfboolean_equality_hash",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "success": true
+    },
+    {
+      "name": "cfdata_value_roundtrip",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "success": true
+    },
+    {
+      "name": "cfnumber_sint32_roundtrip",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "success": true
+    },
+    {
+      "name": "cfnumber_float64_roundtrip",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "success": true
+    },
+    {
+      "name": "cfnumber_cross_type_equality",
+      "classification": "semantic-match-only",
+      "fx_match_level": "semantic",
+      "success": true
+    },
+    {
+      "name": "cfdate_absolute_time_roundtrip",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "success": true
+    }
+  ]
+}

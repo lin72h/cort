@@ -1,0 +1,61 @@
+{
+  "probe": "subset1_scalar_core",
+  "cases": [
+    {
+      "name": "cfboolean_true_singleton",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Boolean true singleton identity and value observation."
+    },
+    {
+      "name": "cfboolean_false_singleton",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Boolean false singleton identity and value observation."
+    },
+    {
+      "name": "cfboolean_equality_hash",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Boolean equality and hash coherence observation."
+    },
+    {
+      "name": "cfdata_value_roundtrip",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Immutable data bytes, length, equality, and hash observation."
+    },
+    {
+      "name": "cfnumber_sint32_roundtrip",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Signed 32-bit number roundtrip and equality/hash observation."
+    },
+    {
+      "name": "cfnumber_float64_roundtrip",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Float64 number roundtrip and equality/hash observation."
+    },
+    {
+      "name": "cfnumber_cross_type_equality",
+      "classification": "semantic-match-only",
+      "fx_match_level": "semantic",
+      "blocking": false,
+      "description": "Cross-type numeric equality observation for future classification."
+    },
+    {
+      "name": "cfdate_absolute_time_roundtrip",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Date absolute time roundtrip and equality/hash observation."
+    }
+  ]
+}

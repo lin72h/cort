@@ -1,12 +1,15 @@
-# cort-mx Subset 0 Execution
+# cort-mx Execution
 
-This directory now holds the executable MX-side assets for CORT Subset 0.
+This directory now holds the executable MX-side assets for the current bounded
+CORT validation slices.
 
 Default run artifacts are written outside this repo to a sibling directory
 named after the repo, currently `../wip-cort-gpt-artifacts/`. Override that
 root with `CORT_ARTIFACTS_ROOT=/path/to/artifacts`.
 
 Current contents:
+
+Subset 0:
 
 - `src/cort_mx_subset0_runtime_ownership.c`
 - `src/cort_subset0_public_allocator_compare.c`
@@ -16,6 +19,13 @@ Current contents:
 - `scripts/run_subset0_suite.sh`
 - `expectations/subset0_runtime_ownership_expected.json`
 - `fixtures/subset0_runtime_ownership_sample.json`
+
+Subset 1A:
+
+- `src/cort_mx_subset1_scalar_core.c`
+- `scripts/run_subset1_scalar_core.sh`
+- `expectations/subset1_scalar_core_expected.json`
+- `fixtures/subset1_scalar_core_sample.json`
 
 ## Purpose
 
@@ -115,6 +125,8 @@ Validated locally on the FX host:
 - Elixir syntax for the reporters with `elixir`
 - runtime-ownership reporter behavior against
   `fixtures/subset0_runtime_ownership_sample.json`
+- generic manifest reporter behavior against
+  `fixtures/subset1_scalar_core_sample.json`
 
 Not validated locally on the FX host:
 
@@ -122,3 +134,23 @@ Not validated locally on the FX host:
 - actual MX run directories and hashes
 
 Those still require a real macOS run.
+
+## Subset 1A Scalar Core
+
+This slice validates immutable scalar core semantics while explicitly deferring
+`CFString` to its own follow-on slice.
+
+Contract:
+
+- `../docs/cort-subset1a-scalar-core-contract.md`
+
+Run it with:
+
+```sh
+cd cort-mx
+scripts/run_subset1_scalar_core.sh
+```
+
+Default output:
+
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/`
