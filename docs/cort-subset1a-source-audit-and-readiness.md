@@ -257,10 +257,10 @@ Implementation notes:
 - `CFNumberGetType` should return the stored canonical type chosen by FX for
   that object
 - `CFNumberGetValue` should support the MX-tested request types first
-- integer-to-integer and integer-to-float comparison should follow MX
-  classification before becoming a hard FX requirement
-- `cfnumber_cross_type_equality` remains semantic-only until MX output is
-  reviewed
+- integer-to-integer and exact-integer float comparison are required for the
+  tested Subset 1A forms
+- do not generalize that into broad `CFNumber` canonicalization beyond the
+  current tested forms without a new MX slice
 - NaN and infinity singleton constants are out of 1A unless the MX probe is
   expanded and the contract is amended
 - no integer cache in the first FX implementation
@@ -328,6 +328,8 @@ Observed gate result:
 - warnings: `0`
 - `cfnumber_cross_type_equality` observed equal for tested `42` integer/float
   forms on MX
+- latest MX review reported FX-vs-MX scalar compare clean: `0` blockers,
+  `0` warnings
 
 The executed first FX implementation slice is:
 

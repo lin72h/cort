@@ -53,10 +53,10 @@ static void expect_abort(void (*fn)(void), const char *name) {
 }
 
 static CFTypeID register_test_type(const char *name, void (*finalize)(CFTypeRef)) {
-    static CFRuntimeClass clsStorage[8];
+    static CFRuntimeClass clsStorage[16];
     static int used = 0;
 
-    if (used >= 8) {
+    if (used >= 16) {
         fail("too many abort test runtime classes");
     }
 
@@ -152,6 +152,21 @@ static void case_data_get_length_non_data(void) {
     (void)CFDataGetLength((CFDataRef)object);
 }
 
+static void case_data_create_copy_non_data(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonDataCopy");
+    (void)CFDataCreateCopy(kCFAllocatorSystemDefault, (CFDataRef)object);
+}
+
+static void case_data_get_byte_ptr_non_data(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonDataBytePtr");
+    (void)CFDataGetBytePtr((CFDataRef)object);
+}
+
+static void case_number_get_type_non_number(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonNumberType");
+    (void)CFNumberGetType((CFNumberRef)object);
+}
+
 static void case_number_get_value_non_number(void) {
     struct TestObject *object = create_abort_test_object("AbortNonNumber");
     SInt32 value = 0;
@@ -161,6 +176,14 @@ static void case_number_get_value_non_number(void) {
 static void case_date_get_absolute_time_non_date(void) {
     struct TestObject *object = create_abort_test_object("AbortNonDate");
     (void)CFDateGetAbsoluteTime((CFDateRef)object);
+}
+
+static void case_cfequal_null(void) {
+    (void)CFEqual(NULL, (CFTypeRef)kCFBooleanTrue);
+}
+
+static void case_cfhash_null(void) {
+    (void)CFHash(NULL);
 }
 
 static void case_double_release_detected(void) {
@@ -215,8 +238,13 @@ int main(void) {
     expect_abort(case_allocator_get_context_non_allocator, "CFAllocatorGetContext(non-allocator)");
     expect_abort(case_boolean_get_value_non_boolean, "CFBooleanGetValue(non-boolean)");
     expect_abort(case_data_get_length_non_data, "CFDataGetLength(non-data)");
+    expect_abort(case_data_create_copy_non_data, "CFDataCreateCopy(non-data)");
+    expect_abort(case_data_get_byte_ptr_non_data, "CFDataGetBytePtr(non-data)");
+    expect_abort(case_number_get_type_non_number, "CFNumberGetType(non-number)");
     expect_abort(case_number_get_value_non_number, "CFNumberGetValue(non-number)");
     expect_abort(case_date_get_absolute_time_non_date, "CFDateGetAbsoluteTime(non-date)");
+    expect_abort(case_cfequal_null, "CFEqual(NULL, object)");
+    expect_abort(case_cfhash_null, "CFHash(NULL)");
     expect_abort(case_double_release_detected, "double release");
     expect_abort(case_retain_in_finalize_aborts, "CFRetain during finalization");
 

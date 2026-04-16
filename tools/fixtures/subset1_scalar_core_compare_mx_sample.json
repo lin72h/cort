@@ -93,7 +93,7 @@
     },
     {
       "name": "cfnumber_cross_type_equality",
-      "classification": "semantic-match-only",
+      "classification": "required",
       "success": true,
       "pointer_identity_same": null,
       "equal_same_value": true,

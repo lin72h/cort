@@ -57,6 +57,14 @@ Primary FX outputs:
 - `../wip-cort-gpt-artifacts/cort-fx/build/out/subset1_scalar_core_fx.json`
 - `../wip-cort-gpt-artifacts/cort-fx/build/subset1a-exported-symbols.txt`
 
+Shared handoff artifact:
+
+- repo-local copy at
+  `/Users/me/wip-launchx/wip-cort-gpt/subset1_scalar_core_fx.json`
+
+Use the repo-local copy when MX should consume the same preserved FX probe
+result without regenerating it locally.
+
 ## MX Run
 
 From:
@@ -155,9 +163,15 @@ Diagnostic-only differences:
   - `hash_same_value`
   - `hash_different_value`
 
-Cross-type numeric equality remains `semantic-match-only` in the current
-contract, so any drift there should show as a warning until the contract is
-promoted.
+Cross-type numeric equality is required for the currently tested Subset 1A
+forms only:
+
+- `kCFNumberSInt32Type`
+- `kCFNumberSInt64Type`
+- exact-integer `kCFNumberFloat64Type`
+
+Do not generalize that into broad `CFNumber` canonicalization beyond this slice
+without a new MX validation pass.
 
 ## Workflow Selfcheck
 

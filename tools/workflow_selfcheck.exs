@@ -170,11 +170,11 @@ defmodule WorkflowSelfcheck do
         ],
         cd: repo_root,
         expect_exit: 0
-      )
+    )
 
     ensure_contains!(output, "- blockers: 0")
-    ensure_contains!(output, "- warnings: 1")
-    ensure_contains!(output, "`cfnumber_cross_type_equality` | warning")
+    ensure_contains!(output, "- warnings: 0")
+    ensure_contains!(output, "`cfnumber_cross_type_equality` | match")
   end
 
   defp subset0_mx_suite_check!(repo_root, artifacts_root) do
@@ -263,8 +263,8 @@ defmodule WorkflowSelfcheck do
       raise RuntimeError, "missing compare report at #{report_path}"
     end
 
-    ensure_contains!(output, "- warnings: 1")
-    ensure_contains!(File.read!(report_path), "`cfnumber_cross_type_equality` | warning")
+    ensure_contains!(output, "- warnings: 0")
+    ensure_contains!(File.read!(report_path), "`cfnumber_cross_type_equality` | match")
   end
 
   defp subset1_compare_artifact_check!(repo_root, artifacts_root) do
@@ -299,7 +299,7 @@ defmodule WorkflowSelfcheck do
       end
     end
 
-    ensure_contains!(File.read!(summary_path), "- warnings: 1")
+    ensure_contains!(File.read!(summary_path), "- warnings: 0")
     ensure_empty_or_whitespace!(File.read!(stderr_path), stderr_path)
   end
 

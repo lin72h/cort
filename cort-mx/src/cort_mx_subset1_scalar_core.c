@@ -483,9 +483,9 @@ static struct CaseResult observe_number_cross_type_equality(void) {
     struct CaseResult result;
     memset(&result, 0, sizeof(result));
     result.name = "cfnumber_cross_type_equality";
-    result.classification = "semantic-match-only";
+    result.classification = "required";
     result.fxMatchLevel = "semantic";
-    result.ownershipNote = "Observation only for now. This case records cross-type numeric equality behavior before FX classifies it as required or variance.";
+    result.ownershipNote = "Required for tested Subset 1A forms only: SInt32, SInt64, and exact-integer Float64 values. Do not generalize beyond this slice.";
     set_api_calls(&result, apiCalls, sizeof(apiCalls) / sizeof(apiCalls[0]));
 
     CFNumberRef int32Number = CFNumberCreate(kCFAllocatorSystemDefault, kCFNumberSInt32Type, &int32Value);

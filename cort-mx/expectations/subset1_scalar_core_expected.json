@@ -45,10 +45,10 @@
     },
     {
       "name": "cfnumber_cross_type_equality",
-      "classification": "semantic-match-only",
+      "classification": "required",
       "fx_match_level": "semantic",
-      "blocking": false,
-      "description": "Cross-type numeric equality observation for future classification."
+      "blocking": true,
+      "description": "Cross-type numeric equality for tested SInt32, SInt64, and exact-integer Float64 forms."
     },
     {
       "name": "cfdate_absolute_time_roundtrip",

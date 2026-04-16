@@ -39,7 +39,7 @@
     },
     {
       "name": "cfnumber_cross_type_equality",
-      "classification": "semantic-match-only",
+      "classification": "required",
       "fx_match_level": "semantic",
       "success": true
     },

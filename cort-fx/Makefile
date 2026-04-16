@@ -56,30 +56,20 @@ INSTALL_DOC_DIR := $(DESTDIR)$(PREFIX)/share/doc/cort-fx
 all: $(LIB) $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY)
 
 check-deps: $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY) $(LIB)
-	@if ldd $(TEST_BINARY) | rg -q 'dispatch|swift|objc|icu|CoreFoundation'; then \
-		echo "forbidden dynamic dependency detected"; \
-		exit 1; \
-	fi
-	@if ldd $(ABORT_TEST_BINARY) | rg -q 'dispatch|swift|objc|icu|CoreFoundation'; then \
-		echo "forbidden dynamic dependency detected"; \
-		exit 1; \
-	fi
-	@if ldd $(SCALAR_TEST_BINARY) | rg -q 'dispatch|swift|objc|icu|CoreFoundation'; then \
-		echo "forbidden dynamic dependency detected"; \
-		exit 1; \
-	fi
-	@if ldd $(SMOKE_BINARY) | rg -q 'dispatch|swift|objc|icu|CoreFoundation'; then \
-		echo "forbidden dynamic dependency detected"; \
-		exit 1; \
-	fi
-	@if ldd $(COMPARE_BINARY) | rg -q 'dispatch|swift|objc|icu|CoreFoundation'; then \
-		echo "forbidden dynamic dependency detected"; \
-		exit 1; \
-	fi
-	@if ldd $(SCALAR_COMPARE_BINARY) | rg -q 'dispatch|swift|objc|icu|CoreFoundation'; then \
-		echo "forbidden dynamic dependency detected"; \
-		exit 1; \
-	fi
+	@for bin in $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY); do \
+		if command -v ldd >/dev/null 2>&1; then \
+			deps=$$(ldd "$$bin" 2>/dev/null || true); \
+		elif command -v otool >/dev/null 2>&1; then \
+			deps=$$(otool -L "$$bin" | sed '1d' | awk '{print $$1}'); \
+		else \
+			echo "no supported dependency inspection tool found"; \
+			exit 1; \
+		fi; \
+		if printf '%s\n' "$$deps" | rg -q 'dispatch|swift|objc|icu|CoreFoundation'; then \
+			echo "forbidden dynamic dependency detected in $$bin"; \
+			exit 1; \
+		fi; \
+	done
 	@if nm -a $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY) $(LIB) | rg -q 'swift|dispatch|objc|icu|CoreFoundation'; then \
 		echo "forbidden symbol detected"; \
 		exit 1; \
@@ -87,7 +77,12 @@ check-deps: $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(SMOKE_BI
 
 $(EXPORTS_ACTUAL): $(LIB)
 	mkdir -p $(BUILD_DIR)
-	nm -g $(LIB) | awk '$$2 ~ /^[TDRS]$$/ { print $$3 }' | rg -v '^_FXCF' | sort -u > $(EXPORTS_ACTUAL)
+	@platform=$$(uname -s); \
+	if [ "$$platform" = "Darwin" ]; then \
+		nm -g $(LIB) | awk '$$2 ~ /^[TDRS]$$/ { print $$NF }' | sed 's/^_//' | rg -v '^_FXCF' | sort -u > $(EXPORTS_ACTUAL); \
+	else \
+		nm -g $(LIB) | awk '$$2 ~ /^[TDRS]$$/ { print $$NF }' | rg -v '^_FXCF' | sort -u > $(EXPORTS_ACTUAL); \
+	fi
 
 check-exports: $(EXPORTS_ACTUAL) $(EXPORTS_EXPECTED)
 	diff -u $(EXPORTS_EXPECTED) $(EXPORTS_ACTUAL)

@@ -158,8 +158,9 @@ Required interpretation rules:
 - `CFNumberGetType` remains stable for the stored representation in the initial
   implementation
 - equal tested numbers hash coherently within the process
-- cross-type numeric equality is observed in 1A but not yet promoted to a hard
-  requirement
+- cross-type numeric equality is required for the tested forms only:
+  `kCFNumberSInt32Type`, `kCFNumberSInt64Type`, and exact-integer
+  `kCFNumberFloat64Type`
 
 ### `CFDate`
 
@@ -171,8 +172,8 @@ Required interpretation rules:
 - raw `CFHash` numbers do not need to match macOS
 - raw `CFTypeID` numbers do not need to match macOS
 - immortal singleton retain-count magnitudes remain diagnostic only
-- cross-type `CFNumber` equality may remain provisional until MX evidence is
-  reviewed and LaunchX decides whether it matters
+- broader `CFNumber` canonicalization remains out of scope beyond the tested
+  Subset 1A forms above
 
 ## Rejected In This Slice
 
@@ -190,7 +191,7 @@ Required interpretation rules:
 | 1A | `CFData` length/bytes/equality/hash | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json` | Implemented locally | `semantic` | raw hash numerics diagnostic | `cfdata_value_roundtrip` | FX local done; FX-vs-MX compare pending |
 | 1A | `CFNumber` `SInt32` roundtrip/equality/hash | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json` | Implemented locally | `semantic` | raw hash numerics diagnostic | `cfnumber_sint32_roundtrip` | FX local done; FX-vs-MX compare pending |
 | 1A | `CFNumber` `Float64` roundtrip/equality/hash | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json` | Implemented locally | `semantic` | raw hash numerics diagnostic | `cfnumber_float64_roundtrip` | FX local done; FX-vs-MX compare pending |
-| 1A | `CFNumber` cross-type equality observation | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json` | Implemented locally to match observed `42` integer/float equality on tested forms | `semantic` | remains semantic-only until broader MX classification | `cfnumber_cross_type_equality` | FX local done; FX-vs-MX compare pending |
+| 1A | `CFNumber` cross-type equality for tested forms | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json` | Implemented locally to match observed `42` integer/float equality on tested forms | `semantic` | no claim beyond `SInt32`, `SInt64`, and exact-integer `Float64` | `cfnumber_cross_type_equality` | MX compare clean |
 | 1A | `CFDate` absolute-time roundtrip/equality/hash | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json` | Implemented locally | `semantic` | raw hash numerics diagnostic | `cfdate_absolute_time_roundtrip` | FX local done; FX-vs-MX compare pending |
 | 1B | minimal `CFString` for bplist/key paths | Not started | Not implemented | `unknown` | dedicated slice required | Deferred | Not ready |
 
@@ -250,15 +251,21 @@ Default output:
 
 ## Exit Gate
 
-Subset 1A is ready for FX-vs-MX semantic comparison when:
+Subset 1A is ready to serve as the base for Subset 1B or container planning
+when:
 
 - MX run artifacts exist
 - the report has no blocker probe failures
 - the required rows have concrete artifact paths in the ledger
-- any semantic-only `CFNumber` cross-type behavior is classified explicitly
+- tested-form `CFNumber` cross-type behavior is classified explicitly
 - `CFString` remains deferred to a dedicated 1B contract instead of leaking back
   into 1A
 
 The FX local implementation now satisfies that gate and emits:
 
 - `../wip-cort-gpt-artifacts/cort-fx/build/out/subset1_scalar_core_fx.json`
+
+Latest MX review result for the shared scalar-core comparison surface:
+
+- blockers: `0`
+- warnings: `0`
