@@ -44,7 +44,7 @@ defmodule WorkflowSelfcheck do
 
   defp checks(repo_root, artifacts_root, host_os) do
     base_checks = [
-      {"shell syntax", fn -> shell_syntax_check!(repo_root) end},
+      {"shell syntax and execute bits", fn -> shell_syntax_check!(repo_root) end},
       {"elixir launcher version", fn -> elixir_version_check!(repo_root) end},
       {"subset0 runtime manifest report", fn -> subset0_runtime_report_check!(repo_root) end},
       {"subset1 manifest report", fn -> subset1_manifest_report_check!(repo_root) end},
@@ -98,7 +98,9 @@ defmodule WorkflowSelfcheck do
     ]
 
     Enum.each(scripts, fn script ->
-      run_cmd!("sh", ["-n", Path.join(repo_root, script)], cd: repo_root, expect_exit: 0)
+      path = Path.join(repo_root, script)
+      run_cmd!("sh", ["-n", path], cd: repo_root, expect_exit: 0)
+      run_cmd!("test", ["-x", path], cd: repo_root, expect_exit: 0)
     end)
   end
 

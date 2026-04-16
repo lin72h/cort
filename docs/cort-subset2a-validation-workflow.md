@@ -142,7 +142,7 @@ tools/run_elixir.sh tools/workflow_selfcheck.exs
 
 What it should cover after the Subset 2A assets land:
 
-- shell syntax for the new MX script
+- shell syntax and execute-bit presence for the new MX script
 - the generic manifest reporter against the Subset 2A sample fixture
 - the Subset 2A FX-vs-MX compare tool against sample JSON fixtures
 - on Darwin hosts only, actual execution of

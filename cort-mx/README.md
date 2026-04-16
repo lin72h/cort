@@ -141,7 +141,7 @@ Exit status:
 
 Portable checks covered by `../tools/run_elixir.sh ../tools/workflow_selfcheck.exs`:
 
-- shell syntax for all scripts with `sh -n`
+- shell syntax and execute-bit presence for all scripts
 - Elixir syntax for the reporters with `elixir`
 - runtime-ownership reporter behavior against
   `fixtures/subset0_runtime_ownership_sample.json`

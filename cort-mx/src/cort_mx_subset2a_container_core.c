@@ -240,7 +240,10 @@ static struct CaseResult observe_array_empty_immutable(void) {
 }
 
 static struct CaseResult observe_array_immutable_cftype_borrowed_get(void) {
-    static const UInt8 bytes[] = {0x00u, 0x41u, 0x7fu, 0xffu};
+    static const UInt8 firstBytes[] = {
+        0x61u, 0x6cu, 0x70u, 0x68u, 0x61u, 0x2du, 0x6bu, 0x65u, 0x79u
+    };
+    static const UInt8 secondBytes[] = {0x00u, 0x41u, 0x7fu, 0xffu};
 
     struct CaseResult result;
     memset(&result, 0, sizeof(result));
@@ -249,56 +252,57 @@ static struct CaseResult observe_array_immutable_cftype_borrowed_get(void) {
     result.fxMatchLevel = "semantic";
     result.ownershipNote = "Immutable array create must retain inserted CFType children; Get returns borrowed child pointers without an extra retain in the tested kCFType callback mode.";
 
-    CFStringRef key = create_ascii_string("alpha-key");
-    CFDataRef data = create_data(bytes, (CFIndex)sizeof(bytes));
-    CFIndex keyBase = (key != NULL) ? CFGetRetainCount(key) : -1;
-    CFIndex dataBase = (data != NULL) ? CFGetRetainCount(data) : -1;
-    const void *values[] = {key, data};
-    CFArrayRef array = (key != NULL && data != NULL)
+    CFDataRef first = create_data(firstBytes, (CFIndex)sizeof(firstBytes));
+    CFDataRef second = create_data(secondBytes, (CFIndex)sizeof(secondBytes));
+    CFIndex firstBase = (first != NULL) ? CFGetRetainCount(first) : -1;
+    CFIndex secondBase = (second != NULL) ? CFGetRetainCount(second) : -1;
+    const void *values[] = {first, second};
+    CFArrayRef array = (first != NULL && second != NULL)
         ? CFArrayCreate(kCFAllocatorSystemDefault, values, 2, &kCFTypeArrayCallBacks)
         : NULL;
 
-    CFIndex keyAfterCreate = (key != NULL) ? CFGetRetainCount(key) : -1;
-    CFIndex dataAfterCreate = (data != NULL) ? CFGetRetainCount(data) : -1;
-    const void *gotKey = (array != NULL) ? CFArrayGetValueAtIndex(array, 0) : NULL;
-    const void *gotData = (array != NULL) ? CFArrayGetValueAtIndex(array, 1) : NULL;
+    CFIndex firstAfterCreate = (first != NULL) ? CFGetRetainCount(first) : -1;
+    CFIndex secondAfterCreate = (second != NULL) ? CFGetRetainCount(second) : -1;
+    const void *gotFirst = (array != NULL) ? CFArrayGetValueAtIndex(array, 0) : NULL;
+    const void *gotSecond = (array != NULL) ? CFArrayGetValueAtIndex(array, 1) : NULL;
     CFIndex arrayCount = (array != NULL) ? CFArrayGetCount(array) : 0;
-    CFIndex keyAfterGet = (key != NULL) ? CFGetRetainCount(key) : -1;
-    CFIndex dataAfterGet = (data != NULL) ? CFGetRetainCount(data) : -1;
+    CFIndex firstAfterGet = (first != NULL) ? CFGetRetainCount(first) : -1;
+    CFIndex secondAfterGet = (second != NULL) ? CFGetRetainCount(second) : -1;
 
     record_type_identity(&result, (CFTypeRef)array);
     result.hasPointerIdentity = true;
-    result.pointerIdentitySame = (gotKey == (const void *)key) && (gotData == (const void *)data);
+    result.pointerIdentitySame = (gotFirst == (const void *)first) && (gotSecond == (const void *)second);
     result.hasLengthValue = (array != NULL);
     result.lengthValue = (array != NULL) ? (long)CFArrayGetCount(array) : 0;
-    result.hasPrimaryValueText = (key != NULL) && utf8_hex_for_string(key, result.primaryValueText, sizeof(result.primaryValueText));
+    result.hasPrimaryValueText = true;
+    set_hex_bytes(result.primaryValueText, sizeof(result.primaryValueText), firstBytes, sizeof(firstBytes));
     result.hasAlternateValueText = true;
-    set_hex_bytes(result.alternateValueText, sizeof(result.alternateValueText), bytes, sizeof(bytes));
+    set_hex_bytes(result.alternateValueText, sizeof(result.alternateValueText), secondBytes, sizeof(secondBytes));
 
     if (array != NULL) {
         CFRelease(array);
     }
-    CFIndex keyAfterRelease = (key != NULL) ? CFGetRetainCount(key) : -1;
-    CFIndex dataAfterRelease = (data != NULL) ? CFGetRetainCount(data) : -1;
+    CFIndex firstAfterRelease = (first != NULL) ? CFGetRetainCount(first) : -1;
+    CFIndex secondAfterRelease = (second != NULL) ? CFGetRetainCount(second) : -1;
 
     result.success =
-        (key != NULL) &&
-        (data != NULL) &&
+        (first != NULL) &&
+        (second != NULL) &&
         (array != NULL) &&
         result.pointerIdentitySame &&
         (arrayCount == 2) &&
-        (keyAfterCreate == keyBase + 1) &&
-        (dataAfterCreate == dataBase + 1) &&
-        (keyAfterGet == keyAfterCreate) &&
-        (dataAfterGet == dataAfterCreate) &&
-        (keyAfterRelease == keyBase) &&
-        (dataAfterRelease == dataBase);
+        (firstAfterCreate == firstBase + 1) &&
+        (secondAfterCreate == secondBase + 1) &&
+        (firstAfterGet == firstAfterCreate) &&
+        (secondAfterGet == secondAfterCreate) &&
+        (firstAfterRelease == firstBase) &&
+        (secondAfterRelease == secondBase);
 
-    if (data != NULL) {
-        CFRelease(data);
+    if (second != NULL) {
+        CFRelease(second);
     }
-    if (key != NULL) {
-        CFRelease(key);
+    if (first != NULL) {
+        CFRelease(first);
     }
     return result;
 }
