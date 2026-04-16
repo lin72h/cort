@@ -340,6 +340,13 @@ The executed first FX implementation slice is:
 7. add the Subset 1A FX comparison artifact
 8. send the FX JSON back through this repo for MX comparison
 
+Current readiness note:
+
+- the FX-vs-MX Subset 1A comparison wrapper and compare-artifact packaging are
+  now wired in the repo
+- what remains pending is the actual FX-emitted
+  `subset1_scalar_core_fx.json` from a real scalar implementation
+
 Stop and request review if MX shows that required 1A behavior depends on
 `CFString`, ObjC bridging, Swift runtime dispatch, ICU, mutable containers, or
 plist code. Those would contradict the current Subset 1A boundary.

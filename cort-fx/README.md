@@ -107,7 +107,9 @@ make check-deps
 make check-exports
 make compare-fx
 make compare-subset1a-fx
+make compare-subset1a-with-mx
 make artifact-run
+make artifact-subset1a-compare
 make test-installed
 ```
 
@@ -122,8 +124,14 @@ What they enforce:
   `../wip-cort-gpt-artifacts/cort-fx/build/out/subset0_public_compare_fx.json`
 - FX scalar-core probe emits
   `../wip-cort-gpt-artifacts/cort-fx/build/out/subset1_scalar_core_fx.json`
+- Subset 1A compare wrapper can compare that FX JSON against MX and preserve a
+  dedicated handoff artifact run
 - artifact-run packaging emits a preservable FX run directory under
   `../wip-cort-gpt-artifacts/cort-fx/runs/`
+- repo workflow selfcheck can validate the compare/report tooling from fixtures
+  with `../tools/run_elixir.sh ../tools/workflow_selfcheck.exs`
+- when that selfcheck runs on Darwin, it also executes the real MX Subset 0
+  and Subset 1A scripts under a temporary artifact root
 
 ## Install
 
@@ -228,7 +236,9 @@ and writes:
 
 - `../wip-cort-gpt-artifacts/cort-fx/build/out/subset0_fx_vs_mx_report.md`
 
-Compare Subset 1A scalar core with:
+## Subset 1A Compare With MX
+
+Compare the local FX scalar-core JSON against the MX scalar-core JSON with:
 
 ```sh
 cd cort-fx
@@ -243,6 +253,30 @@ This uses:
 and writes:
 
 - `../wip-cort-gpt-artifacts/cort-fx/build/out/subset1_scalar_core_fx_vs_mx_report.md`
+
+To preserve a compare-only handoff run:
+
+```sh
+cd cort-fx
+make artifact-subset1a-compare \
+  FX_SCALAR_JSON=/path/to/subset1_scalar_core_fx.json \
+  MX_JSON=/path/to/subset1_scalar_core.json
+```
+
+Default output:
+
+- `../wip-cort-gpt-artifacts/cort-fx/runs/subset1a-fx-vs-mx/`
+
+The compare artifact directory includes:
+
+- `host.txt`
+- `toolchain.txt`
+- `commands.txt`
+- `summary.md`
+- `sha256.txt`
+- `out/subset1_scalar_core_fx.json`
+- `out/subset1_scalar_core_mx.json`
+- `out/subset1a_fx_vs_mx_report.md`
 
 ## Constraints
 

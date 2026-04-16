@@ -172,6 +172,28 @@ Warning rules:
 Numeric `type_id` values are diagnostic only across implementations. The report
 records them, but does not treat raw numeric mismatch as blocking.
 
+## Workflow Selfcheck
+
+Before asking MX or FX to rerun Subset 0 coordination commands after workflow
+changes, run:
+
+```sh
+cd /Users/me/wip-launchx/wip-cort-gpt
+tools/run_elixir.sh tools/workflow_selfcheck.exs
+```
+
+What it covers:
+
+- shell syntax for the current MX and FX wrapper scripts
+- the Subset 0 runtime-ownership reporter against sample JSON
+- the Subset 0 FX-vs-MX compare tool against sample JSON
+- the Subset 1A compare/report tooling that shares the same workflow surface
+- on Darwin hosts only, actual execution of `cort-mx/scripts/run_subset0_suite.sh`
+  under a temporary artifact root
+
+This keeps the shared workflow layer honest without requiring FX to fabricate
+native macOS CoreFoundation evidence.
+
 ## Current Validation State
 
 Current recorded macOS outcome:

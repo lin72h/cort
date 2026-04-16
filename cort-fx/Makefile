@@ -8,10 +8,9 @@ CPPFLAGS += -Iinclude
 LDFLAGS +=
 PREFIX ?= /usr/local
 DESTDIR ?=
-REPO_ROOT != cd .. && pwd
-REPO_PARENT != cd ../.. && pwd
-REPO_NAME != basename "${REPO_ROOT}"
-ARTIFACTS_ROOT != if [ -n "${CORT_ARTIFACTS_ROOT}" ]; then printf '%s\n' "${CORT_ARTIFACTS_ROOT}"; else printf '%s/%s-artifacts\n' "${REPO_PARENT}" "${REPO_NAME}"; fi
+CORT_ARTIFACTS_ROOT ?= ../../wip-cort-gpt-artifacts
+REPO_ROOT := ..
+ARTIFACTS_ROOT := $(CORT_ARTIFACTS_ROOT)
 
 BUILD_DIR ?= $(ARTIFACTS_ROOT)/cort-fx/build
 LIB_DIR := $(BUILD_DIR)/lib
@@ -24,6 +23,7 @@ ELIXIR_RUN := $(REPO_ROOT)/tools/run_elixir.sh
 COMPARE_TOOL := $(REPO_ROOT)/tools/compare_subset0_json.exs
 SCALAR_COMPARE_TOOL := $(REPO_ROOT)/tools/compare_subset1_scalar_core_json.exs
 RUN_ARTIFACT_SCRIPT := scripts/run_subset0_fx_artifacts.sh
+SUBSET1A_COMPARE_ARTIFACT_SCRIPT := scripts/run_subset1a_compare_artifact.sh
 
 LIB := $(LIB_DIR)/libcortfx.a
 LIB_OBJECTS := \
@@ -46,11 +46,12 @@ COMPARE_REPORT ?= $(BUILD_DIR)/out/subset0_fx_vs_mx_report.md
 SCALAR_COMPARE_REPORT ?= $(BUILD_DIR)/out/subset1_scalar_core_fx_vs_mx_report.md
 EXPORTS_EXPECTED := $(EXPORTS_DIR)/subset1a-exported-symbols.txt
 EXPORTS_ACTUAL := $(BUILD_DIR)/subset1a-exported-symbols.txt
+SCALAR_COMPARE_RUN_DIR ?= $(ARTIFACTS_ROOT)/cort-fx/runs/subset1a-fx-vs-mx
 INSTALL_INCLUDE_DIR := $(DESTDIR)$(PREFIX)/include/CoreFoundation
 INSTALL_LIB_DIR := $(DESTDIR)$(PREFIX)/lib
 INSTALL_DOC_DIR := $(DESTDIR)$(PREFIX)/share/doc/cort-fx
 
-.PHONY: all clean check-deps check-exports compare-fx compare-subset1a-fx compare-with-mx compare-subset1a-with-mx artifact-run install install-stage test test-installed
+.PHONY: all clean check-deps check-exports compare-fx compare-subset1a-fx compare-with-mx compare-subset1a-with-mx artifact-run artifact-subset1a-compare install install-stage test test-installed
 
 all: $(LIB) $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY)
 
@@ -117,6 +118,19 @@ compare-subset1a-with-mx: compare-subset1a-fx $(SCALAR_COMPARE_TOOL)
 
 artifact-run: $(RUN_ARTIFACT_SCRIPT)
 	CORT_ARTIFACTS_ROOT="$(ARTIFACTS_ROOT)" BUILD_DIR="$(BUILD_DIR)" STAGE_DIR="$(STAGE_DIR)" $(RUN_ARTIFACT_SCRIPT) $(RUN_DIR)
+
+artifact-subset1a-compare: $(SUBSET1A_COMPARE_ARTIFACT_SCRIPT)
+	@if [ ! -f "$(FX_SCALAR_JSON)" ]; then \
+		echo "set FX_SCALAR_JSON=/path/to/subset1_scalar_core_fx.json"; \
+		exit 1; \
+	fi
+	@if [ -z "$(MX_JSON)" ]; then \
+		echo "set MX_JSON=/path/to/subset1_scalar_core.json"; \
+		exit 1; \
+	fi
+	CORT_ARTIFACTS_ROOT="$(ARTIFACTS_ROOT)" BUILD_DIR="$(BUILD_DIR)" \
+		FX_SCALAR_JSON="$(FX_SCALAR_JSON)" MX_JSON="$(MX_JSON)" \
+		$(SUBSET1A_COMPARE_ARTIFACT_SCRIPT) $(SCALAR_COMPARE_RUN_DIR)
 
 test: $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(SMOKE_BINARY) check-deps check-exports compare-fx compare-subset1a-fx
 	$(TEST_BINARY)

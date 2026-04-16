@@ -95,6 +95,7 @@ Observed MX result:
 Compare the emitted FX JSON against the MX JSON with:
 
 - `tools/compare_subset1_scalar_core_json.exs`
+- `cd cort-fx && make compare-subset1a-with-mx ...`
 
 Direct invocation:
 
@@ -112,6 +113,15 @@ Current FX wrapper:
 cd /Users/me/wip-launchx/wip-cort-gpt/cort-fx
 make compare-subset1a-with-mx \
   MX_JSON=/Users/me/wip-launchx/wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json
+```
+
+To preserve a dedicated compare handoff run:
+
+```sh
+cd /Users/me/wip-launchx/wip-cort-gpt/cort-fx
+make artifact-subset1a-compare \
+  FX_SCALAR_JSON=/path/to/subset1_scalar_core_fx.json \
+  MX_JSON=/path/to/subset1_scalar_core.json
 ```
 
 This writes:
@@ -148,6 +158,27 @@ Diagnostic-only differences:
 Cross-type numeric equality remains `semantic-match-only` in the current
 contract, so any drift there should show as a warning until the contract is
 promoted.
+
+## Workflow Selfcheck
+
+Before relying on the compare/report scripts after workflow changes, run:
+
+```sh
+cd /Users/me/wip-launchx/wip-cort-gpt
+tools/run_elixir.sh tools/workflow_selfcheck.exs
+```
+
+What it covers:
+
+- the Subset 1A manifest reporter against sample JSON
+- the Subset 1A FX-vs-MX compare tool against sample JSON fixtures
+- the FX wrapper commands `make compare-subset1a-with-mx` and
+  `make artifact-subset1a-compare`
+- on Darwin hosts only, actual execution of
+  `cort-mx/scripts/run_subset1_scalar_core.sh` under a temporary artifact root
+
+On non-Darwin hosts, the selfcheck still validates the portable compare/report
+surface and skips the native MX probe run.
 
 ## Recommended Order
 

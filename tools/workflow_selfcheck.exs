@@ -1,0 +1,349 @@
+#!/usr/bin/env elixir
+Code.require_file("cort_tooling.ex", __DIR__)
+
+defmodule WorkflowSelfcheck do
+  def main(argv) do
+    options =
+      CortTooling.parse_args!(argv,
+        artifacts_root: :string,
+        keep_artifacts: :boolean
+      )
+
+    repo_root = Path.expand("..", __DIR__)
+    host_os = :os.type()
+    artifacts_root =
+      CortTooling.string_flag(options, :artifacts_root) ||
+        Path.join(System.tmp_dir!(), "cort-workflow-selfcheck-#{System.system_time(:millisecond)}")
+
+    keep_artifacts = Keyword.get(options, :keep_artifacts, false)
+
+    File.rm_rf!(artifacts_root)
+    File.mkdir_p!(artifacts_root)
+
+    IO.puts("Workflow selfcheck artifact root: #{artifacts_root}")
+    maybe_print_host_note(host_os)
+
+    checks(repo_root, artifacts_root, host_os)
+    |> Enum.each(fn {title, fun} ->
+      IO.puts("==> #{title}")
+      fun.()
+      IO.puts("ok: #{title}")
+    end)
+
+    unless keep_artifacts do
+      File.rm_rf!(artifacts_root)
+    end
+
+    IO.puts("workflow selfcheck passed")
+  rescue
+    error in [ArgumentError, File.Error, ErlangError, RuntimeError] ->
+      IO.puts(:stderr, Exception.message(error))
+      System.halt(1)
+  end
+
+  defp checks(repo_root, artifacts_root, host_os) do
+    base_checks = [
+      {"shell syntax", fn -> shell_syntax_check!(repo_root) end},
+      {"elixir launcher version", fn -> elixir_version_check!(repo_root) end},
+      {"subset0 runtime manifest report", fn -> subset0_runtime_report_check!(repo_root) end},
+      {"subset1 manifest report", fn -> subset1_manifest_report_check!(repo_root) end},
+      {"subset0 compare tool", fn -> subset0_compare_check!(repo_root) end},
+      {"subset1 compare tool", fn -> subset1_compare_check!(repo_root) end},
+      {"subset1 FX make compare wrapper", fn -> subset1_make_compare_check!(repo_root, artifacts_root) end},
+      {"subset1 FX compare artifact wrapper", fn -> subset1_compare_artifact_check!(repo_root, artifacts_root) end}
+    ]
+
+    mx_checks =
+      if darwin_host?(host_os) do
+        [
+          {"subset0 MX suite script", fn -> subset0_mx_suite_check!(repo_root, artifacts_root) end},
+          {"subset1 MX scalar-core script", fn -> subset1_mx_scalar_core_check!(repo_root, artifacts_root) end}
+        ]
+      else
+        []
+      end
+
+    List.insert_at(base_checks, 6, mx_checks)
+    |> List.flatten()
+  end
+
+  defp shell_syntax_check!(repo_root) do
+    scripts = [
+      "tools/run_elixir.sh",
+      "cort-mx/scripts/run_subset0_runtime_ownership.sh",
+      "cort-mx/scripts/run_subset0_public_allocator_compare.sh",
+      "cort-mx/scripts/run_subset0_suite.sh",
+      "cort-mx/scripts/run_subset1_scalar_core.sh",
+      "cort-fx/scripts/run_subset0_fx_artifacts.sh",
+      "cort-fx/scripts/run_subset1a_compare_artifact.sh"
+    ]
+
+    Enum.each(scripts, fn script ->
+      run_cmd!("sh", ["-n", Path.join(repo_root, script)], cd: repo_root, expect_exit: 0)
+    end)
+  end
+
+  defp elixir_version_check!(repo_root) do
+    output = run_cmd!(Path.join(repo_root, "tools/run_elixir.sh"), ["--version"], cd: repo_root, expect_exit: 0)
+    ensure_contains!(output, "Elixir ")
+    ensure_contains!(output, "Erlang/OTP ")
+  end
+
+  defp subset0_runtime_report_check!(repo_root) do
+    output =
+      run_cmd!(
+        Path.join(repo_root, "tools/run_elixir.sh"),
+        [
+          Path.join(repo_root, "tools/report_subset0_runtime_ownership.exs"),
+          "--json",
+          Path.join(repo_root, "cort-mx/fixtures/subset0_runtime_ownership_sample.json"),
+          "--json-label",
+          "out/subset0_runtime_ownership.json",
+          "--expected",
+          Path.join(repo_root, "cort-mx/expectations/subset0_runtime_ownership_expected.json"),
+          "--expected-label",
+          "expectations/subset0_runtime_ownership_expected.json"
+        ],
+        cd: repo_root,
+        expect_exit: 0
+      )
+
+    ensure_contains!(output, "- blockers: 0")
+    ensure_contains!(output, "- warnings: 0")
+  end
+
+  defp subset1_manifest_report_check!(repo_root) do
+    output =
+      run_cmd!(
+        Path.join(repo_root, "tools/run_elixir.sh"),
+        [
+          Path.join(repo_root, "tools/report_case_manifest.exs"),
+          "--title",
+          "Subset 1A Scalar Core Report",
+          "--json",
+          Path.join(repo_root, "cort-mx/fixtures/subset1_scalar_core_sample.json"),
+          "--json-label",
+          "out/subset1_scalar_core.json",
+          "--expected",
+          Path.join(repo_root, "cort-mx/expectations/subset1_scalar_core_expected.json"),
+          "--expected-label",
+          "expectations/subset1_scalar_core_expected.json"
+        ],
+        cd: repo_root,
+        expect_exit: 0
+      )
+
+    ensure_contains!(output, "- blockers: 0")
+    ensure_contains!(output, "- warnings: 0")
+  end
+
+  defp subset0_compare_check!(repo_root) do
+    output =
+      run_cmd!(
+        Path.join(repo_root, "tools/run_elixir.sh"),
+        [
+          Path.join(repo_root, "tools/compare_subset0_json.exs"),
+          "--fx-json",
+          Path.join(repo_root, "tools/fixtures/subset0_public_compare_fx_sample.json"),
+          "--mx-json",
+          Path.join(repo_root, "tools/fixtures/subset0_public_compare_mx_sample.json")
+        ],
+        cd: repo_root,
+        expect_exit: 0
+      )
+
+    ensure_contains!(output, "- blockers: 0")
+    ensure_contains!(output, "- warnings: 0")
+    ensure_contains!(output, "allocator_singleton_retain_identity")
+  end
+
+  defp subset1_compare_check!(repo_root) do
+    output =
+      run_cmd!(
+        Path.join(repo_root, "tools/run_elixir.sh"),
+        [
+          Path.join(repo_root, "tools/compare_subset1_scalar_core_json.exs"),
+          "--fx-json",
+          Path.join(repo_root, "tools/fixtures/subset1_scalar_core_compare_fx_sample.json"),
+          "--mx-json",
+          Path.join(repo_root, "tools/fixtures/subset1_scalar_core_compare_mx_sample.json")
+        ],
+        cd: repo_root,
+        expect_exit: 0
+      )
+
+    ensure_contains!(output, "- blockers: 0")
+    ensure_contains!(output, "- warnings: 1")
+    ensure_contains!(output, "`cfnumber_cross_type_equality` | warning")
+  end
+
+  defp subset0_mx_suite_check!(repo_root, artifacts_root) do
+    run_dir = Path.join([artifacts_root, "cort-mx", "runs", "subset0-mx-suite"])
+    summary_path = Path.join(run_dir, "summary.md")
+    runtime_summary_path = Path.join([run_dir, "runtime-ownership", "summary.md"])
+    runtime_json_path = Path.join([run_dir, "runtime-ownership", "out", "subset0_runtime_ownership.json"])
+    allocator_summary_path = Path.join([run_dir, "public-allocator-compare", "summary.md"])
+    allocator_json_path = Path.join([run_dir, "public-allocator-compare", "out", "subset0_public_compare_mx.json"])
+    allocator_report_path = Path.join([run_dir, "public-allocator-compare", "out", "subset0_public_compare_report.md"])
+
+    run_cmd!(
+      Path.join(repo_root, "cort-mx/scripts/run_subset0_suite.sh"),
+      [],
+      cd: Path.join(repo_root, "cort-mx"),
+      env: [
+        {"CORT_ARTIFACTS_ROOT", artifacts_root},
+        {"FX_JSON", Path.join(repo_root, "tools/fixtures/subset0_public_compare_fx_sample.json")}
+      ],
+      expect_exit: 0
+    )
+
+    for path <- [
+          summary_path,
+          runtime_summary_path,
+          runtime_json_path,
+          allocator_summary_path,
+          allocator_json_path,
+          allocator_report_path
+        ] do
+      unless File.exists?(path) do
+        raise RuntimeError, "missing MX subset0 suite output at #{path}"
+      end
+    end
+
+    ensure_contains!(File.read!(summary_path), "- runtime-ownership exit status: `0`")
+    ensure_contains!(File.read!(summary_path), "- public-allocator-compare exit status: `0`")
+    ensure_contains!(File.read!(runtime_summary_path), "- blockers: 0")
+    ensure_contains!(File.read!(runtime_summary_path), "- warnings: 0")
+    ensure_contains!(File.read!(allocator_summary_path), "- blockers: 0")
+    ensure_contains!(File.read!(allocator_summary_path), "- warnings: 0")
+  end
+
+  defp subset1_mx_scalar_core_check!(repo_root, artifacts_root) do
+    run_dir = Path.join([artifacts_root, "cort-mx", "runs", "subset1-mx-scalar-core"])
+    summary_path = Path.join(run_dir, "summary.md")
+    json_path = Path.join([run_dir, "out", "subset1_scalar_core.json"])
+    stderr_path = Path.join([run_dir, "out", "report.stderr"])
+
+    run_cmd!(
+      Path.join(repo_root, "cort-mx/scripts/run_subset1_scalar_core.sh"),
+      [],
+      cd: Path.join(repo_root, "cort-mx"),
+      env: [{"CORT_ARTIFACTS_ROOT", artifacts_root}],
+      expect_exit: 0
+    )
+
+    for path <- [summary_path, json_path, stderr_path] do
+      unless File.exists?(path) do
+        raise RuntimeError, "missing MX subset1 scalar-core output at #{path}"
+      end
+    end
+
+    ensure_contains!(File.read!(summary_path), "- blockers: 0")
+    ensure_contains!(File.read!(summary_path), "- warnings: 0")
+    ensure_empty_or_whitespace!(File.read!(stderr_path), stderr_path)
+  end
+
+  defp subset1_make_compare_check!(repo_root, artifacts_root) do
+    report_path = Path.join([artifacts_root, "cort-fx", "build", "out", "subset1_scalar_core_fx_vs_mx_report.md"])
+
+    output =
+      run_cmd!(
+        "make",
+        [
+          "compare-subset1a-with-mx",
+          "FX_SCALAR_JSON=#{Path.join(repo_root, "tools/fixtures/subset1_scalar_core_compare_fx_sample.json")}",
+          "MX_JSON=#{Path.join(repo_root, "tools/fixtures/subset1_scalar_core_compare_mx_sample.json")}"
+        ],
+        cd: Path.join(repo_root, "cort-fx"),
+        env: [{"CORT_ARTIFACTS_ROOT", artifacts_root}],
+        expect_exit: 0
+      )
+
+    unless File.exists?(report_path) do
+      raise RuntimeError, "missing compare report at #{report_path}"
+    end
+
+    ensure_contains!(output, "- warnings: 1")
+    ensure_contains!(File.read!(report_path), "`cfnumber_cross_type_equality` | warning")
+  end
+
+  defp subset1_compare_artifact_check!(repo_root, artifacts_root) do
+    run_dir = Path.join([artifacts_root, "cort-fx", "runs", "subset1a-fx-vs-mx"])
+    summary_path = Path.join(run_dir, "summary.md")
+    stderr_path = Path.join([run_dir, "out", "compare.stderr"])
+
+    run_cmd!(
+      "make",
+      [
+        "artifact-subset1a-compare",
+        "FX_SCALAR_JSON=#{Path.join(repo_root, "tools/fixtures/subset1_scalar_core_compare_fx_sample.json")}",
+        "MX_JSON=#{Path.join(repo_root, "tools/fixtures/subset1_scalar_core_compare_mx_sample.json")}"
+      ],
+      cd: Path.join(repo_root, "cort-fx"),
+      env: [{"CORT_ARTIFACTS_ROOT", artifacts_root}],
+      expect_exit: 0
+    )
+
+    for path <- [
+          summary_path,
+          Path.join(run_dir, "commands.txt"),
+          Path.join(run_dir, "host.txt"),
+          Path.join(run_dir, "toolchain.txt"),
+          Path.join([run_dir, "out", "subset1_scalar_core_fx.json"]),
+          Path.join([run_dir, "out", "subset1_scalar_core_mx.json"]),
+          Path.join([run_dir, "out", "subset1a_fx_vs_mx_report.md"]),
+          Path.join(run_dir, "sha256.txt")
+        ] do
+      unless File.exists?(path) do
+        raise RuntimeError, "missing compare artifact output at #{path}"
+      end
+    end
+
+    ensure_contains!(File.read!(summary_path), "- warnings: 1")
+    ensure_empty_or_whitespace!(File.read!(stderr_path), stderr_path)
+  end
+
+  defp run_cmd!(command, args, opts) do
+    cd = Keyword.fetch!(opts, :cd)
+    env = Keyword.get(opts, :env, [])
+    expected_exit = Keyword.get(opts, :expect_exit, 0)
+
+    {output, status} =
+      System.cmd(command, args,
+        cd: cd,
+        env: env,
+        stderr_to_stdout: true
+      )
+
+    if status != expected_exit do
+      raise RuntimeError,
+            "command failed (exit #{status}): #{command} #{Enum.join(args, " ")}\n#{output}"
+    end
+
+    output
+  end
+
+  defp ensure_contains!(text, snippet) do
+    unless String.contains?(text, snippet) do
+      raise RuntimeError, "expected output to contain #{inspect(snippet)}\n#{text}"
+    end
+  end
+
+  defp ensure_empty_or_whitespace!(text, path) do
+    unless String.trim(text) == "" do
+      raise RuntimeError, "expected #{path} to be empty, got:\n#{text}"
+    end
+  end
+
+  defp maybe_print_host_note(host_os) do
+    unless darwin_host?(host_os) do
+      IO.puts("note: skipping macOS-only MX script checks on #{host_label(host_os)}")
+    end
+  end
+
+  defp darwin_host?(host_os), do: host_os == {:unix, :darwin}
+
+  defp host_label({family, name}), do: "#{family}/#{name}"
+end
+
+WorkflowSelfcheck.main(System.argv())

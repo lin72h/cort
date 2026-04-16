@@ -121,7 +121,7 @@ Exit status:
 
 ## Local Validation Status
 
-Validated locally on the FX host:
+Portable checks covered by `../tools/run_elixir.sh ../tools/workflow_selfcheck.exs`:
 
 - shell syntax for all scripts with `sh -n`
 - Elixir syntax for the reporters with `elixir`
@@ -129,15 +129,18 @@ Validated locally on the FX host:
   `fixtures/subset0_runtime_ownership_sample.json`
 - generic manifest reporter behavior against
   `fixtures/subset1_scalar_core_sample.json`
-- Subset 0 FX-vs-MX compare behavior against preserved local artifacts
+- Subset 0 FX-vs-MX compare behavior against sample JSON fixtures
 - Subset 1A FX-vs-MX compare behavior against sample JSON fixtures
+- FX-side Subset 1A compare wrappers against preserved sample artifacts
 
-Not validated locally on the FX host:
+Additional checks performed by the same selfcheck on Darwin hosts:
 
-- actual compilation against native macOS CoreFoundation
-- actual MX run directories and hashes
+- actual `scripts/run_subset0_suite.sh` execution under a temporary artifact root
+- actual `scripts/run_subset1_scalar_core.sh` execution under a temporary
+  artifact root
+- preservation of MX run directories, summaries, and hashes
 
-Those still require a real macOS run.
+On non-Darwin hosts, the selfcheck skips those macOS-only MX script checks.
 
 ## Subset 1A Scalar Core
 
