@@ -6,6 +6,7 @@ INSTALL ?= install
 STRICT_CFLAGS := -std=c11 -Wall -Wextra -Werror -pedantic -pthread -fvisibility=hidden
 CPPFLAGS += -Iinclude
 LDFLAGS +=
+HOST_UNAME_S := $(shell uname -s 2>/dev/null || printf Unknown)
 PREFIX ?= /usr/local
 DESTDIR ?=
 CORT_ARTIFACTS_ROOT ?= ../../wip-cort-gpt-artifacts
@@ -56,17 +57,20 @@ INSTALL_DOC_DIR := $(DESTDIR)$(PREFIX)/share/doc/cort-fx
 all: $(LIB) $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY)
 
 check-deps: $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY) $(LIB)
-	@for bin in $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY); do \
-		if command -v ldd >/dev/null 2>&1; then \
-			deps=$$(ldd "$$bin" 2>/dev/null || true); \
-		elif command -v otool >/dev/null 2>&1; then \
-			deps=$$(otool -L "$$bin" | sed '1d' | awk '{print $$1}'); \
+	@set -eu; \
+	for file in $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY); do \
+		if [ "$(HOST_UNAME_S)" = "Darwin" ]; then \
+			if otool -L "$$file" | sed '1d' | rg -q 'dispatch|swift|objc|icu|CoreFoundation'; then \
+				echo "forbidden dynamic dependency detected in $$file"; \
+				exit 1; \
+			fi; \
+		elif command -v ldd >/dev/null 2>&1; then \
+			if ldd "$$file" | rg -q 'dispatch|swift|objc|icu|CoreFoundation'; then \
+				echo "forbidden dynamic dependency detected in $$file"; \
+				exit 1; \
+			fi; \
 		else \
-			echo "no supported dependency inspection tool found"; \
-			exit 1; \
-		fi; \
-		if printf '%s\n' "$$deps" | rg -q 'dispatch|swift|objc|icu|CoreFoundation'; then \
-			echo "forbidden dynamic dependency detected in $$bin"; \
+			echo "no supported dynamic dependency tool for $(HOST_UNAME_S)"; \
 			exit 1; \
 		fi; \
 	done
@@ -76,12 +80,12 @@ check-deps: $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(SMOKE_BI
 	fi
 
 $(EXPORTS_ACTUAL): $(LIB)
-	mkdir -p $(BUILD_DIR)
-	@platform=$$(uname -s); \
-	if [ "$$platform" = "Darwin" ]; then \
-		nm -g $(LIB) | awk '$$2 ~ /^[TDRS]$$/ { print $$NF }' | sed 's/^_//' | rg -v '^_FXCF' | sort -u > $(EXPORTS_ACTUAL); \
+	@mkdir -p $(BUILD_DIR)
+	@set -eu; \
+	if [ "$(HOST_UNAME_S)" = "Darwin" ]; then \
+		nm -gUj $(LIB) | sed 's/^_//' | rg -v '(^$$|:$$|^_FXCF)' | sort -u > $(EXPORTS_ACTUAL); \
 	else \
-		nm -g $(LIB) | awk '$$2 ~ /^[TDRS]$$/ { print $$NF }' | rg -v '^_FXCF' | sort -u > $(EXPORTS_ACTUAL); \
+		nm -g $(LIB) | awk '$$2 ~ /^[TDRS]$$/ { print $$3 }' | rg -v '^_FXCF' | sort -u > $(EXPORTS_ACTUAL); \
 	fi
 
 check-exports: $(EXPORTS_ACTUAL) $(EXPORTS_EXPECTED)

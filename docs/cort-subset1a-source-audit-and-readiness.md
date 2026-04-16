@@ -3,7 +3,7 @@
 Date: 2026-04-16
 
 Status: source audit complete; MX gate satisfied; local FX scalar
-implementation now exists.
+implementation now exists; host-aware FX verification now passes on Darwin.
 
 This document is the extraction and implementation-readiness note for CORT
 Subset 1A: immutable scalar core without `CFString`.
@@ -346,8 +346,8 @@ Current readiness note:
 
 - the FX-vs-MX Subset 1A comparison wrapper and compare-artifact packaging are
   now wired in the repo
-- what remains pending is the actual FX-emitted
-  `subset1_scalar_core_fx.json` from a real scalar implementation
+- the actual FX-emitted `subset1_scalar_core_fx.json` is now published in-repo
+- the shared FX artifact compare against fresh MX evidence is clean
 
 Stop and request review if MX shows that required 1A behavior depends on
 `CFString`, ObjC bridging, Swift runtime dispatch, ICU, mutable containers, or

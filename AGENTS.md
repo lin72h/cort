@@ -14,6 +14,15 @@ agent work:
 - Use that communication path deliberately: prefer narrow handoff files or
   shared artifacts, and do not commit large build trees or unrelated generated
   output.
+- If the user says `do a clean pull`, treat that as an operational instruction
+  to fully normalize the repo update flow:
+  - try `git pull` first when it can apply cleanly
+  - if local changes block the update, run `git pull --rebase --autostash`
+  - resolve any autostash conflicts
+  - pop or drop any remaining stash entries created by the interrupted
+    pull/rebase flow
+  - leave the repo in a normal post-pull state, not mid-merge, and report what
+    local modifications remain
 
 Any remaining Python workflow code should be treated as transitional and should
 be removed rather than expanded.

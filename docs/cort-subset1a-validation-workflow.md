@@ -27,6 +27,11 @@ MX status:
 - `subset1_scalar_core` completed with `0` blockers and `0` warnings
 - artifact path:
   `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json`
+- MX suite now preserves a dedicated shared-artifact compare run under:
+  `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-suite/`
+- latest shared-artifact compare result: `0` blockers, `0` warnings
+- latest compare report path:
+  `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-suite/scalar-core-compare/out/subset1a_fx_vs_mx_report.md`
 
 FX status:
 
@@ -34,6 +39,8 @@ FX status:
 - `make test` passes
 - local FX probe emits:
   `../wip-cort-gpt-artifacts/cort-fx/build/out/subset1_scalar_core_fx.json`
+- shared FX handoff artifact is published in repo at:
+  `/Users/me/wip-launchx/wip-cort-gpt/subset1_scalar_core_fx.json`
 
 ## Local FX Build And Probe
 
@@ -57,13 +64,8 @@ Primary FX outputs:
 - `../wip-cort-gpt-artifacts/cort-fx/build/out/subset1_scalar_core_fx.json`
 - `../wip-cort-gpt-artifacts/cort-fx/build/subset1a-exported-symbols.txt`
 
-Shared handoff artifact:
-
-- repo-local copy at
-  `/Users/me/wip-launchx/wip-cort-gpt/subset1_scalar_core_fx.json`
-
-Use the repo-local copy when MX should consume the same preserved FX probe
-result without regenerating it locally.
+The repo-local copy is the preferred MX input when coordinating a shared
+compare without regenerating the FX probe locally.
 
 ## MX Run
 
@@ -98,9 +100,50 @@ Observed MX result:
 - `hash_primary == hash_same_value == hash_different_value` for the tested
   `42` row
 
-## FX vs MX Comparison
+## MX Compare Run
 
-Compare the emitted FX JSON against the MX JSON with:
+Compare the shared FX JSON against the MX JSON with:
+
+```sh
+cd /Users/me/wip-launchx/wip-cort-gpt/cort-mx
+scripts/run_subset1_scalar_core_compare.sh
+```
+
+Default inputs:
+
+- FX JSON: `../subset1_scalar_core_fx.json`
+- MX JSON:
+  `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json`
+
+Default output:
+
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core-compare/summary.md`
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core-compare/out/subset1a_fx_vs_mx_report.md`
+
+## MX Suite
+
+Run the full MX Subset 1A suite with:
+
+```sh
+cd /Users/me/wip-launchx/wip-cort-gpt/cort-mx
+scripts/run_subset1_suite.sh
+```
+
+Default output:
+
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-suite/summary.md`
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-suite/scalar-core/summary.md`
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-suite/scalar-core/out/subset1_scalar_core.json`
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-suite/scalar-core-compare/summary.md`
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-suite/scalar-core-compare/out/subset1a_fx_vs_mx_report.md`
+
+This is the preferred coordination path on MX now that `subset1_scalar_core_fx.json`
+is published in-repo. The suite reruns the MX probe and compares the fresh MX
+JSON against the shared FX artifact by default.
+
+## Direct And FX-Side Comparison
+
+Manual compare surfaces still exist when needed:
 
 - `tools/compare_subset1_scalar_core_json.exs`
 - `cd cort-fx && make compare-subset1a-with-mx ...`
@@ -115,7 +158,7 @@ Direct invocation:
   --output /path/to/subset1_scalar_core_fx_vs_mx_report.md
 ```
 
-Current FX wrapper:
+FX wrapper:
 
 ```sh
 cd /Users/me/wip-launchx/wip-cort-gpt/cort-fx
@@ -123,7 +166,7 @@ make compare-subset1a-with-mx \
   MX_JSON=/Users/me/wip-launchx/wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json
 ```
 
-To preserve a dedicated compare handoff run:
+To preserve a dedicated FX-owned compare handoff run:
 
 ```sh
 cd /Users/me/wip-launchx/wip-cort-gpt/cort-fx
@@ -186,10 +229,14 @@ What it covers:
 
 - the Subset 1A manifest reporter against sample JSON
 - the Subset 1A FX-vs-MX compare tool against sample JSON fixtures
+- the MX Subset 1A compare artifact wrapper against sample JSON fixtures
+- the FX `make clean test` target, including dependency/export audits and the
+  current wrong-type abort surface
 - the FX wrapper commands `make compare-subset1a-with-mx` and
   `make artifact-subset1a-compare`
 - on Darwin hosts only, actual execution of
-  `cort-mx/scripts/run_subset1_scalar_core.sh` under a temporary artifact root
+  `cort-mx/scripts/run_subset1_scalar_core.sh` and
+  `cort-mx/scripts/run_subset1_suite.sh` under a temporary artifact root
 
 On non-Darwin hosts, the selfcheck still validates the portable compare/report
 surface and skips the native MX probe run.
@@ -197,8 +244,7 @@ surface and skips the native MX probe run.
 ## Recommended Order
 
 1. Run `make clean test` on FX.
-2. Run `make compare-subset1a-fx` on FX.
-3. Run `scripts/run_subset1_scalar_core.sh` on MX.
-4. Compare FX and MX JSON with `make compare-subset1a-with-mx`.
-5. Record any blocker or warning in the Subset 1A contract ledger.
-6. Only then decide whether Subset 1A is ready to support the next slice.
+2. Publish or refresh the shared FX JSON at `subset1_scalar_core_fx.json`.
+3. Run `scripts/run_subset1_suite.sh` on MX.
+4. Record any blocker or warning in the Subset 1A contract ledger.
+5. Only then decide whether Subset 1A is ready to support the next slice.

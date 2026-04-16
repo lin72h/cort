@@ -125,6 +125,9 @@ What they enforce:
 - public exported symbol set matches `exports/subset1a-exported-symbols.txt`
 - abort-on-misuse policy remains enforced for invalid public calls and
   ownership failures
+- dependency/export audits are normalized across Darwin and `ldd`-based hosts
+- wrong-type abort coverage includes `CFDataCreateCopy`, `CFDataGetBytePtr`,
+  `CFNumberGetType`, `CFEqual`, and `CFHash`
 - installed headers and static library are usable by a standalone C consumer
 - shared allocator comparison harness emits
   `../wip-cort-gpt-artifacts/cort-fx/build/out/subset0_public_compare_fx.json`
@@ -134,8 +137,8 @@ What they enforce:
   dedicated handoff artifact run
 - artifact-run packaging emits a preservable FX run directory under
   `../wip-cort-gpt-artifacts/cort-fx/runs/`
-- repo workflow selfcheck can validate the compare/report tooling from fixtures
-  with `../tools/run_elixir.sh ../tools/workflow_selfcheck.exs`
+- repo workflow selfcheck can validate the compare/report tooling and the FX
+  `make clean test` target with `../tools/run_elixir.sh ../tools/workflow_selfcheck.exs`
 - when that selfcheck runs on Darwin, it also executes the real MX Subset 0
   and Subset 1A scripts under a temporary artifact root
 

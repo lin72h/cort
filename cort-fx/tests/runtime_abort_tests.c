@@ -166,7 +166,6 @@ static void case_number_get_type_non_number(void) {
     struct TestObject *object = create_abort_test_object("AbortNonNumberType");
     (void)CFNumberGetType((CFNumberRef)object);
 }
-
 static void case_number_get_value_non_number(void) {
     struct TestObject *object = create_abort_test_object("AbortNonNumber");
     SInt32 value = 0;
@@ -182,10 +181,18 @@ static void case_cfequal_null(void) {
     (void)CFEqual(NULL, (CFTypeRef)kCFBooleanTrue);
 }
 
+static void case_cfequal_non_cort_same_pointer(void) {
+    int value = 0;
+    (void)CFEqual((CFTypeRef)&value, (CFTypeRef)&value);
+}
 static void case_cfhash_null(void) {
     (void)CFHash(NULL);
 }
 
+static void case_cfhash_non_cort(void) {
+    int value = 0;
+    (void)CFHash((CFTypeRef)&value);
+}
 static void case_double_release_detected(void) {
     struct NoFreeAllocatorStats stats;
     memset(&stats, 0, sizeof(stats));
@@ -240,11 +247,13 @@ int main(void) {
     expect_abort(case_data_get_length_non_data, "CFDataGetLength(non-data)");
     expect_abort(case_data_create_copy_non_data, "CFDataCreateCopy(non-data)");
     expect_abort(case_data_get_byte_ptr_non_data, "CFDataGetBytePtr(non-data)");
-    expect_abort(case_number_get_type_non_number, "CFNumberGetType(non-number)");
     expect_abort(case_number_get_value_non_number, "CFNumberGetValue(non-number)");
+    expect_abort(case_number_get_type_non_number, "CFNumberGetType(non-number)");
     expect_abort(case_date_get_absolute_time_non_date, "CFDateGetAbsoluteTime(non-date)");
     expect_abort(case_cfequal_null, "CFEqual(NULL, object)");
     expect_abort(case_cfhash_null, "CFHash(NULL)");
+    expect_abort(case_cfequal_non_cort_same_pointer, "CFEqual(non-CORT same pointer)");
+    expect_abort(case_cfhash_non_cort, "CFHash(non-CORT)");
     expect_abort(case_double_release_detected, "double release");
     expect_abort(case_retain_in_finalize_aborts, "CFRetain during finalization");
 

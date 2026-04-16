@@ -200,7 +200,8 @@ CFTypeID CFGetTypeID(CFTypeRef cf) {
     CFRuntimeBase *base = _FXCFBaseFromRef(cf);
     uint64_t info = atomic_load_explicit(&base->_cfinfoa, memory_order_acquire);
     CFTypeID typeID = _FXCFTypeIDFromInfo(info);
-    if (__FXCFClassForTypeID(typeID) == NULL) {
+    const CFRuntimeClass *cls = __FXCFClassForTypeID(typeID);
+    if (cls == NULL || _FXCFClassFromBase(base) != cls) {
         _FXCFAbort("CFGetTypeID called with non-CORT object");
     }
     return typeID;
@@ -210,12 +211,12 @@ Boolean CFEqual(CFTypeRef cf1, CFTypeRef cf2) {
     if (cf1 == NULL || cf2 == NULL) {
         _FXCFAbort("CFEqual called with NULL");
     }
-    if (cf1 == cf2) {
-        return true;
-    }
 
     CFTypeID typeID1 = CFGetTypeID(cf1);
     CFTypeID typeID2 = CFGetTypeID(cf2);
+    if (cf1 == cf2) {
+        return true;
+    }
     if (typeID1 != typeID2) {
         return false;
     }

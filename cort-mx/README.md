@@ -24,6 +24,8 @@ Subset 1A:
 
 - `src/cort_mx_subset1_scalar_core.c`
 - `scripts/run_subset1_scalar_core.sh`
+- `scripts/run_subset1_scalar_core_compare.sh`
+- `scripts/run_subset1_suite.sh`
 - `expectations/subset1_scalar_core_expected.json`
 - `fixtures/subset1_scalar_core_sample.json`
 
@@ -141,6 +143,7 @@ Portable checks covered by `../tools/run_elixir.sh ../tools/workflow_selfcheck.e
 - Subset 0 FX-vs-MX compare behavior against sample JSON fixtures
 - Subset 1A FX-vs-MX compare behavior against sample JSON fixtures
 - Subset 1B FX-vs-MX compare behavior against sample JSON fixtures
+- MX-side Subset 1A compare artifact wrapper against preserved sample artifacts
 - FX-side Subset 1A compare wrappers against preserved sample artifacts
 
 Additional checks performed by the same selfcheck on Darwin hosts:
@@ -148,6 +151,8 @@ Additional checks performed by the same selfcheck on Darwin hosts:
 - actual `scripts/run_subset0_suite.sh` execution under a temporary artifact root
 - actual `scripts/run_subset1_scalar_core.sh` execution under a temporary
   artifact root
+- actual `scripts/run_subset1_suite.sh` execution under a temporary artifact
+  root with the shared repo-local FX JSON
 - actual `scripts/run_subset1b_cfstring_core.sh` execution under a temporary
   artifact root
 - preservation of MX run directories, summaries, and hashes
@@ -175,7 +180,38 @@ Default output:
 
 - `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/`
 
-When FX emits a Subset 1A JSON artifact, compare it against MX with:
+Compare the shared FX artifact against an MX scalar-core JSON with:
+
+```sh
+cd cort-mx
+scripts/run_subset1_scalar_core_compare.sh
+```
+
+Default output:
+
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core-compare/`
+
+This defaults to:
+
+- FX JSON: `../subset1_scalar_core_fx.json`
+- MX JSON:
+  `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json`
+
+Run the full MX Subset 1A suite with:
+
+```sh
+cd cort-mx
+scripts/run_subset1_suite.sh
+```
+
+Default output:
+
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-suite/`
+
+This reruns the MX scalar-core probe and then compares the fresh MX JSON
+against the shared repo-local `subset1_scalar_core_fx.json`.
+
+Direct compare invocation is still available with:
 
 ```sh
 cd ..
