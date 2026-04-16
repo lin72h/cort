@@ -2,8 +2,8 @@
 
 Date: 2026-04-16
 
-Status: source audit complete; FX scalar implementation remains blocked on MX
-Subset 1A artifacts.
+Status: source audit complete; MX gate satisfied; local FX scalar
+implementation now exists.
 
 This document is the extraction and implementation-readiness note for CORT
 Subset 1A: immutable scalar core without `CFString`.
@@ -315,15 +315,21 @@ Abort/failure tests to consider after MX classification:
 
 ## Implementation Start Gate
 
-Do not start FX Subset 1A scalar code until MX provides:
+This gate is now satisfied. MX provided:
 
 - `subset1_scalar_core.json`
 - `summary.md`
 - blocker/warning count from the Elixir manifest reporter
 - explicit classification for `cfnumber_cross_type_equality`
 
-If MX returns zero blocker failures, the first FX implementation slice should
-be:
+Observed gate result:
+
+- blockers: `0`
+- warnings: `0`
+- `cfnumber_cross_type_equality` observed equal for tested `42` integer/float
+  forms on MX
+
+The executed first FX implementation slice is:
 
 1. add `CFEqual` and `CFHash` to the existing runtime base
 2. add minimal scalar headers and export snapshot

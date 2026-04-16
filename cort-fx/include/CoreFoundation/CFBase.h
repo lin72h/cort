@@ -120,6 +120,8 @@ CF_EXPORT CFIndex CFAllocatorGetPreferredSizeForSize(CFAllocatorRef allocator, C
 CF_EXPORT void CFAllocatorGetContext(CFAllocatorRef allocator, CFAllocatorContext *context);
 
 CF_EXPORT CFTypeID CFGetTypeID(CFTypeRef cf);
+CF_EXPORT Boolean CFEqual(CFTypeRef cf1, CFTypeRef cf2);
+CF_EXPORT CFHashCode CFHash(CFTypeRef cf);
 CF_EXPORT CFTypeRef CFRetain(CFTypeRef cf);
 CF_EXPORT void CFRelease(CFTypeRef cf);
 CF_EXPORT CFIndex CFGetRetainCount(CFTypeRef cf);

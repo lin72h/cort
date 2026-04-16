@@ -128,6 +128,41 @@ static void case_allocator_get_context_non_allocator(void) {
     CFAllocatorGetContext((CFAllocatorRef)object, &context);
 }
 
+static struct TestObject *create_abort_test_object(const char *name) {
+    CFTypeID typeID = register_test_type(name, NULL);
+    struct TestObject *object = (struct TestObject *)_CFRuntimeCreateInstance(
+        kCFAllocatorSystemDefault,
+        typeID,
+        (CFIndex)(sizeof(struct TestObject) - sizeof(CFRuntimeBase)),
+        NULL
+    );
+    if (object == NULL) {
+        fail("abort test object allocation failed");
+    }
+    return object;
+}
+
+static void case_boolean_get_value_non_boolean(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonBoolean");
+    (void)CFBooleanGetValue((CFBooleanRef)object);
+}
+
+static void case_data_get_length_non_data(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonData");
+    (void)CFDataGetLength((CFDataRef)object);
+}
+
+static void case_number_get_value_non_number(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonNumber");
+    SInt32 value = 0;
+    (void)CFNumberGetValue((CFNumberRef)object, kCFNumberSInt32Type, &value);
+}
+
+static void case_date_get_absolute_time_non_date(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonDate");
+    (void)CFDateGetAbsoluteTime((CFDateRef)object);
+}
+
 static void case_double_release_detected(void) {
     struct NoFreeAllocatorStats stats;
     memset(&stats, 0, sizeof(stats));
@@ -178,6 +213,10 @@ int main(void) {
     expect_abort(case_cfrelease_null, "CFRelease(NULL)");
     expect_abort(case_cfretain_null, "CFRetain(NULL)");
     expect_abort(case_allocator_get_context_non_allocator, "CFAllocatorGetContext(non-allocator)");
+    expect_abort(case_boolean_get_value_non_boolean, "CFBooleanGetValue(non-boolean)");
+    expect_abort(case_data_get_length_non_data, "CFDataGetLength(non-data)");
+    expect_abort(case_number_get_value_non_number, "CFNumberGetValue(non-number)");
+    expect_abort(case_date_get_absolute_time_non_date, "CFDateGetAbsoluteTime(non-date)");
     expect_abort(case_double_release_detected, "double release");
     expect_abort(case_retain_in_finalize_aborts, "CFRetain during finalization");
 

@@ -94,6 +94,10 @@ static const CFRuntimeClass __CFAllocatorClass = {
     0
 };
 
+const CFRuntimeClass *_FXCFAllocatorClass(void) {
+    return &__CFAllocatorClass;
+}
+
 static struct __CFAllocator __kCFAllocatorSystemDefault = {
     {
         (uintptr_t)&__CFAllocatorClass,

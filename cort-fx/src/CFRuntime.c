@@ -45,7 +45,11 @@ static void __FXCFPublishClass(CFTypeID typeID, const CFRuntimeClass *cls) {
 static void __FXCFInitializeRuntime(void) {
     __FXCFPublishClass(_kCFRuntimeIDNotAType, &__CFNotATypeClass);
     __FXCFPublishClass(_kCFRuntimeIDCFType, &__CFTypeClass);
-    __FXCFPublishClass(_kCFRuntimeIDCFAllocator, _FXCFClassFromBase((const CFRuntimeBase *)kCFAllocatorSystemDefault));
+    __FXCFPublishClass(_kCFRuntimeIDCFAllocator, _FXCFAllocatorClass());
+    __FXCFPublishClass(_kCFRuntimeIDCFBoolean, _FXCFBooleanClass());
+    __FXCFPublishClass(_kCFRuntimeIDCFNumber, _FXCFNumberClass());
+    __FXCFPublishClass(_kCFRuntimeIDCFData, _FXCFDataClass());
+    __FXCFPublishClass(_kCFRuntimeIDCFDate, _FXCFDateClass());
 }
 
 static void __FXCFInitialize(void) {
@@ -200,6 +204,51 @@ CFTypeID CFGetTypeID(CFTypeRef cf) {
         _FXCFAbort("CFGetTypeID called with non-CORT object");
     }
     return typeID;
+}
+
+Boolean CFEqual(CFTypeRef cf1, CFTypeRef cf2) {
+    if (cf1 == NULL || cf2 == NULL) {
+        _FXCFAbort("CFEqual called with NULL");
+    }
+    if (cf1 == cf2) {
+        return true;
+    }
+
+    CFTypeID typeID1 = CFGetTypeID(cf1);
+    CFTypeID typeID2 = CFGetTypeID(cf2);
+    if (typeID1 != typeID2) {
+        return false;
+    }
+
+    const CFRuntimeClass *cls = __FXCFClassForTypeID(typeID1);
+    if (cls == NULL) {
+        _FXCFAbort("CFEqual called with non-CORT object");
+    }
+    if (cls->equal != NULL) {
+        return cls->equal(cf1, cf2);
+    }
+    return false;
+}
+
+CFHashCode CFHash(CFTypeRef cf) {
+    if (cf == NULL) {
+        _FXCFAbort("CFHash called with NULL");
+    }
+
+    CFTypeID typeID = CFGetTypeID(cf);
+    const CFRuntimeClass *cls = __FXCFClassForTypeID(typeID);
+    if (cls == NULL) {
+        _FXCFAbort("CFHash called with non-CORT object");
+    }
+    if (cls->hash != NULL) {
+        return cls->hash(cf);
+    }
+
+    uintptr_t bits = (uintptr_t)cf;
+    bits ^= bits >> 33u;
+    bits *= 0xff51afd7ed558ccdULL;
+    bits ^= bits >> 33u;
+    return (CFHashCode)bits;
 }
 
 CFIndex CFGetRetainCount(CFTypeRef cf) {

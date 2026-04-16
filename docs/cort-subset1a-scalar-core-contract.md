@@ -2,6 +2,9 @@
 
 Date: 2026-04-16
 
+Status: MX validation clean; local FX implementation and FX scalar-core probe
+exist.
+
 This document defines the next narrow semantic slice after validated Subset 0:
 immutable scalar core without `CFString`.
 
@@ -182,17 +185,17 @@ Required interpretation rules:
 
 | Subset | API or behavior | MX observation artifact | FX implementation status | Match level | Known variance | Test name | Migration status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1A | `CFBoolean` singleton identity and value | Pending `subset1_scalar_core` | Not implemented | `semantic` | retain-count numerics diagnostic | `cfboolean_true_singleton`, `cfboolean_false_singleton` | MX pending |
-| 1A | `CFBoolean` equality/hash coherence | Pending | Not implemented | `semantic` | raw hash numerics diagnostic | `cfboolean_equality_hash` | MX pending |
-| 1A | `CFData` length/bytes/equality/hash | Pending | Not implemented | `semantic` | raw hash numerics diagnostic | `cfdata_value_roundtrip` | MX pending |
-| 1A | `CFNumber` `SInt32` roundtrip/equality/hash | Pending | Not implemented | `semantic` | raw hash numerics diagnostic | `cfnumber_sint32_roundtrip` | MX pending |
-| 1A | `CFNumber` `Float64` roundtrip/equality/hash | Pending | Not implemented | `semantic` | raw hash numerics diagnostic | `cfnumber_float64_roundtrip` | MX pending |
-| 1A | `CFNumber` cross-type equality observation | Pending | Not implemented | `semantic` | may remain semantic-only | `cfnumber_cross_type_equality` | MX pending |
-| 1A | `CFDate` absolute-time roundtrip/equality/hash | Pending | Not implemented | `semantic` | raw hash numerics diagnostic | `cfdate_absolute_time_roundtrip` | MX pending |
+| 1A | `CFBoolean` singleton identity and value | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json` | Implemented locally in `cort-fx`; FX probe emits `../wip-cort-gpt-artifacts/cort-fx/build/out/subset1_scalar_core_fx.json` | `semantic` | retain-count numerics diagnostic | `cfboolean_true_singleton`, `cfboolean_false_singleton` | FX local done; FX-vs-MX compare pending |
+| 1A | `CFBoolean` equality/hash coherence | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json` | Implemented locally | `semantic` | raw hash numerics diagnostic | `cfboolean_equality_hash` | FX local done; FX-vs-MX compare pending |
+| 1A | `CFData` length/bytes/equality/hash | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json` | Implemented locally | `semantic` | raw hash numerics diagnostic | `cfdata_value_roundtrip` | FX local done; FX-vs-MX compare pending |
+| 1A | `CFNumber` `SInt32` roundtrip/equality/hash | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json` | Implemented locally | `semantic` | raw hash numerics diagnostic | `cfnumber_sint32_roundtrip` | FX local done; FX-vs-MX compare pending |
+| 1A | `CFNumber` `Float64` roundtrip/equality/hash | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json` | Implemented locally | `semantic` | raw hash numerics diagnostic | `cfnumber_float64_roundtrip` | FX local done; FX-vs-MX compare pending |
+| 1A | `CFNumber` cross-type equality observation | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json` | Implemented locally to match observed `42` integer/float equality on tested forms | `semantic` | remains semantic-only until broader MX classification | `cfnumber_cross_type_equality` | FX local done; FX-vs-MX compare pending |
+| 1A | `CFDate` absolute-time roundtrip/equality/hash | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json` | Implemented locally | `semantic` | raw hash numerics diagnostic | `cfdate_absolute_time_roundtrip` | FX local done; FX-vs-MX compare pending |
 | 1B | minimal `CFString` for bplist/key paths | Not started | Not implemented | `unknown` | dedicated slice required | Deferred | Not ready |
 
-No FX Subset 1 implementation should begin until the 1A MX run artifacts exist
-and the required rows above are classified against them.
+The MX gate for local FX Subset 1A implementation is now satisfied. The next
+gate is FX-vs-MX comparison on the emitted FX JSON artifact.
 
 ## MX Probe Assets
 
@@ -240,7 +243,7 @@ Default output:
 
 ## Exit Gate
 
-Subset 1A is ready for FX implementation planning only when:
+Subset 1A is ready for FX-vs-MX semantic comparison when:
 
 - MX run artifacts exist
 - the report has no blocker probe failures
@@ -248,3 +251,7 @@ Subset 1A is ready for FX implementation planning only when:
 - any semantic-only `CFNumber` cross-type behavior is classified explicitly
 - `CFString` remains deferred to a dedicated 1B contract instead of leaking back
   into 1A
+
+The FX local implementation now satisfies that gate and emits:
+
+- `../wip-cort-gpt-artifacts/cort-fx/build/out/subset1_scalar_core_fx.json`

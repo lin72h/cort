@@ -62,6 +62,35 @@ int main(void) {
         fail("retain must return the same pointer");
     }
 
+    {
+        static const UInt8 bytes[] = {0x10u, 0x20u, 0x30u};
+        SInt32 value = 42;
+        double when = 1234.5;
+        CFDataRef data = CFDataCreate(kCFAllocatorSystemDefault, bytes, (CFIndex)sizeof(bytes));
+        CFNumberRef number = CFNumberCreate(kCFAllocatorSystemDefault, kCFNumberSInt32Type, &value);
+        CFDateRef date = CFDateCreate(kCFAllocatorSystemDefault, when);
+
+        if (data == NULL || number == NULL || date == NULL) {
+            fail("scalar create failed");
+        }
+        if (!CFBooleanGetValue(kCFBooleanTrue)) {
+            fail("boolean getter failed");
+        }
+        if (CFDataGetLength(data) != (CFIndex)sizeof(bytes)) {
+            fail("data length mismatch");
+        }
+        if (CFNumberGetType(number) != kCFNumberSInt32Type) {
+            fail("number type mismatch");
+        }
+        if (CFDateGetAbsoluteTime(date) != when) {
+            fail("date roundtrip mismatch");
+        }
+
+        CFRelease((CFTypeRef)date);
+        CFRelease((CFTypeRef)number);
+        CFRelease((CFTypeRef)data);
+    }
+
     CFRelease((CFTypeRef)object);
     CFRelease((CFTypeRef)object);
 

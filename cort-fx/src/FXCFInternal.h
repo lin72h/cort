@@ -18,6 +18,10 @@ enum {
     _kCFRuntimeIDNotAType = 0,
     _kCFRuntimeIDCFType = 1,
     _kCFRuntimeIDCFAllocator = 2,
+    _kCFRuntimeIDCFBoolean = 3,
+    _kCFRuntimeIDCFNumber = 4,
+    _kCFRuntimeIDCFData = 5,
+    _kCFRuntimeIDCFDate = 6,
     _kCFRuntimeStartingClassID = 16
 };
 
@@ -43,6 +47,13 @@ static inline uint32_t _FXCFRetainCountFromInfo(uint64_t info);
 static inline Boolean _FXCFInfoIsImmortal(uint64_t info);
 static inline Boolean _FXCFAllocatorIsSystemDefault(CFAllocatorRef allocator);
 static inline Boolean _FXCFAllocatorRespectsHintZero(CFAllocatorRef allocator);
+static inline void _FXCFValidateType(CFTypeRef cf, CFTypeID expectedTypeID, const char *apiName);
+
+const CFRuntimeClass *_FXCFAllocatorClass(void);
+const CFRuntimeClass *_FXCFBooleanClass(void);
+const CFRuntimeClass *_FXCFNumberClass(void);
+const CFRuntimeClass *_FXCFDataClass(void);
+const CFRuntimeClass *_FXCFDateClass(void);
 
 static inline CFRuntimeBase *_FXCFBaseFromRef(CFTypeRef cf) {
     return (CFRuntimeBase *)(uintptr_t)cf;
@@ -97,6 +108,15 @@ static inline Boolean _FXCFAllocatorIsSystemDefault(CFAllocatorRef allocator) {
 
 static inline Boolean _FXCFAllocatorRespectsHintZero(CFAllocatorRef allocator) {
     return allocator == kCFAllocatorSystemDefault;
+}
+
+static inline void _FXCFValidateType(CFTypeRef cf, CFTypeID expectedTypeID, const char *apiName) {
+    if (cf == NULL) {
+        _FXCFAbort(apiName);
+    }
+    if (CFGetTypeID(cf) != expectedTypeID) {
+        _FXCFAbort(apiName);
+    }
 }
 
 #endif
