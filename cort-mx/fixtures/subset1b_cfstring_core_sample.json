@@ -1,0 +1,47 @@
+{
+  "probe": "subset1b_cfstring_core",
+  "results": [
+    {
+      "name": "cfstring_ascii_cstring_roundtrip",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "success": true
+    },
+    {
+      "name": "cfstring_utf8_cstring_roundtrip",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "success": true
+    },
+    {
+      "name": "cfstring_bytes_ascii_roundtrip",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "success": true
+    },
+    {
+      "name": "cfstring_utf16_characters_roundtrip",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "success": true
+    },
+    {
+      "name": "cfstring_copy_equality_hash",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "success": true
+    },
+    {
+      "name": "cfstring_getcstring_small_buffer",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "success": true
+    },
+    {
+      "name": "cfstring_bytes_invalid_utf8_rejected",
+      "classification": "required-but-error-text-flexible",
+      "fx_match_level": "error-text-flexible",
+      "success": true
+    }
+  ]
+}

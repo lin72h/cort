@@ -47,8 +47,10 @@ defmodule WorkflowSelfcheck do
       {"elixir launcher version", fn -> elixir_version_check!(repo_root) end},
       {"subset0 runtime manifest report", fn -> subset0_runtime_report_check!(repo_root) end},
       {"subset1 manifest report", fn -> subset1_manifest_report_check!(repo_root) end},
+      {"subset1b manifest report", fn -> subset1b_manifest_report_check!(repo_root) end},
       {"subset0 compare tool", fn -> subset0_compare_check!(repo_root) end},
       {"subset1 compare tool", fn -> subset1_compare_check!(repo_root) end},
+      {"subset1b compare tool", fn -> subset1b_compare_check!(repo_root) end},
       {"subset1 FX make compare wrapper", fn -> subset1_make_compare_check!(repo_root, artifacts_root) end},
       {"subset1 FX compare artifact wrapper", fn -> subset1_compare_artifact_check!(repo_root, artifacts_root) end}
     ]
@@ -57,7 +59,8 @@ defmodule WorkflowSelfcheck do
       if darwin_host?(host_os) do
         [
           {"subset0 MX suite script", fn -> subset0_mx_suite_check!(repo_root, artifacts_root) end},
-          {"subset1 MX scalar-core script", fn -> subset1_mx_scalar_core_check!(repo_root, artifacts_root) end}
+          {"subset1 MX scalar-core script", fn -> subset1_mx_scalar_core_check!(repo_root, artifacts_root) end},
+          {"subset1b MX CFString script", fn -> subset1b_mx_cfstring_check!(repo_root, artifacts_root) end}
         ]
       else
         []
@@ -74,6 +77,7 @@ defmodule WorkflowSelfcheck do
       "cort-mx/scripts/run_subset0_public_allocator_compare.sh",
       "cort-mx/scripts/run_subset0_suite.sh",
       "cort-mx/scripts/run_subset1_scalar_core.sh",
+      "cort-mx/scripts/run_subset1b_cfstring_core.sh",
       "cort-fx/scripts/run_subset0_fx_artifacts.sh",
       "cort-fx/scripts/run_subset1a_compare_artifact.sh"
     ]
@@ -137,6 +141,31 @@ defmodule WorkflowSelfcheck do
     ensure_contains!(output, "- warnings: 0")
   end
 
+  defp subset1b_manifest_report_check!(repo_root) do
+    output =
+      run_cmd!(
+        Path.join(repo_root, "tools/run_elixir.sh"),
+        [
+          Path.join(repo_root, "tools/report_case_manifest.exs"),
+          "--title",
+          "Subset 1B Minimal CFString Report",
+          "--json",
+          Path.join(repo_root, "cort-mx/fixtures/subset1b_cfstring_core_sample.json"),
+          "--json-label",
+          "out/subset1b_cfstring_core.json",
+          "--expected",
+          Path.join(repo_root, "cort-mx/expectations/subset1b_cfstring_core_expected.json"),
+          "--expected-label",
+          "expectations/subset1b_cfstring_core_expected.json"
+        ],
+        cd: repo_root,
+        expect_exit: 0
+      )
+
+    ensure_contains!(output, "- blockers: 0")
+    ensure_contains!(output, "- warnings: 0")
+  end
+
   defp subset0_compare_check!(repo_root) do
     output =
       run_cmd!(
@@ -175,6 +204,26 @@ defmodule WorkflowSelfcheck do
     ensure_contains!(output, "- blockers: 0")
     ensure_contains!(output, "- warnings: 0")
     ensure_contains!(output, "`cfnumber_cross_type_equality` | match")
+  end
+
+  defp subset1b_compare_check!(repo_root) do
+    output =
+      run_cmd!(
+        Path.join(repo_root, "tools/run_elixir.sh"),
+        [
+          Path.join(repo_root, "tools/compare_subset1b_cfstring_json.exs"),
+          "--fx-json",
+          Path.join(repo_root, "tools/fixtures/subset1b_cfstring_compare_fx_sample.json"),
+          "--mx-json",
+          Path.join(repo_root, "tools/fixtures/subset1b_cfstring_compare_mx_sample.json")
+        ],
+        cd: repo_root,
+        expect_exit: 0
+      )
+
+    ensure_contains!(output, "- blockers: 0")
+    ensure_contains!(output, "- warnings: 0")
+    ensure_contains!(output, "`cfstring_bytes_invalid_utf8_rejected` | match")
   end
 
   defp subset0_mx_suite_check!(repo_root, artifacts_root) do
@@ -235,6 +284,31 @@ defmodule WorkflowSelfcheck do
     for path <- [summary_path, json_path, stderr_path] do
       unless File.exists?(path) do
         raise RuntimeError, "missing MX subset1 scalar-core output at #{path}"
+      end
+    end
+
+    ensure_contains!(File.read!(summary_path), "- blockers: 0")
+    ensure_contains!(File.read!(summary_path), "- warnings: 0")
+    ensure_empty_or_whitespace!(File.read!(stderr_path), stderr_path)
+  end
+
+  defp subset1b_mx_cfstring_check!(repo_root, artifacts_root) do
+    run_dir = Path.join([artifacts_root, "cort-mx", "runs", "subset1b-mx-cfstring-core"])
+    summary_path = Path.join(run_dir, "summary.md")
+    json_path = Path.join([run_dir, "out", "subset1b_cfstring_core.json"])
+    stderr_path = Path.join([run_dir, "out", "report.stderr"])
+
+    run_cmd!(
+      Path.join(repo_root, "cort-mx/scripts/run_subset1b_cfstring_core.sh"),
+      [],
+      cd: Path.join(repo_root, "cort-mx"),
+      env: [{"CORT_ARTIFACTS_ROOT", artifacts_root}],
+      expect_exit: 0
+    )
+
+    for path <- [summary_path, json_path, stderr_path] do
+      unless File.exists?(path) do
+        raise RuntimeError, "missing MX subset1b CFString output at #{path}"
       end
     end
 

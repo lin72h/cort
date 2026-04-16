@@ -1,0 +1,54 @@
+{
+  "probe": "subset1b_cfstring_core",
+  "cases": [
+    {
+      "name": "cfstring_ascii_cstring_roundtrip",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "ASCII C-string creation, UTF-8 export, UTF-16 export, equality, and hash observation."
+    },
+    {
+      "name": "cfstring_utf8_cstring_roundtrip",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "UTF-8 C-string creation and roundtrip observation for tested BMP and supplementary scalar content."
+    },
+    {
+      "name": "cfstring_bytes_ascii_roundtrip",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "ASCII bytes creation and full-range ASCII extraction observation."
+    },
+    {
+      "name": "cfstring_utf16_characters_roundtrip",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "UTF-16 character creation, UTF-8 export, and equality/hash observation."
+    },
+    {
+      "name": "cfstring_copy_equality_hash",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "CreateCopy ownership plus equal-string hash coherence observation."
+    },
+    {
+      "name": "cfstring_getcstring_small_buffer",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "CFStringGetCString buffer-too-small failure observation."
+    },
+    {
+      "name": "cfstring_bytes_invalid_utf8_rejected",
+      "classification": "required-but-error-text-flexible",
+      "fx_match_level": "error-text-flexible",
+      "blocking": true,
+      "description": "Malformed UTF-8 byte creation must fail safely without producing an object."
+    }
+  ]
+}

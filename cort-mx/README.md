@@ -27,6 +27,13 @@ Subset 1A:
 - `expectations/subset1_scalar_core_expected.json`
 - `fixtures/subset1_scalar_core_sample.json`
 
+Subset 1B:
+
+- `src/cort_mx_subset1b_cfstring_core.c`
+- `scripts/run_subset1b_cfstring_core.sh`
+- `expectations/subset1b_cfstring_core_expected.json`
+- `fixtures/subset1b_cfstring_core_sample.json`
+
 ## Purpose
 
 These assets turn the MX lane from a text request into a reproducible run
@@ -129,14 +136,19 @@ Portable checks covered by `../tools/run_elixir.sh ../tools/workflow_selfcheck.e
   `fixtures/subset0_runtime_ownership_sample.json`
 - generic manifest reporter behavior against
   `fixtures/subset1_scalar_core_sample.json`
+- generic manifest reporter behavior against
+  `fixtures/subset1b_cfstring_core_sample.json`
 - Subset 0 FX-vs-MX compare behavior against sample JSON fixtures
 - Subset 1A FX-vs-MX compare behavior against sample JSON fixtures
+- Subset 1B FX-vs-MX compare behavior against sample JSON fixtures
 - FX-side Subset 1A compare wrappers against preserved sample artifacts
 
 Additional checks performed by the same selfcheck on Darwin hosts:
 
 - actual `scripts/run_subset0_suite.sh` execution under a temporary artifact root
 - actual `scripts/run_subset1_scalar_core.sh` execution under a temporary
+  artifact root
+- actual `scripts/run_subset1b_cfstring_core.sh` execution under a temporary
   artifact root
 - preservation of MX run directories, summaries, and hashes
 
@@ -171,4 +183,35 @@ tools/run_elixir.sh tools/compare_subset1_scalar_core_json.exs \
   --fx-json /path/to/subset1_scalar_core_fx.json \
   --mx-json /path/to/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json \
   --output /path/to/subset1_scalar_core_fx_vs_mx_report.md
+```
+
+## Subset 1B Minimal CFString
+
+This slice validates the bounded immutable `CFString` core needed by future
+bplist and plist-valid key paths.
+
+Contract:
+
+- `../docs/cort-subset1b-cfstring-contract.md`
+- `../docs/cort-subset1b-validation-workflow.md`
+
+Run it with:
+
+```sh
+cd cort-mx
+scripts/run_subset1b_cfstring_core.sh
+```
+
+Default output:
+
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/`
+
+When FX later emits a Subset 1B JSON artifact, compare it against MX with:
+
+```sh
+cd ..
+tools/run_elixir.sh tools/compare_subset1b_cfstring_json.exs \
+  --fx-json /path/to/subset1b_cfstring_fx.json \
+  --mx-json /path/to/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json \
+  --output /path/to/subset1b_cfstring_fx_vs_mx_report.md
 ```

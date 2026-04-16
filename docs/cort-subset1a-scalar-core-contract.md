@@ -193,10 +193,10 @@ Required interpretation rules:
 | 1A | `CFNumber` `Float64` roundtrip/equality/hash | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json` | Implemented locally | `semantic` | raw hash numerics diagnostic | `cfnumber_float64_roundtrip` | FX local done; FX-vs-MX compare pending |
 | 1A | `CFNumber` cross-type equality for tested forms | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json` | Implemented locally to match observed `42` integer/float equality on tested forms | `semantic` | no claim beyond `SInt32`, `SInt64`, and exact-integer `Float64` | `cfnumber_cross_type_equality` | MX compare clean |
 | 1A | `CFDate` absolute-time roundtrip/equality/hash | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json` | Implemented locally | `semantic` | raw hash numerics diagnostic | `cfdate_absolute_time_roundtrip` | FX local done; FX-vs-MX compare pending |
-| 1B | minimal `CFString` for bplist/key paths | Not started | Not implemented | `unknown` | dedicated slice required | Deferred | Not ready |
+| 1B | minimal `CFString` for bplist/key paths | `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json` | MX assets ready; FX not implemented | `unknown` | dedicated string slice with malformed UTF-8 classification and ASCII fast-path notes | MX run pending | Not ready |
 
 The MX gate for local FX Subset 1A implementation is now satisfied. The next
-gate is FX-vs-MX comparison on the emitted FX JSON artifact.
+gate is the dedicated Subset 1B `CFString` contract and MX run.
 
 Current MX report status for the artifact above:
 
@@ -222,6 +222,9 @@ Run script:
 FX source audit and pre-implementation readiness:
 
 - `docs/cort-subset1a-source-audit-and-readiness.md`
+- `docs/cort-subset1b-cfstring-contract.md`
+- `docs/cort-subset1b-source-audit-and-readiness.md`
+- `docs/cort-subset1b-validation-workflow.md`
 
 ## Expected MX Artifacts
 
@@ -260,6 +263,9 @@ when:
 - tested-form `CFNumber` cross-type behavior is classified explicitly
 - `CFString` remains deferred to a dedicated 1B contract instead of leaking back
   into 1A
+
+That dedicated 1B contract and its MX assets now exist; the remaining gate is
+the first bounded MX run for `subset1b_cfstring_core`.
 
 The FX local implementation now satisfies that gate and emits:
 

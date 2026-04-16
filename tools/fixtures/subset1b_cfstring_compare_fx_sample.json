@@ -1,0 +1,103 @@
+{
+  "probe": "subset1b_cfstring_core",
+  "results": [
+    {
+      "name": "cfstring_ascii_cstring_roundtrip",
+      "classification": "required",
+      "success": true,
+      "equal_same_value": true,
+      "equal_different_value": false,
+      "type_id": 310,
+      "hash_primary": 1001,
+      "hash_same_value": 1001,
+      "hash_different_value": 1002,
+      "length_value": 18,
+      "primary_value_text": "6c61756e6368642e7061636b65742d6b6579",
+      "alternate_value_text": "006c00610075006e006300680064002e007000610063006b00650074002d006b00650079"
+    },
+    {
+      "name": "cfstring_utf8_cstring_roundtrip",
+      "classification": "required",
+      "success": true,
+      "equal_same_value": true,
+      "equal_different_value": false,
+      "type_id": 310,
+      "hash_primary": 2001,
+      "hash_same_value": 2001,
+      "hash_different_value": 2002,
+      "length_value": 9,
+      "primary_value_text": "636166c3a92de298832df09f93a6",
+      "alternate_value_text": "00630061006600e9002d2603002dd83ddce6"
+    },
+    {
+      "name": "cfstring_bytes_ascii_roundtrip",
+      "classification": "required",
+      "success": true,
+      "equal_same_value": true,
+      "equal_different_value": false,
+      "type_id": 310,
+      "hash_primary": 1001,
+      "hash_same_value": 1001,
+      "hash_different_value": 1002,
+      "length_value": 18,
+      "primary_value_text": "6c61756e6368642e7061636b65742d6b6579",
+      "alternate_value_text": "006c00610075006e006300680064002e007000610063006b00650074002d006b00650079"
+    },
+    {
+      "name": "cfstring_utf16_characters_roundtrip",
+      "classification": "required",
+      "success": true,
+      "equal_same_value": true,
+      "equal_different_value": false,
+      "type_id": 310,
+      "hash_primary": 3001,
+      "hash_same_value": 3001,
+      "hash_different_value": 3002,
+      "length_value": 6,
+      "primary_value_text": "4fcea92de697a5f09f93a6",
+      "alternate_value_text": "004f03a9002d65e5d83ddce6"
+    },
+    {
+      "name": "cfstring_copy_equality_hash",
+      "classification": "required",
+      "success": true,
+      "equal_same_value": true,
+      "equal_different_value": false,
+      "type_id": 310,
+      "hash_primary": 2001,
+      "hash_same_value": 2001,
+      "hash_different_value": 2002,
+      "length_value": 9,
+      "primary_value_text": "636166c3a92de298832df09f93a6",
+      "alternate_value_text": "00630061006600e9002d2603002dd83ddce6"
+    },
+    {
+      "name": "cfstring_getcstring_small_buffer",
+      "classification": "required",
+      "success": true,
+      "equal_same_value": null,
+      "equal_different_value": null,
+      "type_id": 310,
+      "hash_primary": null,
+      "hash_same_value": null,
+      "hash_different_value": null,
+      "length_value": 9,
+      "primary_value_text": "buffer-too-small",
+      "alternate_value_text": null
+    },
+    {
+      "name": "cfstring_bytes_invalid_utf8_rejected",
+      "classification": "required-but-error-text-flexible",
+      "success": true,
+      "equal_same_value": null,
+      "equal_different_value": null,
+      "type_id": null,
+      "hash_primary": null,
+      "hash_same_value": null,
+      "hash_different_value": null,
+      "length_value": null,
+      "primary_value_text": null,
+      "alternate_value_text": null
+    }
+  ]
+}

@@ -6,6 +6,12 @@ Subset 0 and Subset 1A:
 - Subset 0: runtime and ownership core
 - Subset 1A: immutable scalar core without `CFString`
 
+The next planned slice is Subset 1B:
+
+- minimal immutable `CFString` for bplist and plist-valid key paths
+- MX assets and contracts live in `../docs/` and `../cort-mx/`
+- no FX `CFString` implementation is present yet
+
 It is not the final repository layout. The final target remains
 `../nx/cort/cort-fx/` after explicit permission.
 
