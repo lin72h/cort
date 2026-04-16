@@ -30,6 +30,11 @@ workflow:
 - report the full runtime-ownership JSON against the current expected-case
   manifest
 
+Python note:
+
+- the reporter tools are kept compatible with stock macOS `python3` 3.9.x
+- no third-party Python dependencies are required
+
 ## One-Off Runs
 
 Runtime ownership probe:
@@ -58,7 +63,7 @@ To compare against an FX allocator JSON during the MX run:
 
 ```sh
 cd cort-mx
-FX_JSON=/path/to/subset0_public_compare_fx.json \
+FX_JSON=/Users/me/wip-launchx/wip-cort-gpt-artifacts/cort-fx/build/out/subset0_public_compare_fx.json \
   scripts/run_subset0_public_allocator_compare.sh
 ```
 
@@ -79,9 +84,13 @@ With FX allocator JSON available:
 
 ```sh
 cd cort-mx
-FX_JSON=/path/to/subset0_public_compare_fx.json \
+FX_JSON=/Users/me/wip-launchx/wip-cort-gpt-artifacts/cort-fx/build/out/subset0_public_compare_fx.json \
   scripts/run_subset0_suite.sh
 ```
+
+If the FX lane used `make artifact-run`, the same JSON is also preserved under:
+
+- `../wip-cort-gpt-artifacts/cort-fx/runs/subset0-fx-local/out/subset0_public_compare_fx.json`
 
 ## Runtime Ownership Report
 

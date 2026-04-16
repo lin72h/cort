@@ -97,9 +97,16 @@ If the FX allocator JSON is available during the MX run:
 
 ```sh
 cd /Users/me/wip-launchx/wip-cort-gpt/cort-mx
-FX_JSON=/path/to/subset0_public_compare_fx.json \
+FX_JSON=/Users/me/wip-launchx/wip-cort-gpt-artifacts/cort-fx/build/out/subset0_public_compare_fx.json \
   scripts/run_subset0_suite.sh
 ```
+
+Stable preserved FX JSON paths:
+
+- live build output:
+  `../wip-cort-gpt-artifacts/cort-fx/build/out/subset0_public_compare_fx.json`
+- preserved artifact-run copy:
+  `../wip-cort-gpt-artifacts/cort-fx/runs/subset0-fx-local/out/subset0_public_compare_fx.json`
 
 The suite creates:
 

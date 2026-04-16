@@ -1,23 +1,22 @@
 #!/usr/bin/env python3
-from __future__ import annotations
-
 import argparse
 import json
 import sys
 from pathlib import Path
+from typing import Dict, List, Optional, Set, Tuple
 
 
 def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def load_results(path: Path) -> tuple[str | None, dict[str, dict]]:
+def load_results(path: Path) -> Tuple[Optional[str], Dict[str, dict]]:
     data = load_json(path)
     probe = data.get("probe")
     results = data.get("results")
     if not isinstance(results, list):
         raise ValueError(f"{path} does not contain a top-level results array")
-    by_name: dict[str, dict] = {}
+    by_name: Dict[str, dict] = {}
     for entry in results:
         name = entry.get("name")
         if not isinstance(name, str) or not name:
@@ -28,7 +27,7 @@ def load_results(path: Path) -> tuple[str | None, dict[str, dict]]:
     return probe if isinstance(probe, str) else None, by_name
 
 
-def render_report(actual_path: Path, expected_path: Path) -> tuple[str, int, int]:
+def render_report(actual_path: Path, expected_path: Path) -> Tuple[str, int, int]:
     expected = load_json(expected_path)
     expected_probe = expected.get("probe")
     expected_cases = expected.get("cases")
@@ -39,7 +38,7 @@ def render_report(actual_path: Path, expected_path: Path) -> tuple[str, int, int
 
     blockers = 0
     warnings = 0
-    lines: list[str] = []
+    lines: List[str] = []
     lines.append("# Subset 0 Runtime Ownership Report")
     lines.append("")
     lines.append(f"- actual JSON: `{actual_path}`")
@@ -58,7 +57,7 @@ def render_report(actual_path: Path, expected_path: Path) -> tuple[str, int, int
     lines.append("| Case | Status | Notes |")
     lines.append("| --- | --- | --- |")
 
-    expected_names: set[str] = set()
+    expected_names: Set[str] = set()
     for case in expected_cases:
         name = case.get("name")
         if not isinstance(name, str) or not name:
@@ -70,7 +69,7 @@ def render_report(actual_path: Path, expected_path: Path) -> tuple[str, int, int
 
         actual = actual_results.get(name)
         status = "match"
-        notes: list[str] = []
+        notes: List[str] = []
 
         if actual is None:
             notes.append("missing from actual results")

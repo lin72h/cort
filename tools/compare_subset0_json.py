@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-from __future__ import annotations
-
 import argparse
 import json
 import sys
 from pathlib import Path
+from typing import Dict, List, Optional, Tuple
 
 
 BLOCKING_CLASSIFICATIONS = {"required", "required-but-error-text-flexible"}
@@ -19,13 +18,13 @@ NOTE_FIELDS = {
 }
 
 
-def load_results(path: Path) -> dict[str, dict]:
+def load_results(path: Path) -> Dict[str, dict]:
     data = json.loads(path.read_text(encoding="utf-8"))
     results = data.get("results")
     if not isinstance(results, list):
         raise ValueError(f"{path} does not contain a top-level results array")
 
-    by_name: dict[str, dict] = {}
+    by_name: Dict[str, dict] = {}
     for entry in results:
         name = entry.get("name")
         if not isinstance(name, str) or not name:
@@ -36,19 +35,19 @@ def load_results(path: Path) -> dict[str, dict]:
     return by_name
 
 
-def is_blocking(classification: str | None) -> bool:
+def is_blocking(classification: Optional[str]) -> bool:
     return classification in BLOCKING_CLASSIFICATIONS
 
 
 def render_report(
-    fx_results: dict[str, dict],
-    mx_results: dict[str, dict],
+    fx_results: Dict[str, dict],
+    mx_results: Dict[str, dict],
     fx_label: str,
     mx_label: str,
-) -> tuple[str, int, int]:
+) -> Tuple[str, int, int]:
     blockers = 0
     warnings = 0
-    lines: list[str] = []
+    lines: List[str] = []
     lines.append("# Subset 0 FX vs MX Comparison")
     lines.append("")
     lines.append(f"- FX input: `{fx_label}`")
@@ -66,7 +65,7 @@ def render_report(
     for name in all_names:
         fx_case = fx_results.get(name)
         mx_case = mx_results.get(name)
-        notes: list[str] = []
+        notes: List[str] = []
         status = "match"
 
         if fx_case is None or mx_case is None:

@@ -12,18 +12,24 @@ rm -rf "$TMP_DIR"
 mkdir -p "$TMP_DIR"
 
 runtime_status=0
-if ! "$SCRIPT_DIR/run_subset0_runtime_ownership.sh" "$TMP_DIR/runtime-ownership"; then
+if "$SCRIPT_DIR/run_subset0_runtime_ownership.sh" "$TMP_DIR/runtime-ownership"; then
+    runtime_status=0
+else
     runtime_status=$?
 fi
 
 allocator_status=0
 if [ -n "${FX_JSON:-}" ]; then
     FX_JSON_ABS=$(absolute_path "$FX_JSON")
-    if ! FX_JSON="$FX_JSON_ABS" "$SCRIPT_DIR/run_subset0_public_allocator_compare.sh" "$TMP_DIR/public-allocator-compare"; then
+    if FX_JSON="$FX_JSON_ABS" "$SCRIPT_DIR/run_subset0_public_allocator_compare.sh" "$TMP_DIR/public-allocator-compare"; then
+        allocator_status=0
+    else
         allocator_status=$?
     fi
 else
-    if ! "$SCRIPT_DIR/run_subset0_public_allocator_compare.sh" "$TMP_DIR/public-allocator-compare"; then
+    if "$SCRIPT_DIR/run_subset0_public_allocator_compare.sh" "$TMP_DIR/public-allocator-compare"; then
+        allocator_status=0
+    else
         allocator_status=$?
     fi
 fi
@@ -53,6 +59,9 @@ write_sha256_manifest "$TMP_DIR"
 rm -rf "$OUT_DIR"
 mv "$TMP_DIR" "$OUT_DIR"
 printf 'Wrote MX Subset 0 suite artifacts to %s\n' "$OUT_DIR"
+if [ "$runtime_status" -ne 0 ] && [ "$allocator_status" -ne 0 ]; then
+    exit "$runtime_status"
+fi
 if [ "$runtime_status" -ne 0 ]; then
     exit "$runtime_status"
 fi

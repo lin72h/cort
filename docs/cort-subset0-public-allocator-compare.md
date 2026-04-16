@@ -40,7 +40,7 @@ make compare-fx
 
 Output artifact:
 
-- `cort-fx/build/out/subset0_public_compare_fx.json`
+- `../wip-cort-gpt-artifacts/cort-fx/build/out/subset0_public_compare_fx.json`
 
 For a preservable local FX run directory, use:
 
@@ -48,6 +48,10 @@ For a preservable local FX run directory, use:
 cd /Users/me/wip-launchx/wip-cort-gpt/cort-fx
 make artifact-run
 ```
+
+Preserved FX JSON path from that run:
+
+- `../wip-cort-gpt-artifacts/cort-fx/runs/subset0-fx-local/out/subset0_public_compare_fx.json`
 
 ## MX Run
 
