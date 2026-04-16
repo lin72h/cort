@@ -111,6 +111,8 @@ defmodule CompareResultSets do
       |> maybe_add_field_notes(blocking_case, left_case, right_case, Keyword.get(config, :semantic_boolean_fields, []))
       |> maybe_add_field_notes(blocking_case, left_case, right_case, Keyword.get(config, :semantic_numeric_fields, []))
       |> maybe_add_field_notes(blocking_case, left_case, right_case, Keyword.get(config, :semantic_text_fields, []))
+      |> maybe_add_side_invariant_notes(blocking_case, left_case, Keyword.fetch!(config, :left_side), config)
+      |> maybe_add_side_invariant_notes(blocking_case, right_case, Keyword.fetch!(config, :right_side), config)
       |> add_diagnostic_field_notes(left_case, right_case, config)
 
     final_notes =
@@ -221,6 +223,38 @@ defmodule CompareResultSets do
       end)
 
     {updated_notes, status, blockers, warnings}
+  end
+
+  defp maybe_add_side_invariant_notes({notes, status, blockers, warnings}, blocking_case, case_data, side_label, config) do
+    Enum.reduce(Keyword.get(config, :side_invariants, []), {notes, status, blockers, warnings}, fn invariant, acc ->
+      {truth_field, lhs_field, rhs_field, description} = invariant
+      truth_value = Map.get(case_data, truth_field)
+      lhs_value = Map.get(case_data, lhs_field)
+      rhs_value = Map.get(case_data, rhs_field)
+
+      if truth_value === true and not is_nil(lhs_value) and not is_nil(rhs_value) and lhs_value != rhs_value do
+        {acc_notes, acc_status, acc_blockers, acc_warnings} = acc
+        note = "#{side_label} invariant failed (#{description}): #{lhs_field}=#{inspect(lhs_value)} #{rhs_field}=#{inspect(rhs_value)}"
+
+        if blocking_case do
+          {
+            acc_notes ++ [note],
+            "BLOCKER",
+            acc_blockers + if(acc_status == "BLOCKER", do: 0, else: 1),
+            acc_warnings
+          }
+        else
+          {
+            acc_notes ++ [note],
+            if(acc_status == "BLOCKER", do: acc_status, else: "warning"),
+            acc_blockers,
+            acc_warnings + if(acc_status in ["warning", "BLOCKER"], do: 0, else: 1)
+          }
+        end
+      else
+        acc
+      end
+    end)
   end
 
   defp blocking?(classification, config) do

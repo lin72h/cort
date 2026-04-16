@@ -16,6 +16,20 @@
       "alternate_value_text": "006c00610075006e006300680064002e007000610063006b00650074002d006b00650079"
     },
     {
+      "name": "cfstring_empty_roundtrip",
+      "classification": "required",
+      "success": true,
+      "equal_same_value": true,
+      "equal_different_value": false,
+      "type_id": 310,
+      "hash_primary": 900,
+      "hash_same_value": 900,
+      "hash_different_value": 901,
+      "length_value": 0,
+      "primary_value_text": "",
+      "alternate_value_text": ""
+    },
+    {
       "name": "cfstring_utf8_cstring_roundtrip",
       "classification": "required",
       "success": true,
@@ -82,11 +96,25 @@
       "hash_same_value": null,
       "hash_different_value": null,
       "length_value": 9,
-      "primary_value_text": "buffer-too-small",
-      "alternate_value_text": null
+      "primary_value_text": "636166c3a92de298832df09f93a6",
+      "alternate_value_text": "small-buffer-fails"
     },
     {
       "name": "cfstring_bytes_invalid_utf8_rejected",
+      "classification": "required-but-error-text-flexible",
+      "success": true,
+      "equal_same_value": null,
+      "equal_different_value": null,
+      "type_id": null,
+      "hash_primary": null,
+      "hash_same_value": null,
+      "hash_different_value": null,
+      "length_value": null,
+      "primary_value_text": null,
+      "alternate_value_text": null
+    },
+    {
+      "name": "cfstring_cstring_invalid_utf8_rejected",
       "classification": "required-but-error-text-flexible",
       "success": true,
       "equal_same_value": null,

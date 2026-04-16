@@ -8,6 +8,7 @@ defmodule CompareSubset1ScalarCoreJson do
   @semantic_numeric_fields ["length_value"]
   @semantic_text_fields ["primary_value_text", "alternate_value_text"]
   @diagnostic_fields ["type_id", "type_description", "hash_primary", "hash_same_value", "hash_different_value"]
+  @side_invariants [{"equal_same_value", "hash_primary", "hash_same_value", "equal-value hash coherence"}]
 
   def main(argv) do
     options =
@@ -39,6 +40,7 @@ defmodule CompareSubset1ScalarCoreJson do
         semantic_numeric_fields: @semantic_numeric_fields,
         semantic_text_fields: @semantic_text_fields,
         diagnostic_fields: @diagnostic_fields,
+        side_invariants: @side_invariants,
         success_verdict: "- verdict: no blocking mismatches found in the shared scalar-core comparison surface",
         failure_verdict: "- verdict: blocking mismatches found; do not treat FX as semantically aligned for the affected required scalar-core rows"
       )

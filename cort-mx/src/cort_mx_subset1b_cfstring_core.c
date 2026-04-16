@@ -358,6 +358,92 @@ static struct CaseResult observe_ascii_cstring_roundtrip(void) {
     return result;
 }
 
+static struct CaseResult observe_empty_string_roundtrip(void) {
+    static const char *apiCalls[] = {
+        "CFStringCreateWithCString",
+        "CFStringCreateWithBytes",
+        "CFStringCreateWithCharacters",
+        "CFStringGetLength",
+        "CFStringGetCString",
+        "CFStringGetCharacters",
+        "CFEqual",
+        "CFHash"
+    };
+    static const UInt8 emptyBytes[] = "";
+    static const UniChar emptyChars[] = {0u};
+
+    struct CaseResult result;
+    init_required_result(
+        &result,
+        "cfstring_empty_roundtrip",
+        "Subset 1B requires zero-length strings to be constructible through the tested creation paths and to roundtrip cleanly.",
+        apiCalls,
+        sizeof(apiCalls) / sizeof(apiCalls[0])
+    );
+
+    CFStringRef primary = CFStringCreateWithCString(kCFAllocatorSystemDefault, "", kCFStringEncodingASCII);
+    CFStringRef sameBytes = CFStringCreateWithBytes(kCFAllocatorSystemDefault, emptyBytes, 0, kCFStringEncodingASCII, false);
+    CFStringRef sameChars = CFStringCreateWithCharacters(kCFAllocatorSystemDefault, emptyChars, 0);
+    CFStringRef different = CFStringCreateWithCString(kCFAllocatorSystemDefault, "x", kCFStringEncodingASCII);
+    char exactFitBuffer[1];
+    exactFitBuffer[0] = 'x';
+
+    if (primary != NULL) {
+        record_type_identity(&result, primary);
+        result.hasLengthValue = true;
+        result.lengthValue = (long)CFStringGetLength(primary);
+        result.hasPrimaryValueText = utf8_hex_for_string(primary, result.primaryValueText, sizeof(result.primaryValueText));
+        result.hasAlternateValueText = utf16_hex_for_string(primary, result.alternateValueText, sizeof(result.alternateValueText));
+    }
+
+    if (primary != NULL && sameBytes != NULL && sameChars != NULL) {
+        result.hasEqualSameValue = true;
+        result.equalSameValue = CFEqual(primary, sameBytes) && CFEqual(primary, sameChars);
+        result.hasHashPrimary = true;
+        result.hashPrimary = (long)CFHash(primary);
+        result.hasHashSameValue = true;
+        result.hashSameValue = (long)CFHash(sameBytes);
+    }
+
+    if (primary != NULL && different != NULL) {
+        result.hasEqualDifferentValue = true;
+        result.equalDifferentValue = CFEqual(primary, different);
+        result.hasHashDifferentValue = true;
+        result.hashDifferentValue = (long)CFHash(different);
+    }
+
+    result.success =
+        primary != NULL &&
+        sameBytes != NULL &&
+        sameChars != NULL &&
+        different != NULL &&
+        result.lengthValue == 0 &&
+        result.hasPrimaryValueText &&
+        strcmp(result.primaryValueText, "") == 0 &&
+        result.hasAlternateValueText &&
+        strcmp(result.alternateValueText, "") == 0 &&
+        CFStringGetCString(primary, exactFitBuffer, (CFIndex)sizeof(exactFitBuffer), kCFStringEncodingUTF8) &&
+        exactFitBuffer[0] == '\0' &&
+        result.equalSameValue &&
+        !result.equalDifferentValue &&
+        result.hashPrimary == result.hashSameValue;
+
+    if (different != NULL) {
+        CFRelease(different);
+    }
+    if (sameChars != NULL) {
+        CFRelease(sameChars);
+    }
+    if (sameBytes != NULL) {
+        CFRelease(sameBytes);
+    }
+    if (primary != NULL) {
+        CFRelease(primary);
+    }
+
+    return result;
+}
+
 static struct CaseResult observe_utf8_cstring_roundtrip(void) {
     static const char *apiCalls[] = {
         "CFStringCreateWithCString",
@@ -699,27 +785,41 @@ static struct CaseResult observe_getcstring_small_buffer(void) {
         "CFStringGetCString"
     };
     static const char sample[] = "caf\xc3\xa9-\xe2\x98\x83-\xf0\x9f\x93\xa6";
-
     struct CaseResult result;
     init_required_result(
         &result,
         "cfstring_getcstring_small_buffer",
-        "Subset 1B requires CFStringGetCString to fail cleanly when the output buffer is too small.",
+        "Subset 1B requires CFStringGetCString to succeed for an exact-fit buffer and fail cleanly when the output buffer is too small.",
         apiCalls,
         sizeof(apiCalls) / sizeof(apiCalls[0])
     );
 
     CFStringRef primary = CFStringCreateWithCString(kCFAllocatorSystemDefault, sample, kCFStringEncodingUTF8);
+    char exactFitBuffer[sizeof(sample)];
     char smallBuffer[4];
+    memset(exactFitBuffer, 0, sizeof(exactFitBuffer));
     memset(smallBuffer, 0, sizeof(smallBuffer));
 
     if (primary != NULL) {
         record_type_identity(&result, primary);
         result.hasLengthValue = true;
         result.lengthValue = (long)CFStringGetLength(primary);
-        result.hasPrimaryValueText = true;
-        snprintf(result.primaryValueText, sizeof(result.primaryValueText), "%s", "buffer-too-small");
-        result.success = !CFStringGetCString(primary, smallBuffer, (CFIndex)sizeof(smallBuffer), kCFStringEncodingUTF8);
+        result.hasAlternateValueText = true;
+        snprintf(result.alternateValueText, sizeof(result.alternateValueText), "%s", "small-buffer-fails");
+        if (CFStringGetCString(primary, exactFitBuffer, (CFIndex)sizeof(exactFitBuffer), kCFStringEncodingUTF8)) {
+            result.hasPrimaryValueText = true;
+            set_hex_bytes(
+                result.primaryValueText,
+                sizeof(result.primaryValueText),
+                (const UInt8 *)exactFitBuffer,
+                strlen(exactFitBuffer)
+            );
+            result.success =
+                strcmp(exactFitBuffer, sample) == 0 &&
+                !CFStringGetCString(primary, smallBuffer, (CFIndex)sizeof(smallBuffer), kCFStringEncodingUTF8);
+        } else {
+            result.success = false;
+        }
         CFRelease(primary);
     } else {
         result.success = false;
@@ -756,15 +856,43 @@ static struct CaseResult observe_invalid_utf8_rejected(void) {
     return result;
 }
 
+static struct CaseResult observe_invalid_utf8_cstring_rejected(void) {
+    static const char *apiCalls[] = {
+        "CFStringCreateWithCString"
+    };
+    static const char invalidUTF8CString[] = {(char)0xc3, (char)0x28, '\0'};
+
+    struct CaseResult result;
+    memset(&result, 0, sizeof(result));
+    result.name = "cfstring_cstring_invalid_utf8_rejected";
+    result.classification = "required-but-error-text-flexible";
+    result.fxMatchLevel = "error-text-flexible";
+    result.ownershipNote = "Malformed UTF-8 C-string input must be rejected safely. Error wording is not part of the contract.";
+    set_api_calls(&result, apiCalls, sizeof(apiCalls) / sizeof(apiCalls[0]));
+
+    CFStringRef string = CFStringCreateWithCString(
+        kCFAllocatorSystemDefault,
+        invalidUTF8CString,
+        kCFStringEncodingUTF8
+    );
+    result.success = (string == NULL);
+    if (string != NULL) {
+        CFRelease(string);
+    }
+    return result;
+}
+
 int main(void) {
     struct CaseResult results[] = {
         observe_ascii_cstring_roundtrip(),
+        observe_empty_string_roundtrip(),
         observe_utf8_cstring_roundtrip(),
         observe_bytes_ascii_roundtrip(),
         observe_utf16_characters_roundtrip(),
         observe_copy_equality_hash(),
         observe_getcstring_small_buffer(),
-        observe_invalid_utf8_rejected()
+        observe_invalid_utf8_rejected(),
+        observe_invalid_utf8_cstring_rejected()
     };
     size_t resultCount = sizeof(results) / sizeof(results[0]);
 

@@ -13,6 +13,7 @@ Scope of this slice:
 - UTF-8 create/export paths
 - UTF-16 code-unit create/export paths
 - equality and hash coherence
+- zero-length string behavior
 - malformed UTF-8 rejection
 
 Explicitly excluded:
@@ -113,6 +114,9 @@ Blocking mismatches:
   - `length_value`
   - `primary_value_text`
   - `alternate_value_text`
+- independent hash-coherence invariant on each side:
+  - when `equal_same_value` is `true`, `hash_primary` must equal
+    `hash_same_value`
 
 Diagnostic-only differences:
 
@@ -130,6 +134,8 @@ Case-specific interpretation:
   the compare surface stays stable across terminals and source encodings
 - malformed UTF-8 rejection is judged by `success` and object absence semantics,
   not by error wording
+- the `cfstring_getcstring_small_buffer` row now covers both exact-fit success
+  and undersized-buffer failure
 
 ## Workflow Selfcheck
 
@@ -155,5 +161,5 @@ What it should cover after the Subset 1B assets land:
 1. Run `scripts/run_subset1b_cfstring_core.sh` on MX.
 2. Review `summary.md` for blockers or warnings.
 3. Record the artifact path in the Subset 1B contract ledger.
-4. Classify malformed UTF-8 rejection explicitly.
+4. Classify zero-length creation and malformed UTF-8 rejection explicitly.
 5. Only then start the FX `CFString` implementation.

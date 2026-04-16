@@ -8,6 +8,12 @@
       "success": true
     },
     {
+      "name": "cfstring_empty_roundtrip",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "success": true
+    },
+    {
       "name": "cfstring_utf8_cstring_roundtrip",
       "classification": "required",
       "fx_match_level": "semantic",
@@ -39,6 +45,12 @@
     },
     {
       "name": "cfstring_bytes_invalid_utf8_rejected",
+      "classification": "required-but-error-text-flexible",
+      "fx_match_level": "error-text-flexible",
+      "success": true
+    },
+    {
+      "name": "cfstring_cstring_invalid_utf8_rejected",
       "classification": "required-but-error-text-flexible",
       "fx_match_level": "error-text-flexible",
       "success": true
