@@ -208,6 +208,10 @@ Run script:
 
 - `cort-mx/scripts/run_subset1_scalar_core.sh`
 
+FX source audit and pre-implementation readiness:
+
+- `docs/cort-subset1a-source-audit-and-readiness.md`
+
 ## Expected MX Artifacts
 
 The MX run should preserve:

@@ -1,6 +1,9 @@
 #!/bin/sh
 set -eu
 
+: "${ERL_CRASH_DUMP:=/dev/null}"
+export ERL_CRASH_DUMP
+
 if [ -n "${ELIXIR:-}" ]; then
     exec "$ELIXIR" "$@"
 fi
