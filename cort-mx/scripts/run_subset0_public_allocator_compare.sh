@@ -25,7 +25,7 @@ write_toolchain_info "$TMP_DIR/toolchain.txt"
     printf 'compile: %s\n' "$COMPILE_CMD"
     printf 'run: %s\n' "$RUN_CMD"
     if [ -n "${FX_JSON:-}" ]; then
-        printf 'compare: python3 %s --fx-json %s --mx-json out/%s --output out/subset0_public_compare_report.md\n' "$COMPARE_TOOL" "$FX_JSON" "$JSON_NAME"
+        printf 'compare: python3 %s --fx-json %s --fx-label %s --mx-json out/%s --mx-label out/%s --output out/subset0_public_compare_report.md\n' "$COMPARE_TOOL" "$FX_JSON" "$FX_JSON" "$JSON_NAME" "$JSON_NAME"
     fi
 } > "$TMP_DIR/commands.txt"
 
@@ -39,7 +39,9 @@ write_toolchain_info "$TMP_DIR/toolchain.txt"
 if [ -n "${FX_JSON:-}" ]; then
     python3 "$COMPARE_TOOL" \
         --fx-json "$FX_JSON" \
+        --fx-label "$FX_JSON" \
         --mx-json "$TMP_DIR/out/$JSON_NAME" \
+        --mx-label "out/$JSON_NAME" \
         --output "$TMP_DIR/out/subset0_public_compare_report.md" \
         > "$TMP_DIR/out/report.stdout" \
         2> "$TMP_DIR/out/report.stderr" || compare_status=$?

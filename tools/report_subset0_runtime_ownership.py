@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import argparse
 import json
 import sys
@@ -132,12 +134,18 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Report MX runtime-ownership results against the expected Subset 0 case manifest.")
     parser.add_argument("--json", required=True, help="Path to the runtime-ownership JSON artifact")
     parser.add_argument("--expected", required=True, help="Path to the expected-case manifest JSON")
+    parser.add_argument("--json-label", help="Optional label to render instead of the runtime-ownership JSON path")
+    parser.add_argument("--expected-label", help="Optional label to render instead of the expected manifest path")
     parser.add_argument("--output", help="Optional path for the markdown report")
     args = parser.parse_args()
 
     actual_path = Path(args.json)
     expected_path = Path(args.expected)
     report, blockers, _warnings = render_report(actual_path, expected_path)
+    if args.json_label:
+        report = report.replace(f"`{actual_path}`", f"`{args.json_label}`", 1)
+    if args.expected_label:
+        report = report.replace(f"`{expected_path}`", f"`{args.expected_label}`", 1)
 
     if args.output:
         output_path = Path(args.output)

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import argparse
 import json
 import sys
@@ -146,6 +148,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Compare FX and MX Subset 0 JSON results.")
     parser.add_argument("--fx-json", required=True, help="Path to the FX JSON artifact")
     parser.add_argument("--mx-json", required=True, help="Path to the MX JSON artifact")
+    parser.add_argument("--fx-label", help="Optional label to render instead of the FX JSON path")
+    parser.add_argument("--mx-label", help="Optional label to render instead of the MX JSON path")
     parser.add_argument("--output", help="Optional path for the markdown report")
     args = parser.parse_args()
 
@@ -154,7 +158,12 @@ def main() -> int:
 
     fx_results = load_results(fx_path)
     mx_results = load_results(mx_path)
-    report, blockers, _warnings = render_report(fx_results, mx_results, str(fx_path), str(mx_path))
+    report, blockers, _warnings = render_report(
+        fx_results,
+        mx_results,
+        args.fx_label or str(fx_path),
+        args.mx_label or str(mx_path),
+    )
 
     if args.output:
         output_path = Path(args.output)

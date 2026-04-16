@@ -11,13 +11,21 @@ TMP_DIR="${OUT_DIR}.tmp"
 rm -rf "$TMP_DIR"
 mkdir -p "$TMP_DIR"
 
-"$SCRIPT_DIR/run_subset0_runtime_ownership.sh" "$TMP_DIR/runtime-ownership"
+runtime_status=0
+if ! "$SCRIPT_DIR/run_subset0_runtime_ownership.sh" "$TMP_DIR/runtime-ownership"; then
+    runtime_status=$?
+fi
 
+allocator_status=0
 if [ -n "${FX_JSON:-}" ]; then
     FX_JSON_ABS=$(absolute_path "$FX_JSON")
-    FX_JSON="$FX_JSON_ABS" "$SCRIPT_DIR/run_subset0_public_allocator_compare.sh" "$TMP_DIR/public-allocator-compare"
+    if ! FX_JSON="$FX_JSON_ABS" "$SCRIPT_DIR/run_subset0_public_allocator_compare.sh" "$TMP_DIR/public-allocator-compare"; then
+        allocator_status=$?
+    fi
 else
-    "$SCRIPT_DIR/run_subset0_public_allocator_compare.sh" "$TMP_DIR/public-allocator-compare"
+    if ! "$SCRIPT_DIR/run_subset0_public_allocator_compare.sh" "$TMP_DIR/public-allocator-compare"; then
+        allocator_status=$?
+    fi
 fi
 
 generated_at=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
@@ -36,6 +44,8 @@ Notes:
 - runtime-ownership summary is in \`runtime-ownership/summary.md\`
 - public allocator comparison summary is in \`public-allocator-compare/summary.md\`
 - this suite wrapper preserves both sub-run directories under one root for handoff
+- runtime-ownership exit status: \`$runtime_status\`
+- public-allocator-compare exit status: \`$allocator_status\`
 EOF
 
 write_sha256_manifest "$TMP_DIR"
@@ -43,3 +53,7 @@ write_sha256_manifest "$TMP_DIR"
 rm -rf "$OUT_DIR"
 mv "$TMP_DIR" "$OUT_DIR"
 printf 'Wrote MX Subset 0 suite artifacts to %s\n' "$OUT_DIR"
+if [ "$runtime_status" -ne 0 ]; then
+    exit "$runtime_status"
+fi
+exit "$allocator_status"

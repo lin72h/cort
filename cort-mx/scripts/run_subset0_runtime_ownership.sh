@@ -25,7 +25,7 @@ write_toolchain_info "$TMP_DIR/toolchain.txt"
 {
     printf 'compile: %s\n' "$COMPILE_CMD"
     printf 'run: %s\n' "$RUN_CMD"
-    printf 'report: python3 %s --json out/%s --expected %s --output summary.md\n' "$REPORT_TOOL" "$JSON_NAME" "$EXPECTATIONS_FILE"
+    printf 'report: python3 %s --json out/%s --json-label out/%s --expected %s --expected-label expectations/%s --output summary.md\n' "$REPORT_TOOL" "$JSON_NAME" "$JSON_NAME" "$EXPECTATIONS_FILE" "$(basename "$EXPECTATIONS_FILE")"
 } > "$TMP_DIR/commands.txt"
 
 (
@@ -35,9 +35,11 @@ write_toolchain_info "$TMP_DIR/toolchain.txt"
     cp "out/$JSON_NAME" "out/subset0_runtime_ownership.stdout"
 )
 
-python3 "$REPORT_TOOL" \
+    python3 "$REPORT_TOOL" \
     --json "$TMP_DIR/out/$JSON_NAME" \
+    --json-label "out/$JSON_NAME" \
     --expected "$EXPECTATIONS_FILE" \
+    --expected-label "expectations/$(basename "$EXPECTATIONS_FILE")" \
     --output "$TMP_DIR/summary.md" \
     > "$TMP_DIR/out/report.stdout" \
     2> "$TMP_DIR/out/report.stderr" || report_status=$?
