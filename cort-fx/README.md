@@ -8,9 +8,10 @@ Subset 0, Subset 1A, and Subset 1B:
 - Subset 1B: minimal immutable `CFString` for plist-valid keys and later
   bplist string paths
 
-The next planned slice after this proof is Subset 2:
+The next planned slice after this proof is Subset 2A:
 
-- containers and ownership semantics for object graphs
+- bounded container core for arrays, dictionaries, and ownership semantics for
+  plist-valid object graphs
 - MX and FX contracts still live in `../docs/` and `../cort-mx/`
 
 It is not the final repository layout. The final target remains
@@ -154,8 +155,8 @@ What they enforce:
   `../wip-cort-gpt-artifacts/cort-fx/runs/`
 - repo workflow selfcheck can validate the compare/report tooling and the FX
   `make clean test` target with `../tools/run_elixir.sh ../tools/workflow_selfcheck.exs`
-- when that selfcheck runs on Darwin, it also executes the real MX Subset 0
-  and Subset 1A scripts under a temporary artifact root
+- when that selfcheck runs on Darwin, it also executes the real MX Subset 0,
+  Subset 1A, Subset 1B, and Subset 2A scripts under a temporary artifact root
 
 ## Install
 

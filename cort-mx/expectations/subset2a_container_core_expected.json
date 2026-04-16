@@ -1,0 +1,61 @@
+{
+  "probe": "subset2a_container_core",
+  "cases": [
+    {
+      "name": "cfarray_empty_immutable",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Empty immutable array creation and zero-count observation."
+    },
+    {
+      "name": "cfarray_immutable_cftype_borrowed_get",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Immutable array creation with kCFTypeArrayCallBacks plus borrowed Get pointer identity."
+    },
+    {
+      "name": "cfarray_mutable_append_remove_retains",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Mutable array append/remove ownership with kCFTypeArrayCallBacks and borrowed Get semantics."
+    },
+    {
+      "name": "cfarray_createcopy_borrowed_get",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Array CreateCopy ownership plus borrowed child pointer identity."
+    },
+    {
+      "name": "cfdictionary_empty_immutable",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Empty immutable dictionary creation and zero-count observation."
+    },
+    {
+      "name": "cfdictionary_immutable_string_key_lookup",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Immutable dictionary string-key lookup with borrowed Get and GetValueIfPresent semantics."
+    },
+    {
+      "name": "cfdictionary_mutable_set_replace_remove_retains",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Mutable dictionary set, replace, remove, and deallocation ownership with string keys."
+    },
+    {
+      "name": "cfdictionary_createcopy_borrowed_lookup",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Dictionary CreateCopy ownership plus borrowed lookup pointer identity."
+    }
+  ]
+}

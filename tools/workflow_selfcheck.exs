@@ -49,9 +49,11 @@ defmodule WorkflowSelfcheck do
       {"subset0 runtime manifest report", fn -> subset0_runtime_report_check!(repo_root) end},
       {"subset1 manifest report", fn -> subset1_manifest_report_check!(repo_root) end},
       {"subset1b manifest report", fn -> subset1b_manifest_report_check!(repo_root) end},
+      {"subset2a manifest report", fn -> subset2a_manifest_report_check!(repo_root) end},
       {"subset0 compare tool", fn -> subset0_compare_check!(repo_root) end},
       {"subset1 compare tool", fn -> subset1_compare_check!(repo_root) end},
       {"subset1b compare tool", fn -> subset1b_compare_check!(repo_root) end},
+      {"subset2a compare tool", fn -> subset2a_compare_check!(repo_root) end},
       {"subset1 MX compare artifact wrapper", fn -> subset1_mx_compare_artifact_check!(repo_root, artifacts_root) end},
       {"subset1b MX compare artifact wrapper", fn -> subset1b_mx_compare_artifact_check!(repo_root, artifacts_root) end},
       {"subset1 FX test target", fn -> subset1_fx_test_target_check!(repo_root, artifacts_root) end},
@@ -67,7 +69,8 @@ defmodule WorkflowSelfcheck do
           {"subset1 MX scalar-core script", fn -> subset1_mx_scalar_core_check!(repo_root, artifacts_root) end},
           {"subset1 MX suite script", fn -> subset1_mx_suite_check!(repo_root, artifacts_root) end},
           {"subset1b MX CFString script", fn -> subset1b_mx_cfstring_check!(repo_root, artifacts_root) end},
-          {"subset1b MX suite script", fn -> subset1b_mx_suite_check!(repo_root, artifacts_root) end}
+          {"subset1b MX suite script", fn -> subset1b_mx_suite_check!(repo_root, artifacts_root) end},
+          {"subset2a MX container script", fn -> subset2a_mx_container_check!(repo_root, artifacts_root) end}
         ]
       else
         []
@@ -89,6 +92,7 @@ defmodule WorkflowSelfcheck do
       "cort-mx/scripts/run_subset1b_cfstring_core.sh",
       "cort-mx/scripts/run_subset1b_cfstring_compare.sh",
       "cort-mx/scripts/run_subset1b_suite.sh",
+      "cort-mx/scripts/run_subset2a_container_core.sh",
       "cort-fx/scripts/run_subset0_fx_artifacts.sh",
       "cort-fx/scripts/run_subset1a_compare_artifact.sh"
     ]
@@ -177,6 +181,31 @@ defmodule WorkflowSelfcheck do
     ensure_contains!(output, "- warnings: 0")
   end
 
+  defp subset2a_manifest_report_check!(repo_root) do
+    output =
+      run_cmd!(
+        Path.join(repo_root, "tools/run_elixir.sh"),
+        [
+          Path.join(repo_root, "tools/report_case_manifest.exs"),
+          "--title",
+          "Subset 2A Container Core Report",
+          "--json",
+          Path.join(repo_root, "cort-mx/fixtures/subset2a_container_core_sample.json"),
+          "--json-label",
+          "out/subset2a_container_core.json",
+          "--expected",
+          Path.join(repo_root, "cort-mx/expectations/subset2a_container_core_expected.json"),
+          "--expected-label",
+          "expectations/subset2a_container_core_expected.json"
+        ],
+        cd: repo_root,
+        expect_exit: 0
+      )
+
+    ensure_contains!(output, "- blockers: 0")
+    ensure_contains!(output, "- warnings: 0")
+  end
+
   defp subset0_compare_check!(repo_root) do
     output =
       run_cmd!(
@@ -236,6 +265,27 @@ defmodule WorkflowSelfcheck do
     ensure_contains!(output, "- warnings: 0")
     ensure_contains!(output, "`cfstring_bytes_invalid_utf8_rejected` | match")
   end
+
+  defp subset2a_compare_check!(repo_root) do
+    output =
+      run_cmd!(
+        Path.join(repo_root, "tools/run_elixir.sh"),
+        [
+          Path.join(repo_root, "tools/compare_subset2a_container_json.exs"),
+          "--fx-json",
+          Path.join(repo_root, "tools/fixtures/subset2a_container_compare_fx_sample.json"),
+          "--mx-json",
+          Path.join(repo_root, "tools/fixtures/subset2a_container_compare_mx_sample.json")
+        ],
+        cd: repo_root,
+        expect_exit: 0
+      )
+
+    ensure_contains!(output, "- blockers: 0")
+    ensure_contains!(output, "- warnings: 0")
+    ensure_contains!(output, "`cfdictionary_mutable_set_replace_remove_retains` | match")
+  end
+
   defp subset1_mx_compare_artifact_check!(repo_root, artifacts_root) do
     run_dir = Path.join([artifacts_root, "cort-mx", "runs", "subset1-mx-scalar-core-compare"])
     summary_path = Path.join(run_dir, "summary.md")
@@ -321,7 +371,8 @@ defmodule WorkflowSelfcheck do
     for path <- [
           Path.join([artifacts_root, "cort-fx", "build", "out", "subset0_public_compare_fx.json"]),
           Path.join([artifacts_root, "cort-fx", "build", "out", "subset1_scalar_core_fx.json"]),
-          Path.join([artifacts_root, "cort-fx", "build", "subset1a-exported-symbols.txt"])
+          Path.join([artifacts_root, "cort-fx", "build", "out", "subset1b_cfstring_fx.json"]),
+          Path.join([artifacts_root, "cort-fx", "build", "subset1b-exported-symbols.txt"])
         ] do
       unless File.exists?(path) do
         raise RuntimeError, "missing FX test output at #{path}"
@@ -331,6 +382,7 @@ defmodule WorkflowSelfcheck do
     ensure_contains!(output, "PASS runtime_ownership_tests")
     ensure_contains!(output, "PASS runtime_abort_tests")
     ensure_contains!(output, "PASS scalar_core_tests")
+    ensure_contains!(output, "PASS string_core_tests")
     ensure_contains!(output, "PASS c_consumer_smoke")
   end
 
@@ -500,6 +552,30 @@ defmodule WorkflowSelfcheck do
     ensure_contains!(File.read!(compare_summary_path), "- warnings: 0")
   end
 
+  defp subset2a_mx_container_check!(repo_root, artifacts_root) do
+    run_dir = Path.join([artifacts_root, "cort-mx", "runs", "subset2a-mx-container-core"])
+    summary_path = Path.join(run_dir, "summary.md")
+    json_path = Path.join([run_dir, "out", "subset2a_container_core.json"])
+    stderr_path = Path.join([run_dir, "out", "report.stderr"])
+
+    run_cmd!(
+      Path.join(repo_root, "cort-mx/scripts/run_subset2a_container_core.sh"),
+      [],
+      cd: Path.join(repo_root, "cort-mx"),
+      env: [{"CORT_ARTIFACTS_ROOT", artifacts_root}],
+      expect_exit: 0
+    )
+
+    for path <- [summary_path, json_path, stderr_path] do
+      unless File.exists?(path) do
+        raise RuntimeError, "missing MX subset2a container output at #{path}"
+      end
+    end
+
+    ensure_contains!(File.read!(summary_path), "- blockers: 0")
+    ensure_contains!(File.read!(summary_path), "- warnings: 0")
+    ensure_empty_or_whitespace!(File.read!(stderr_path), stderr_path)
+  end
   defp subset1_make_compare_check!(repo_root, artifacts_root) do
     report_path = Path.join([artifacts_root, "cort-fx", "build", "out", "subset1_scalar_core_fx_vs_mx_report.md"])
 

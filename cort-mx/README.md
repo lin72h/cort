@@ -38,6 +38,13 @@ Subset 1B:
 - `expectations/subset1b_cfstring_core_expected.json`
 - `fixtures/subset1b_cfstring_core_sample.json`
 
+Subset 2A:
+
+- `src/cort_mx_subset2a_container_core.c`
+- `scripts/run_subset2a_container_core.sh`
+- `expectations/subset2a_container_core_expected.json`
+- `fixtures/subset2a_container_core_sample.json`
+
 ## Purpose
 
 These assets turn the MX lane from a text request into a reproducible run
@@ -142,9 +149,12 @@ Portable checks covered by `../tools/run_elixir.sh ../tools/workflow_selfcheck.e
   `fixtures/subset1_scalar_core_sample.json`
 - generic manifest reporter behavior against
   `fixtures/subset1b_cfstring_core_sample.json`
+- generic manifest reporter behavior against
+  `fixtures/subset2a_container_core_sample.json`
 - Subset 0 FX-vs-MX compare behavior against sample JSON fixtures
 - Subset 1A FX-vs-MX compare behavior against sample JSON fixtures
 - Subset 1B FX-vs-MX compare behavior against sample JSON fixtures
+- Subset 2A FX-vs-MX compare behavior against sample JSON fixtures
 - MX-side Subset 1A compare artifact wrapper against preserved sample artifacts
 - MX-side Subset 1B compare artifact wrapper against preserved sample artifacts
 - FX-side Subset 1A compare wrappers against preserved sample artifacts
@@ -160,6 +170,8 @@ Additional checks performed by the same selfcheck on Darwin hosts:
   artifact root
 - actual `scripts/run_subset1b_suite.sh` execution under a temporary artifact
   root with preserved sample FX JSON
+- actual `scripts/run_subset2a_container_core.sh` execution under a temporary
+  artifact root
 - preservation of MX run directories, summaries, and hashes
 
 On non-Darwin hosts, the selfcheck skips those macOS-only MX script checks.
@@ -289,4 +301,40 @@ tools/run_elixir.sh tools/compare_subset1b_cfstring_json.exs \
   --fx-json /path/to/subset1b_cfstring_fx.json \
   --mx-json /path/to/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json \
   --output /path/to/subset1b_cfstring_fx_vs_mx_report.md
+```
+
+## Subset 2A Container Core
+
+This slice validates the first narrow container surface:
+
+- immutable `CFArray` with `kCFTypeArrayCallBacks`
+- mutable `CFArray` append/remove ownership
+- immutable `CFDictionary` with `kCFType` key/value callbacks
+- mutable `CFDictionary` set/replace/remove ownership
+- borrowed Get semantics and string-key lookup
+
+Contract:
+
+- `../docs/cort-subset2a-container-core-contract.md`
+- `../docs/cort-subset2a-validation-workflow.md`
+
+Run it with:
+
+```sh
+cd cort-mx
+scripts/run_subset2a_container_core.sh
+```
+
+Default output:
+
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/`
+
+When FX later emits a Subset 2A JSON artifact, compare it against MX with:
+
+```sh
+cd ..
+tools/run_elixir.sh tools/compare_subset2a_container_json.exs \
+  --fx-json /path/to/subset2a_container_fx.json \
+  --mx-json /path/to/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json \
+  --output /path/to/subset2a_container_fx_vs_mx_report.md
 ```
