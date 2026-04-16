@@ -20,7 +20,8 @@ BIN_DIR := $(BUILD_DIR)/bin
 STAGE_DIR ?= $(BUILD_DIR)/stage
 EXPORTS_DIR := exports
 RUN_DIR ?= $(ARTIFACTS_ROOT)/cort-fx/runs/subset0-fx-local
-COMPARE_TOOL := $(REPO_ROOT)/tools/compare_subset0_json.py
+ELIXIR_RUN := $(REPO_ROOT)/tools/run_elixir.sh
+COMPARE_TOOL := $(REPO_ROOT)/tools/compare_subset0_json.exs
 RUN_ARTIFACT_SCRIPT := scripts/run_subset0_fx_artifacts.sh
 
 LIB := $(LIB_DIR)/libcortfx.a
@@ -82,7 +83,7 @@ compare-with-mx: compare-fx $(COMPARE_TOOL)
 		echo "set MX_JSON=/path/to/subset0_public_compare_mx.json"; \
 		exit 1; \
 	fi
-	python3 $(COMPARE_TOOL) --fx-json $(FX_JSON) --mx-json $(MX_JSON) --output $(COMPARE_REPORT)
+	$(ELIXIR_RUN) $(COMPARE_TOOL) --fx-json $(FX_JSON) --mx-json $(MX_JSON) --output $(COMPARE_REPORT)
 	cat $(COMPARE_REPORT)
 
 artifact-run: $(RUN_ARTIFACT_SCRIPT)

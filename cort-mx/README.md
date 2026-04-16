@@ -30,10 +30,11 @@ workflow:
 - report the full runtime-ownership JSON against the current expected-case
   manifest
 
-Python note:
+Elixir note:
 
-- the reporter tools are kept compatible with stock macOS `python3` 3.9.x
-- no third-party Python dependencies are required
+- the workflow reporters now run through Elixir with no third-party dependencies
+- if your default `elixir` points at the wrong OTP, set `ELIXIR=/path/to/elixir`
+  and/or adjust `PATH` before running the scripts
 
 ## One-Off Runs
 
@@ -96,7 +97,7 @@ If the FX lane used `make artifact-run`, the same JSON is also preserved under:
 
 The runtime-ownership script uses:
 
-- `../tools/report_subset0_runtime_ownership.py`
+- `../tools/report_subset0_runtime_ownership.exs`
 - `expectations/subset0_runtime_ownership_expected.json`
 
 It emits a blocker/warning summary in the run directory `summary.md`.
@@ -111,7 +112,7 @@ Exit status:
 Validated locally on the FX host:
 
 - shell syntax for all scripts with `sh -n`
-- Python syntax for the reporters with `python3 -m py_compile`
+- Elixir syntax for the reporters with `elixir`
 - runtime-ownership reporter behavior against
   `fixtures/subset0_runtime_ownership_sample.json`
 

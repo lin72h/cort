@@ -8,6 +8,7 @@ CORT_REPO_ROOT=$(CDPATH= cd -- "$CORT_MX_DIR/.." && pwd)
 CORT_REPO_PARENT=$(CDPATH= cd -- "$CORT_REPO_ROOT/.." && pwd)
 CORT_REPO_NAME=$(basename "$CORT_REPO_ROOT")
 CORT_ARTIFACTS_ROOT=${CORT_ARTIFACTS_ROOT:-"$CORT_REPO_PARENT/${CORT_REPO_NAME}-artifacts"}
+CORT_ELIXIR_RUNNER="$CORT_REPO_ROOT/tools/run_elixir.sh"
 
 absolute_path() {
     path=$1
@@ -79,8 +80,8 @@ write_toolchain_info() {
         printf '\n'
         run_clang --version
         printf '\n'
-        if command -v python3 >/dev/null 2>&1; then
-            python3 --version
+        if [ -x "$CORT_ELIXIR_RUNNER" ]; then
+            "$CORT_ELIXIR_RUNNER" --version
         fi
     } > "$output"
 }

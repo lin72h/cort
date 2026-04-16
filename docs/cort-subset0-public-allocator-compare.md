@@ -120,6 +120,27 @@ not papered over.
 Do not upgrade a semantic-only row into a blocking runtime issue unless the
 Subset 0 contract is amended.
 
+## Current Result
+
+The current MX rerun with a real FX JSON input produced:
+
+- allocator comparison report:
+  `../wip-cort-gpt-artifacts/cort-mx/runs/subset0-mx-suite/public-allocator-compare/out/subset0_public_compare_report.md`
+- MX JSON:
+  `../wip-cort-gpt-artifacts/cort-mx/runs/subset0-mx-suite/public-allocator-compare/out/subset0_public_compare_mx.json`
+
+Outcome:
+
+- blockers: 0
+- warnings: 0
+- verdict: no blocking mismatches found in the shared comparison surface
+
+Observed diagnostic-only variance:
+
+- `allocator_singleton_retain_identity` retain-count magnitude differs between
+  FX and MX
+- pointer identity and required ownership semantics still match
+
 ## What This Does Not Cover
 
 This harness does not cover:

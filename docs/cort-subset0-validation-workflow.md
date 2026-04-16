@@ -117,7 +117,7 @@ The suite creates:
 
 The runtime-ownership script also runs:
 
-- `tools/report_subset0_runtime_ownership.py`
+- `tools/report_subset0_runtime_ownership.exs`
 
 against:
 
@@ -137,7 +137,7 @@ MX script exit behavior:
 
 Comparison tool:
 
-- `tools/compare_subset0_json.py`
+- `tools/compare_subset0_json.exs`
 
 Wrapper command:
 
@@ -172,6 +172,24 @@ Warning rules:
 Numeric `type_id` values are diagnostic only across implementations. The report
 records them, but does not treat raw numeric mismatch as blocking.
 
+## Current Validation State
+
+Current recorded macOS outcome:
+
+- runtime-ownership suite summary:
+  `../wip-cort-gpt-artifacts/cort-mx/runs/subset0-mx-suite/runtime-ownership/summary.md`
+- public allocator comparison summary:
+  `../wip-cort-gpt-artifacts/cort-mx/runs/subset0-mx-suite/public-allocator-compare/summary.md`
+
+Current result:
+
+- runtime-ownership: 0 blockers, 0 warnings
+- public allocator comparison: 0 blockers, 0 warnings
+- no confirmed FX-vs-MX semantic mismatch on the shared allocator surface
+- only diagnostic variance observed so far:
+  `allocator_singleton_retain_identity` retain-count magnitude differs, while
+  pointer identity semantics still match
+
 ## Recommended Order
 
 1. Run `make artifact-run` on FX and preserve the local run directory.
@@ -201,9 +219,16 @@ Subset 0 is still not semantically complete until MX confirms:
 
 FX local evidence is necessary, but not sufficient.
 
+Current state against that gate:
+
+- public retain/release and allocator rows are now confirmed by MX for Subset 0
+- no blocking mismatch is currently recorded on the shared allocator surface
+- future Subset 0 completion still depends on whether the remaining public rows
+  needed by LaunchX stay within this validated semantic envelope
+
 Local validation boundary:
 
 - FX artifact-run and compare tooling were executed locally
-- MX shell and Python assets were syntax-checked locally
+- MX shell and Elixir assets were syntax-checked locally
 - MX runtime-ownership reporting was exercised against a sample JSON fixture
 - actual MX compilation and run capture still require a real macOS host

@@ -8,7 +8,8 @@ OUT_DIR=${1:-"$CORT_ARTIFACTS_ROOT/cort-mx/runs/subset0-mx-public-allocator-comp
 OUT_DIR=$(absolute_path "$OUT_DIR")
 TMP_DIR="${OUT_DIR}.tmp"
 SOURCE_FILE="$CORT_MX_DIR/src/cort_subset0_public_allocator_compare.c"
-COMPARE_TOOL="$CORT_REPO_ROOT/tools/compare_subset0_json.py"
+COMPARE_TOOL="$CORT_REPO_ROOT/tools/compare_subset0_json.exs"
+ELIXIR_RUNNER="$CORT_REPO_ROOT/tools/run_elixir.sh"
 BIN_NAME="cort_subset0_public_allocator_compare"
 JSON_NAME="subset0_public_compare_mx.json"
 
@@ -25,7 +26,7 @@ write_toolchain_info "$TMP_DIR/toolchain.txt"
     printf 'compile: %s\n' "$COMPILE_CMD"
     printf 'run: %s\n' "$RUN_CMD"
     if [ -n "${FX_JSON:-}" ]; then
-        printf 'compare: python3 %s --fx-json %s --fx-label %s --mx-json out/%s --mx-label out/%s --output out/subset0_public_compare_report.md\n' "$COMPARE_TOOL" "$FX_JSON" "$FX_JSON" "$JSON_NAME" "$JSON_NAME"
+        printf 'compare: %s %s --fx-json %s --fx-label %s --mx-json out/%s --mx-label out/%s --output out/subset0_public_compare_report.md\n' "$ELIXIR_RUNNER" "$COMPARE_TOOL" "$FX_JSON" "$FX_JSON" "$JSON_NAME" "$JSON_NAME"
     fi
 } > "$TMP_DIR/commands.txt"
 
@@ -37,7 +38,7 @@ write_toolchain_info "$TMP_DIR/toolchain.txt"
 )
 
 if [ -n "${FX_JSON:-}" ]; then
-    python3 "$COMPARE_TOOL" \
+    "$ELIXIR_RUNNER" "$COMPARE_TOOL" \
         --fx-json "$FX_JSON" \
         --fx-label "$FX_JSON" \
         --mx-json "$TMP_DIR/out/$JSON_NAME" \
@@ -68,7 +69,7 @@ Artifacts:
 Comparison:
 
 - no FX JSON was provided to this script
-- run \`python3 $COMPARE_TOOL --fx-json /path/to/fx.json --mx-json out/$JSON_NAME --output out/subset0_public_compare_report.md\` later to compare against FX
+- run \`$ELIXIR_RUNNER $COMPARE_TOOL --fx-json /path/to/fx.json --mx-json out/$JSON_NAME --output out/subset0_public_compare_report.md\` later to compare against FX
 EOF
 fi
 

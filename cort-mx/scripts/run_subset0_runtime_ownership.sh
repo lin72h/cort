@@ -9,7 +9,8 @@ OUT_DIR=$(absolute_path "$OUT_DIR")
 TMP_DIR="${OUT_DIR}.tmp"
 SOURCE_FILE="$CORT_MX_DIR/src/cort_mx_subset0_runtime_ownership.c"
 EXPECTATIONS_FILE="$CORT_MX_DIR/expectations/subset0_runtime_ownership_expected.json"
-REPORT_TOOL="$CORT_REPO_ROOT/tools/report_subset0_runtime_ownership.py"
+REPORT_TOOL="$CORT_REPO_ROOT/tools/report_subset0_runtime_ownership.exs"
+ELIXIR_RUNNER="$CORT_REPO_ROOT/tools/run_elixir.sh"
 BIN_NAME="cort_mx_subset0_runtime_ownership"
 JSON_NAME="subset0_runtime_ownership.json"
 
@@ -25,7 +26,7 @@ write_toolchain_info "$TMP_DIR/toolchain.txt"
 {
     printf 'compile: %s\n' "$COMPILE_CMD"
     printf 'run: %s\n' "$RUN_CMD"
-    printf 'report: python3 %s --json out/%s --json-label out/%s --expected %s --expected-label expectations/%s --output summary.md\n' "$REPORT_TOOL" "$JSON_NAME" "$JSON_NAME" "$EXPECTATIONS_FILE" "$(basename "$EXPECTATIONS_FILE")"
+    printf 'report: %s %s --json out/%s --json-label out/%s --expected %s --expected-label expectations/%s --output summary.md\n' "$ELIXIR_RUNNER" "$REPORT_TOOL" "$JSON_NAME" "$JSON_NAME" "$EXPECTATIONS_FILE" "$(basename "$EXPECTATIONS_FILE")"
 } > "$TMP_DIR/commands.txt"
 
 (
@@ -35,7 +36,7 @@ write_toolchain_info "$TMP_DIR/toolchain.txt"
     cp "out/$JSON_NAME" "out/subset0_runtime_ownership.stdout"
 )
 
-    python3 "$REPORT_TOOL" \
+    "$ELIXIR_RUNNER" "$REPORT_TOOL" \
     --json "$TMP_DIR/out/$JSON_NAME" \
     --json-label "out/$JSON_NAME" \
     --expected "$EXPECTATIONS_FILE" \

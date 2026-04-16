@@ -180,7 +180,7 @@ make compare-with-mx MX_JSON=/path/to/subset0_public_compare_mx.json
 
 This uses:
 
-- `../tools/compare_subset0_json.py`
+- `../tools/compare_subset0_json.exs`
 
 and writes:
 

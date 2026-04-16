@@ -561,8 +561,8 @@ Temporary implementation location in this repo:
 - `cort-mx/expectations/subset0_runtime_ownership_expected.json`
 - `cort-mx/src/cort_mx_subset0_runtime_ownership.c`
 - `cort-mx/src/cort_subset0_public_allocator_compare.c`
-- `tools/compare_subset0_json.py`
-- `tools/report_subset0_runtime_ownership.py`
+- `tools/compare_subset0_json.exs`
+- `tools/report_subset0_runtime_ownership.exs`
 - `docs/cort-subset0-public-allocator-compare.md`
 - `docs/cort-subset0-validation-workflow.md`
 - `docs/cort-fx-subset0-provenance.md`
@@ -595,7 +595,7 @@ Local verification result on the FX host:
 - FX-vs-MX comparison wrapper is ready and self-compare reports zero blockers
 - MX execution scripts, expectation manifest, and runtime-ownership reporter are
   now present in the repo
-- MX shell syntax and Python syntax were validated locally
+- MX shell syntax and Elixir tooling were validated locally
 - runtime-ownership reporting was exercised locally against a sample JSON
   fixture
 - dynamic dependencies are limited to `libthr`, `libc`, and `libsys`
@@ -641,7 +641,12 @@ Local proof constraints and known variances:
 - custom allocator support is present only far enough for Subset 0 proof
 - `CFAllocatorReallocate` returns `NULL` when an allocator does not provide a
   reallocate callback; there is no lossy allocate-and-free fallback
-- MX has not yet validated the required public semantic rows
+- MX validated the current runtime-ownership manifest with zero blockers and
+  zero warnings on macOS
+- MX and FX allocator comparison found zero blockers and zero warnings on the
+  shared allocator surface
+- allocator singleton retain-count magnitudes differ diagnostically between FX
+  and MX, but pointer identity and required ownership semantics match
 - implementation provenance and deliberate departures are recorded in
   `docs/cort-fx-subset0-provenance.md`
 - shared FX/MX public allocator comparison flow is recorded in
@@ -654,16 +659,16 @@ Local proof constraints and known variances:
 
 | Subset | API or behavior | MX observation artifact | FX implementation status | Match level | Known variance | Test name | Migration status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 0 | `CFRetain` returns same pointer and increments ownership | Pending `cort-mx-subset0-runtime-ownership` | Implemented locally in `cort-fx`; verified by `runtime_ownership_tests` | `semantic` | retain-count numerics flexible | `runtime_retain_returns_same_pointer` | MX pending |
-| 0 | `CFRelease` consumes one retain | Pending | Implemented locally in `cort-fx`; verified by `runtime_ownership_tests` | `semantic` | failure mode text flexible | `runtime_release_balances_retain` | MX pending |
+| 0 | `CFRetain` returns same pointer and increments ownership | `../wip-cort-gpt-artifacts/cort-mx/runs/subset0-mx-suite/runtime-ownership/out/subset0_runtime_ownership.json` | Implemented locally in `cort-fx`; verified by `runtime_ownership_tests` | `semantic` | retain-count numerics flexible | `runtime_retain_returns_same_pointer` | MX validated |
+| 0 | `CFRelease` consumes one retain | `../wip-cort-gpt-artifacts/cort-mx/runs/subset0-mx-suite/runtime-ownership/out/subset0_runtime_ownership.json` | Implemented locally in `cort-fx`; verified by `runtime_ownership_tests` | `semantic` | failure mode text flexible | `runtime_release_balances_retain` | MX validated |
 | 0 | finalizer fires exactly once at last release | FX-only internal plus MX ownership observations | Implemented locally in `cort-fx`; verified by `runtime_ownership_tests` | `fx-specific` | macOS private runtime finalizer not probed | `runtime_finalizer_once` | Local proof only |
-| 0 | `CFGetTypeID` returns stable process-local type ID | Pending public MX object probes | Implemented locally in `cort-fx`; verified by `runtime_ownership_tests` | `semantic` | numeric IDs may differ | `runtime_type_id_stable` | MX pending |
+| 0 | `CFGetTypeID` returns stable process-local type ID | `../wip-cort-gpt-artifacts/cort-mx/runs/subset0-mx-suite/runtime-ownership/out/subset0_runtime_ownership.json` | Implemented locally in `cort-fx`; verified by `runtime_ownership_tests` | `semantic` | numeric IDs may differ | `runtime_type_id_stable` | MX validated |
 | 0 | `_CFRuntimeRegisterClass` registers custom class | No private MX probe by design | Implemented locally in `cort-fx`; verified by `runtime_ownership_tests` | `fx-specific` | public MX has no supported equivalent | `runtime_register_custom_class` | Local proof only |
 | 0 | `_CFRuntimeCreateInstance` allocates typed object | No private MX probe by design | Implemented locally in `cort-fx`; verified by `runtime_ownership_tests` | `fx-specific` | internal FX mechanism only | `runtime_create_instance_sets_type` | Local proof only |
-| 0 | default/system allocator bootstraps runtime allocation | MX public allocator behavior optional | Implemented locally in `cort-fx`; verified by `runtime_ownership_tests` | `semantic` | FX can use simpler bootstrap | `allocator_system_allocates_runtime_object` | MX pending |
+| 0 | default/system allocator bootstraps runtime allocation | `../wip-cort-gpt-artifacts/cort-mx/runs/subset0-mx-suite/public-allocator-compare/out/subset0_public_compare_mx.json` | Implemented locally in `cort-fx`; verified by `runtime_ownership_tests` | `semantic` | FX can use simpler bootstrap | `allocator_system_allocates_runtime_object` | MX validated |
 | 0 | static allocator singletons are immortal | FX-specific, informed by public allocator singleton behavior | Implemented locally in `cort-fx`; verified by `runtime_ownership_tests` | `fx-specific` | native retain-count numerics ignored | `allocator_static_singletons_immortal` | Local proof only |
-| 0 | `kCFAllocatorNull` refuses allocation | Pending if MX includes allocator probe | Implemented locally in `cort-fx`; verified by `runtime_ownership_tests` | `semantic` | error text flexible | `allocator_null_returns_null` | MX pending |
-| 0 | retain/release thread safety | No MX internals; public stress probe allowed | Implemented locally in `cort-fx`; verified by `runtime_ownership_tests` | `semantic` | exact retain count flexible | `runtime_concurrent_retain_release` | MX pending |
+| 0 | `kCFAllocatorNull` refuses allocation | `../wip-cort-gpt-artifacts/cort-mx/runs/subset0-mx-suite/public-allocator-compare/out/subset0_public_compare_mx.json` | Implemented locally in `cort-fx`; verified by `runtime_ownership_tests` | `semantic` | error text flexible | `allocator_null_returns_null` | MX validated |
+| 0 | retain/release thread safety | `../wip-cort-gpt-artifacts/cort-mx/runs/subset0-mx-suite/runtime-ownership/out/subset0_runtime_ownership.json` | Implemented locally in `cort-fx`; verified by `runtime_ownership_tests` | `semantic` | exact retain count flexible | `runtime_concurrent_retain_release` | MX validated |
 | 0 | `CFCopyTypeIDDescription` | Observation only | Deferred | `unknown` | requires `CFString` | Deferred | Not ready |
 | 0 | `CFCopyDescription` | Observation only | Deferred | `unknown` | requires `CFString` | Deferred | Not ready |
 | 0 | Objective-C bridge behavior | Out of scope | Rejected | `rejected` | no ObjC on FX | None | Not applicable |
@@ -673,6 +678,25 @@ Local proof constraints and known variances:
 
 No LaunchX production path may depend on any row whose match level remains
 `unknown`.
+
+Actual Subset 0 MX validation outcome recorded on macOS:
+
+- runtime-ownership report:
+  `../wip-cort-gpt-artifacts/cort-mx/runs/subset0-mx-suite/runtime-ownership/summary.md`
+- runtime-ownership JSON:
+  `../wip-cort-gpt-artifacts/cort-mx/runs/subset0-mx-suite/runtime-ownership/out/subset0_runtime_ownership.json`
+- public allocator comparison report:
+  `../wip-cort-gpt-artifacts/cort-mx/runs/subset0-mx-suite/public-allocator-compare/out/subset0_public_compare_report.md`
+- public allocator comparison MX JSON:
+  `../wip-cort-gpt-artifacts/cort-mx/runs/subset0-mx-suite/public-allocator-compare/out/subset0_public_compare_mx.json`
+
+Observed outcome:
+
+- runtime-ownership: 0 blockers, 0 warnings
+- allocator comparison: 0 blockers, 0 warnings
+- diagnostic-only variance:
+  `allocator_singleton_retain_identity` retain-count magnitude differs between
+  FX and MX, but pointer identity semantics still match
 
 ## Exact MX Probe Request
 
