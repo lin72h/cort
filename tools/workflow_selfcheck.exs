@@ -55,6 +55,7 @@ defmodule WorkflowSelfcheck do
       {"subset1 MX compare artifact wrapper", fn -> subset1_mx_compare_artifact_check!(repo_root, artifacts_root) end},
       {"subset1 FX test target", fn -> subset1_fx_test_target_check!(repo_root, artifacts_root) end},
       {"subset1 FX make compare wrapper", fn -> subset1_make_compare_check!(repo_root, artifacts_root) end},
+      {"subset1b FX make compare wrapper", fn -> subset1b_make_compare_check!(repo_root, artifacts_root) end},
       {"subset1 FX compare artifact wrapper", fn -> subset1_compare_artifact_check!(repo_root, artifacts_root) end}
     ]
 
@@ -477,6 +478,30 @@ defmodule WorkflowSelfcheck do
 
     ensure_contains!(File.read!(summary_path), "- warnings: 0")
     ensure_empty_or_whitespace!(File.read!(stderr_path), stderr_path)
+  end
+
+  defp subset1b_make_compare_check!(repo_root, artifacts_root) do
+    report_path = Path.join([artifacts_root, "cort-fx", "build", "out", "subset1b_cfstring_fx_vs_mx_report.md"])
+
+    output =
+      run_cmd!(
+        "make",
+        [
+          "compare-subset1b-with-mx",
+          "FX_STRING_JSON=#{Path.join(repo_root, "tools/fixtures/subset1b_cfstring_compare_fx_sample.json")}",
+          "MX_JSON=#{Path.join(repo_root, "tools/fixtures/subset1b_cfstring_compare_mx_sample.json")}"
+        ],
+        cd: Path.join(repo_root, "cort-fx"),
+        env: [{"CORT_ARTIFACTS_ROOT", artifacts_root}],
+        expect_exit: 0
+      )
+
+    unless File.exists?(report_path) do
+      raise RuntimeError, "missing compare report at #{report_path}"
+    end
+
+    ensure_contains!(output, "- warnings: 0")
+    ensure_contains!(File.read!(report_path), "`cfstring_cstring_invalid_utf8_rejected` | match")
   end
 
   defp run_cmd!(command, args, opts) do

@@ -29,13 +29,15 @@ Explicitly excluded:
 
 MX status:
 
-- probe source, expectations, fixture, and run script exist
-- bounded macOS validation has not been run yet
+- bounded macOS validation completed cleanly on the original 1B probe surface
+- tightened `08db786` probe additions still need a fresh MX rerun for final
+  acceptance of the empty-string and malformed-UTF-8 `CString` rows
 
 FX status:
 
-- no `CFString` implementation yet
-- Subset 1A provides the runtime and scalar base this slice will depend on
+- bounded 1B `CFString` implementation exists locally in `cort-fx`
+- local FX tests, installed-consumer test, and FX JSON probe are green
+- MX comparison against the tightened 1B surface is still pending
 
 ## MX Run
 
@@ -77,9 +79,9 @@ The report should be treated the same way as earlier bounded slices:
 - warnings indicate coordination or classification cleanup work
 - artifacts must still be preserved even on non-zero exit
 
-## Future FX vs MX Comparison
+## FX vs MX Comparison
 
-Once FX emits a Subset 1B JSON artifact, compare it against the MX JSON with:
+Compare the FX JSON artifact against the MX JSON with:
 
 - `tools/compare_subset1b_cfstring_json.exs`
 
@@ -93,9 +95,16 @@ Direct invocation:
   --output /path/to/subset1b_cfstring_fx_vs_mx_report.md
 ```
 
-Expected future FX artifact path:
+FX artifact path:
 
 - `../wip-cort-gpt-artifacts/cort-fx/build/out/subset1b_cfstring_fx.json`
+
+Convenience make target:
+
+```sh
+cd /Users/me/wip-launchx/wip-cort-gpt/cort-fx
+make compare-subset1b-with-mx MX_JSON=/path/to/subset1b_cfstring_core.json
+```
 
 ## Comparison Rules
 

@@ -177,6 +177,35 @@ static void case_date_get_absolute_time_non_date(void) {
     (void)CFDateGetAbsoluteTime((CFDateRef)object);
 }
 
+static void case_string_get_length_non_string(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonStringLength");
+    (void)CFStringGetLength((CFStringRef)object);
+}
+
+static void case_string_create_copy_non_string(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonStringCopy");
+    (void)CFStringCreateCopy(kCFAllocatorSystemDefault, (CFStringRef)object);
+}
+
+static void case_string_get_cstring_non_string(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonStringCString");
+    char buffer[8];
+    (void)CFStringGetCString((CFStringRef)object, buffer, (CFIndex)sizeof(buffer), kCFStringEncodingUTF8);
+}
+
+static void case_string_get_characters_non_string(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonStringCharacters");
+    UniChar buffer[4];
+    CFStringGetCharacters((CFStringRef)object, CFRangeMake(0, 1), buffer);
+}
+
+static void case_string_get_bytes_non_string(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonStringBytes");
+    UInt8 buffer[8];
+    CFIndex used = 0;
+    (void)CFStringGetBytes((CFStringRef)object, CFRangeMake(0, 1), kCFStringEncodingASCII, 0, false, buffer, (CFIndex)sizeof(buffer), &used);
+}
+
 static void case_cfequal_null(void) {
     (void)CFEqual(NULL, (CFTypeRef)kCFBooleanTrue);
 }
@@ -250,6 +279,11 @@ int main(void) {
     expect_abort(case_number_get_value_non_number, "CFNumberGetValue(non-number)");
     expect_abort(case_number_get_type_non_number, "CFNumberGetType(non-number)");
     expect_abort(case_date_get_absolute_time_non_date, "CFDateGetAbsoluteTime(non-date)");
+    expect_abort(case_string_get_length_non_string, "CFStringGetLength(non-string)");
+    expect_abort(case_string_create_copy_non_string, "CFStringCreateCopy(non-string)");
+    expect_abort(case_string_get_cstring_non_string, "CFStringGetCString(non-string)");
+    expect_abort(case_string_get_characters_non_string, "CFStringGetCharacters(non-string)");
+    expect_abort(case_string_get_bytes_non_string, "CFStringGetBytes(non-string)");
     expect_abort(case_cfequal_null, "CFEqual(NULL, object)");
     expect_abort(case_cfhash_null, "CFHash(NULL)");
     expect_abort(case_cfequal_non_cort_same_pointer, "CFEqual(non-CORT same pointer)");

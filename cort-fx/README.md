@@ -1,16 +1,17 @@
-# cort-fx Subset 0 And 1A Proof
+# cort-fx Subset 0, 1A, And 1B Proof
 
 This directory holds the temporary standalone `cort-fx` proof for CORT
-Subset 0 and Subset 1A:
+Subset 0, Subset 1A, and Subset 1B:
 
 - Subset 0: runtime and ownership core
 - Subset 1A: immutable scalar core without `CFString`
+- Subset 1B: minimal immutable `CFString` for plist-valid keys and later
+  bplist string paths
 
-The next planned slice is Subset 1B:
+The next planned slice after this proof is Subset 2:
 
-- minimal immutable `CFString` for bplist and plist-valid key paths
-- MX assets and contracts live in `../docs/` and `../cort-mx/`
-- no FX `CFString` implementation is present yet
+- containers and ownership semantics for object graphs
+- MX and FX contracts still live in `../docs/` and `../cort-mx/`
 
 It is not the final repository layout. The final target remains
 `../nx/cort/cort-fx/` after explicit permission.
@@ -57,10 +58,18 @@ Implemented:
 - `CFDateGetTypeID`
 - `CFDateCreate`
 - `CFDateGetAbsoluteTime`
+- `CFStringGetTypeID`
+- `CFStringCreateWithCString`
+- `CFStringCreateWithBytes`
+- `CFStringCreateWithCharacters`
+- `CFStringCreateCopy`
+- `CFStringGetLength`
+- `CFStringGetCharacters`
+- `CFStringGetCString`
+- `CFStringGetBytes`
 
 Explicitly not implemented here:
 
-- `CFString`
 - containers
 - plist/bplist
 - XML plist
@@ -101,9 +110,11 @@ This builds under `../wip-cort-gpt-artifacts/cort-fx/build/` by default:
 - `bin/runtime_ownership_tests`
 - `bin/runtime_abort_tests`
 - `bin/scalar_core_tests`
+- `bin/string_core_tests`
 - `bin/c_consumer_smoke`
 - `bin/subset0_public_compare_fx`
 - `bin/subset1_scalar_core_fx`
+- `bin/subset1b_cfstring_fx`
 
 ## Verification Targets
 
@@ -113,7 +124,9 @@ make check-deps
 make check-exports
 make compare-fx
 make compare-subset1a-fx
+make compare-subset1b-fx
 make compare-subset1a-with-mx
+make compare-subset1b-with-mx
 make artifact-run
 make artifact-subset1a-compare
 make test-installed
@@ -122,7 +135,7 @@ make test-installed
 What they enforce:
 
 - no Swift, Objective-C, dispatch, ICU, or CoreFoundation link/symbol coupling
-- public exported symbol set matches `exports/subset1a-exported-symbols.txt`
+- public exported symbol set matches `exports/subset1b-exported-symbols.txt`
 - abort-on-misuse policy remains enforced for invalid public calls and
   ownership failures
 - dependency/export audits are normalized across Darwin and `ldd`-based hosts
@@ -133,6 +146,8 @@ What they enforce:
   `../wip-cort-gpt-artifacts/cort-fx/build/out/subset0_public_compare_fx.json`
 - FX scalar-core probe emits
   `../wip-cort-gpt-artifacts/cort-fx/build/out/subset1_scalar_core_fx.json`
+- FX CFString probe emits
+  `../wip-cort-gpt-artifacts/cort-fx/build/out/subset1b_cfstring_fx.json`
 - Subset 1A compare wrapper can compare that FX JSON against MX and preserve a
   dedicated handoff artifact run
 - artifact-run packaging emits a preservable FX run directory under
@@ -155,6 +170,7 @@ Installed files:
 - `include/CoreFoundation/CFData.h`
 - `include/CoreFoundation/CFDate.h`
 - `include/CoreFoundation/CFNumber.h`
+- `include/CoreFoundation/CFString.h`
 - `include/CoreFoundation/CFRuntime.h`
 - `include/CoreFoundation/CoreFoundation.h`
 - `lib/libcortfx.a`
@@ -196,6 +212,23 @@ That produces:
 MX should compare that against:
 
 - `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json`
+
+## CFString Probe
+
+FX runs the local Subset 1B CFString probe with:
+
+```sh
+cd cort-fx
+make compare-subset1b-fx
+```
+
+That produces:
+
+- `../wip-cort-gpt-artifacts/cort-fx/build/out/subset1b_cfstring_fx.json`
+
+MX should compare that against:
+
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset1b-mx-cfstring-core/out/subset1b_cfstring_core.json`
 
 ## Artifact Run
 

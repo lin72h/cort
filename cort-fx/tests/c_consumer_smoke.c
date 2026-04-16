@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 struct SmokeObject {
     CFRuntimeBase base;
@@ -66,11 +67,13 @@ int main(void) {
         static const UInt8 bytes[] = {0x10u, 0x20u, 0x30u};
         SInt32 value = 42;
         double when = 1234.5;
+        char textBuffer[32];
         CFDataRef data = CFDataCreate(kCFAllocatorSystemDefault, bytes, (CFIndex)sizeof(bytes));
         CFNumberRef number = CFNumberCreate(kCFAllocatorSystemDefault, kCFNumberSInt32Type, &value);
         CFDateRef date = CFDateCreate(kCFAllocatorSystemDefault, when);
+        CFStringRef string = CFStringCreateWithCString(kCFAllocatorSystemDefault, "launchd.packet-key", kCFStringEncodingASCII);
 
-        if (data == NULL || number == NULL || date == NULL) {
+        if (data == NULL || number == NULL || date == NULL || string == NULL) {
             fail("scalar create failed");
         }
         if (!CFBooleanGetValue(kCFBooleanTrue)) {
@@ -85,7 +88,17 @@ int main(void) {
         if (CFDateGetAbsoluteTime(date) != when) {
             fail("date roundtrip mismatch");
         }
+        if (CFStringGetLength(string) != 18) {
+            fail("string length mismatch");
+        }
+        if (!CFStringGetCString(string, textBuffer, (CFIndex)sizeof(textBuffer), kCFStringEncodingUTF8)) {
+            fail("string UTF-8 export failed");
+        }
+        if (strcmp(textBuffer, "launchd.packet-key") != 0) {
+            fail("string UTF-8 export mismatch");
+        }
 
+        CFRelease((CFTypeRef)string);
         CFRelease((CFTypeRef)date);
         CFRelease((CFTypeRef)number);
         CFRelease((CFTypeRef)data);

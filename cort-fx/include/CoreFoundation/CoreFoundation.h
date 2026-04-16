@@ -5,6 +5,7 @@
 #include "CFData.h"
 #include "CFDate.h"
 #include "CFNumber.h"
+#include "CFString.h"
 #include "CFRuntime.h"
 
 #endif

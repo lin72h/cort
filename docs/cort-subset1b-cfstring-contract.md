@@ -2,7 +2,9 @@
 
 Date: 2026-04-16
 
-Status: planned; MX validation assets exist; FX implementation has not started.
+Status: bounded MX validation exists on the original 1B surface; bounded FX
+implementation exists locally; final tightened-surface MX rerun is still
+pending.
 
 This document defines the next narrow slice after validated Subset 1A:
 minimal immutable `CFString` semantics required by future bplist and
@@ -10,8 +12,8 @@ plist-valid key paths.
 
 Purpose:
 
-- validate the smallest useful `CFString` surface on macOS before FX
-  implementation starts
+- validate the smallest useful `CFString` surface on macOS before broadening
+  FX string work
 - support the string creation and extraction paths that future binary plist
   work will actually need
 - keep ICU, locale, formatting, mutable strings, and broad text processing out
