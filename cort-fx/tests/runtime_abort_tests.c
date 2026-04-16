@@ -206,6 +206,62 @@ static void case_string_get_bytes_non_string(void) {
     (void)CFStringGetBytes((CFStringRef)object, CFRangeMake(0, 1), kCFStringEncodingASCII, 0, false, buffer, (CFIndex)sizeof(buffer), &used);
 }
 
+static void case_array_get_count_non_array(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonArrayCount");
+    (void)CFArrayGetCount((CFArrayRef)object);
+}
+
+static void case_array_create_copy_non_array(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonArrayCopy");
+    (void)CFArrayCreateCopy(kCFAllocatorSystemDefault, (CFArrayRef)object);
+}
+
+static void case_array_get_value_non_array(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonArrayGet");
+    (void)CFArrayGetValueAtIndex((CFArrayRef)object, 0);
+}
+
+static void case_array_append_value_non_array(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonArrayAppend");
+    CFArrayAppendValue((CFMutableArrayRef)object, kCFBooleanTrue);
+}
+
+static void case_array_remove_value_non_array(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonArrayRemove");
+    CFArrayRemoveValueAtIndex((CFMutableArrayRef)object, 0);
+}
+
+static void case_dictionary_get_count_non_dictionary(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonDictionaryCount");
+    (void)CFDictionaryGetCount((CFDictionaryRef)object);
+}
+
+static void case_dictionary_create_copy_non_dictionary(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonDictionaryCopy");
+    (void)CFDictionaryCreateCopy(kCFAllocatorSystemDefault, (CFDictionaryRef)object);
+}
+
+static void case_dictionary_get_value_non_dictionary(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonDictionaryGet");
+    (void)CFDictionaryGetValue((CFDictionaryRef)object, kCFBooleanTrue);
+}
+
+static void case_dictionary_get_value_if_present_non_dictionary(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonDictionaryGetIfPresent");
+    const void *value = NULL;
+    (void)CFDictionaryGetValueIfPresent((CFDictionaryRef)object, kCFBooleanTrue, &value);
+}
+
+static void case_dictionary_set_value_non_dictionary(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonDictionarySet");
+    CFDictionarySetValue((CFMutableDictionaryRef)object, kCFBooleanTrue, kCFBooleanFalse);
+}
+
+static void case_dictionary_remove_value_non_dictionary(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonDictionaryRemove");
+    CFDictionaryRemoveValue((CFMutableDictionaryRef)object, kCFBooleanTrue);
+}
+
 static void case_cfequal_null(void) {
     (void)CFEqual(NULL, (CFTypeRef)kCFBooleanTrue);
 }
@@ -284,6 +340,17 @@ int main(void) {
     expect_abort(case_string_get_cstring_non_string, "CFStringGetCString(non-string)");
     expect_abort(case_string_get_characters_non_string, "CFStringGetCharacters(non-string)");
     expect_abort(case_string_get_bytes_non_string, "CFStringGetBytes(non-string)");
+    expect_abort(case_array_get_count_non_array, "CFArrayGetCount(non-array)");
+    expect_abort(case_array_create_copy_non_array, "CFArrayCreateCopy(non-array)");
+    expect_abort(case_array_get_value_non_array, "CFArrayGetValueAtIndex(non-array)");
+    expect_abort(case_array_append_value_non_array, "CFArrayAppendValue(non-array)");
+    expect_abort(case_array_remove_value_non_array, "CFArrayRemoveValueAtIndex(non-array)");
+    expect_abort(case_dictionary_get_count_non_dictionary, "CFDictionaryGetCount(non-dictionary)");
+    expect_abort(case_dictionary_create_copy_non_dictionary, "CFDictionaryCreateCopy(non-dictionary)");
+    expect_abort(case_dictionary_get_value_non_dictionary, "CFDictionaryGetValue(non-dictionary)");
+    expect_abort(case_dictionary_get_value_if_present_non_dictionary, "CFDictionaryGetValueIfPresent(non-dictionary)");
+    expect_abort(case_dictionary_set_value_non_dictionary, "CFDictionarySetValue(non-dictionary)");
+    expect_abort(case_dictionary_remove_value_non_dictionary, "CFDictionaryRemoveValue(non-dictionary)");
     expect_abort(case_cfequal_null, "CFEqual(NULL, object)");
     expect_abort(case_cfhash_null, "CFHash(NULL)");
     expect_abort(case_cfequal_non_cort_same_pointer, "CFEqual(non-CORT same pointer)");

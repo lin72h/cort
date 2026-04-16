@@ -31,13 +31,16 @@ Explicitly excluded:
 MX status:
 
 - probe source, expectations, fixture, and run script exist
-- bounded macOS validation has not been run yet
+- bounded macOS validation exists and the probe has been hardened to avoid the
+  earlier saturated-retain-count false blocker on
+  `cfarray_immutable_cftype_borrowed_get`
 
 FX status:
 
-- no container implementation yet
-- Subset 1A and Subset 1B provide the runtime, scalar, and `CFString` base this
-  slice will depend on later
+- bounded `CFArray` and `CFDictionary` implementation exists locally
+- shared FX artifact path is `../subset2a_container_fx.json`
+- Subset 1A and Subset 1B provide the runtime, scalar, and `CFString` base for
+  this slice
 
 ## MX Run
 
@@ -62,6 +65,52 @@ Primary MX outputs:
 
 - `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/summary.md`
 - `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json`
+
+## MX Compare Wrapper
+
+Compare the shared FX artifact against the preserved MX JSON with:
+
+```sh
+cd /Users/me/wip-launchx/wip-cort-gpt/cort-mx
+scripts/run_subset2a_container_compare.sh
+```
+
+Default compare outputs:
+
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core-compare/summary.md`
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core-compare/out/subset2a_container_fx_vs_mx_report.md`
+
+Default compare inputs:
+
+- FX JSON: `../subset2a_container_fx.json`
+- MX JSON:
+  `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json`
+
+Override either input with:
+
+- `FX_JSON=/path/to/subset2a_container_fx.json`
+- `MX_JSON=/path/to/subset2a_container_core.json`
+
+## MX Suite
+
+Run the full Subset 2A MX suite with:
+
+```sh
+cd /Users/me/wip-launchx/wip-cort-gpt/cort-mx
+scripts/run_subset2a_suite.sh
+```
+
+Default suite outputs:
+
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-suite/summary.md`
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-suite/container-core/summary.md`
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-suite/container-core-compare/summary.md`
+
+The suite reruns the MX core probe and then:
+
+- compares against the shared in-repo `subset2a_container_fx.json` when present
+- or preserves a compare stub that explicitly says the shared FX artifact is
+  missing
 
 ## MX Manifest Report
 
@@ -95,9 +144,10 @@ Direct invocation:
   --output /path/to/subset2a_container_fx_vs_mx_report.md
 ```
 
-Expected future FX artifact path:
+Expected FX artifact path:
 
 - `../wip-cort-gpt-artifacts/cort-fx/build/out/subset2a_container_fx.json`
+- shared handoff artifact: `../subset2a_container_fx.json`
 
 ## Comparison Rules
 
@@ -145,15 +195,21 @@ What it should cover after the Subset 2A assets land:
 - shell syntax and execute-bit presence for the new MX script
 - the generic manifest reporter against the Subset 2A sample fixture
 - the Subset 2A FX-vs-MX compare tool against sample JSON fixtures
+- the MX Subset 2A compare wrapper against preserved sample artifacts
 - on Darwin hosts only, actual execution of
   `cort-mx/scripts/run_subset2a_container_core.sh` under a temporary artifact
   root
+- on Darwin hosts only, actual execution of
+  `cort-mx/scripts/run_subset2a_suite.sh` under a temporary artifact root with
+  preserved sample FX JSON
 
 ## Recommended Order
 
 1. Run `scripts/run_subset2a_container_core.sh` on MX.
 2. Review `summary.md` for blockers or warnings.
-3. Record the artifact path in the Subset 2A contract ledger.
-4. Classify borrowed Get semantics and replacement-release semantics
+3. Compare against the shared FX artifact with
+   `scripts/run_subset2a_container_compare.sh` or `scripts/run_subset2a_suite.sh`.
+4. Record the artifact paths in the Subset 2A contract ledger.
+5. Classify borrowed Get semantics and replacement-release semantics
    explicitly.
-5. Only then start the FX container implementation.
+6. Only then widen beyond the bounded container core.

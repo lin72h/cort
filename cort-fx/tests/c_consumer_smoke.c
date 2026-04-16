@@ -72,6 +72,9 @@ int main(void) {
         CFNumberRef number = CFNumberCreate(kCFAllocatorSystemDefault, kCFNumberSInt32Type, &value);
         CFDateRef date = CFDateCreate(kCFAllocatorSystemDefault, when);
         CFStringRef string = CFStringCreateWithCString(kCFAllocatorSystemDefault, "launchd.packet-key", kCFStringEncodingASCII);
+        const void *arrayValues[] = {string, data};
+        CFArrayRef array = NULL;
+        CFMutableDictionaryRef dictionary = NULL;
 
         if (data == NULL || number == NULL || date == NULL || string == NULL) {
             fail("scalar create failed");
@@ -98,6 +101,32 @@ int main(void) {
             fail("string UTF-8 export mismatch");
         }
 
+        array = CFArrayCreate(kCFAllocatorSystemDefault, arrayValues, 2, &kCFTypeArrayCallBacks);
+        dictionary = CFDictionaryCreateMutable(
+            kCFAllocatorSystemDefault,
+            0,
+            &kCFTypeDictionaryKeyCallBacks,
+            &kCFTypeDictionaryValueCallBacks
+        );
+        if (array == NULL || dictionary == NULL) {
+            fail("container create failed");
+        }
+        if (CFArrayGetCount(array) != 2) {
+            fail("array count mismatch");
+        }
+        if (CFArrayGetValueAtIndex(array, 0) != (const void *)string) {
+            fail("array borrowed get mismatch");
+        }
+        CFDictionarySetValue(dictionary, string, data);
+        if (CFDictionaryGetCount(dictionary) != 1) {
+            fail("dictionary count mismatch");
+        }
+        if (CFDictionaryGetValue(dictionary, string) != (const void *)data) {
+            fail("dictionary borrowed get mismatch");
+        }
+
+        CFRelease((CFTypeRef)dictionary);
+        CFRelease((CFTypeRef)array);
         CFRelease((CFTypeRef)string);
         CFRelease((CFTypeRef)date);
         CFRelease((CFTypeRef)number);

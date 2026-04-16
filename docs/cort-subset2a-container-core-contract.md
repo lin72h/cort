@@ -229,14 +229,14 @@ Required interpretation rules:
 
 | Subset | API or behavior | MX observation artifact | FX implementation status | Match level | Known variance | Test name | Migration status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 2A | empty immutable array creation | `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json` | Not implemented | `unknown` | type numerics diagnostic | `cfarray_empty_immutable` | MX run pending |
-| 2A | immutable array borrowed getter with `kCFTypeArrayCallBacks` | `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json` | Not implemented | `unknown` | type numerics diagnostic | `cfarray_immutable_cftype_borrowed_get` | MX run pending |
-| 2A | mutable array append/remove retain-release semantics | `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json` | Not implemented | `unknown` | raw retain-count numerics diagnostic | `cfarray_mutable_append_remove_retains` | MX run pending |
-| 2A | array CreateCopy ownership with borrowed child identity | `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json` | Not implemented | `unknown` | container copy pointer identity diagnostic only | `cfarray_createcopy_borrowed_get` | MX run pending |
-| 2A | empty immutable dictionary creation | `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json` | Not implemented | `unknown` | type numerics diagnostic | `cfdictionary_empty_immutable` | MX run pending |
-| 2A | immutable dictionary string-key lookup and borrowed value getter | `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json` | Not implemented | `unknown` | type numerics diagnostic | `cfdictionary_immutable_string_key_lookup` | MX run pending |
-| 2A | mutable dictionary set/replace/remove retain-release semantics | `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json` | Not implemented | `unknown` | raw retain-count numerics diagnostic | `cfdictionary_mutable_set_replace_remove_retains` | MX run pending |
-| 2A | dictionary CreateCopy ownership with borrowed value identity | `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json` | Not implemented | `unknown` | container copy pointer identity diagnostic only | `cfdictionary_createcopy_borrowed_lookup` | MX run pending |
+| 2A | empty immutable array creation | `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json` | Implemented locally | `unknown` | type numerics diagnostic | `cfarray_empty_immutable` | awaiting final MX compare |
+| 2A | immutable array borrowed getter with `kCFTypeArrayCallBacks` | `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json` | Implemented locally | `unknown` | type numerics diagnostic | `cfarray_immutable_cftype_borrowed_get` | awaiting final MX compare |
+| 2A | mutable array append/remove retain-release semantics | `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json` | Implemented locally | `unknown` | raw retain-count numerics diagnostic | `cfarray_mutable_append_remove_retains` | awaiting final MX compare |
+| 2A | array CreateCopy ownership with borrowed child identity | `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json` | Implemented locally | `unknown` | container copy pointer identity diagnostic only | `cfarray_createcopy_borrowed_get` | awaiting final MX compare |
+| 2A | empty immutable dictionary creation | `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json` | Implemented locally | `unknown` | type numerics diagnostic | `cfdictionary_empty_immutable` | awaiting final MX compare |
+| 2A | immutable dictionary string-key lookup and borrowed value getter | `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json` | Implemented locally | `unknown` | type numerics diagnostic | `cfdictionary_immutable_string_key_lookup` | awaiting final MX compare |
+| 2A | mutable dictionary set/replace/remove retain-release semantics | `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json` | Implemented locally | `unknown` | raw retain-count numerics diagnostic | `cfdictionary_mutable_set_replace_remove_retains` | awaiting final MX compare |
+| 2A | dictionary CreateCopy ownership with borrowed value identity | `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json` | Implemented locally | `unknown` | container copy pointer identity diagnostic only | `cfdictionary_createcopy_borrowed_lookup` | awaiting final MX compare |
 
 ## MX Probe Assets
 
@@ -255,6 +255,8 @@ Run script:
 Future FX-vs-MX compare tool:
 
 - `tools/compare_subset2a_container_json.exs`
+- `cort-mx/scripts/run_subset2a_container_compare.sh`
+- `cort-mx/scripts/run_subset2a_suite.sh`
 
 FX readiness note:
 

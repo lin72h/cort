@@ -54,6 +54,8 @@ typedef const void *CFTypeRef;
 typedef const struct __CFAllocator *CFAllocatorRef;
 typedef const struct __CFString *CFStringRef;
 typedef struct __CFString *CFMutableStringRef;
+typedef const struct __CFArray *CFArrayRef;
+typedef struct __CFArray *CFMutableArrayRef;
 typedef const struct __CFDictionary *CFDictionaryRef;
 typedef struct __CFDictionary *CFMutableDictionaryRef;
 

@@ -23,6 +23,8 @@ enum {
     _kCFRuntimeIDCFData = 5,
     _kCFRuntimeIDCFDate = 6,
     _kCFRuntimeIDCFString = 7,
+    _kCFRuntimeIDCFArray = 8,
+    _kCFRuntimeIDCFDictionary = 9,
     _kCFRuntimeStartingClassID = 16
 };
 
@@ -56,6 +58,8 @@ const CFRuntimeClass *_FXCFNumberClass(void);
 const CFRuntimeClass *_FXCFDataClass(void);
 const CFRuntimeClass *_FXCFDateClass(void);
 const CFRuntimeClass *_FXCFStringClass(void);
+const CFRuntimeClass *_FXCFArrayClass(void);
+const CFRuntimeClass *_FXCFDictionaryClass(void);
 
 static inline CFRuntimeBase *_FXCFBaseFromRef(CFTypeRef cf) {
     return (CFRuntimeBase *)(uintptr_t)cf;

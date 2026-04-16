@@ -42,6 +42,8 @@ Subset 2A:
 
 - `src/cort_mx_subset2a_container_core.c`
 - `scripts/run_subset2a_container_core.sh`
+- `scripts/run_subset2a_container_compare.sh`
+- `scripts/run_subset2a_suite.sh`
 - `expectations/subset2a_container_core_expected.json`
 - `fixtures/subset2a_container_core_sample.json`
 
@@ -157,6 +159,7 @@ Portable checks covered by `../tools/run_elixir.sh ../tools/workflow_selfcheck.e
 - Subset 2A FX-vs-MX compare behavior against sample JSON fixtures
 - MX-side Subset 1A compare artifact wrapper against preserved sample artifacts
 - MX-side Subset 1B compare artifact wrapper against preserved sample artifacts
+- MX-side Subset 2A compare artifact wrapper against preserved sample artifacts
 - FX-side Subset 1A compare wrappers against preserved sample artifacts
 
 Additional checks performed by the same selfcheck on Darwin hosts:
@@ -172,6 +175,8 @@ Additional checks performed by the same selfcheck on Darwin hosts:
   root with preserved sample FX JSON
 - actual `scripts/run_subset2a_container_core.sh` execution under a temporary
   artifact root
+- actual `scripts/run_subset2a_suite.sh` execution under a temporary artifact
+  root with preserved sample FX JSON
 - preservation of MX run directories, summaries, and hashes
 
 On non-Darwin hosts, the selfcheck skips those macOS-only MX script checks.
@@ -329,7 +334,41 @@ Default output:
 
 - `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/`
 
-When FX later emits a Subset 2A JSON artifact, compare it against MX with:
+Compare an FX Subset 2A JSON artifact against MX with:
+
+```sh
+cd cort-mx
+scripts/run_subset2a_container_compare.sh
+```
+
+Default output:
+
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core-compare/`
+
+This defaults to:
+
+- FX JSON: `../subset2a_container_fx.json`
+- MX JSON:
+  `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json`
+
+Run the full MX Subset 2A suite with:
+
+```sh
+cd cort-mx
+scripts/run_subset2a_suite.sh
+```
+
+Default output:
+
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-suite/`
+
+This reruns the MX container probe and then:
+
+- compares against the shared in-repo `subset2a_container_fx.json` when it is
+  present
+- or preserves a compare summary that says the FX artifact is not available yet
+
+Direct compare invocation is still available with:
 
 ```sh
 cd ..
