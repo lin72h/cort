@@ -1,0 +1,103 @@
+{
+  "probe": "subset0_runtime_ownership",
+  "cases": [
+    {
+      "name": "cfallocator_system_default",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Allocator singleton identity and retain/release observation."
+    },
+    {
+      "name": "cfstring_create_with_cstring",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Public string identity and retain/release observation."
+    },
+    {
+      "name": "cfdata_create",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Public data identity and retain/release observation."
+    },
+    {
+      "name": "cfnumber_create_int32",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Public number identity and retain/release observation."
+    },
+    {
+      "name": "cfboolean_true",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Boolean singleton ownership observation."
+    },
+    {
+      "name": "cfboolean_false",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Boolean singleton ownership observation."
+    },
+    {
+      "name": "cfdate_create",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Public date identity and retain/release observation."
+    },
+    {
+      "name": "cfarray_create_empty",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Public array type identity observation."
+    },
+    {
+      "name": "cfdictionary_create_empty",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Public dictionary type identity observation."
+    },
+    {
+      "name": "cferror_create",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Public error identity observation."
+    },
+    {
+      "name": "create_copy_get_ownership",
+      "classification": "required",
+      "fx_match_level": "semantic",
+      "blocking": true,
+      "description": "Create/Copy/Get ownership convention observation."
+    },
+    {
+      "name": "mutable_array_callback_ownership",
+      "classification": "semantic-match-only",
+      "fx_match_level": "semantic",
+      "blocking": false,
+      "description": "Future Subset 2 ownership evidence only."
+    },
+    {
+      "name": "mutable_dictionary_callback_ownership",
+      "classification": "semantic-match-only",
+      "fx_match_level": "semantic",
+      "blocking": false,
+      "description": "Future Subset 2 ownership evidence only."
+    },
+    {
+      "name": "cfcopydescription_diagnostic",
+      "classification": "semantic-match-only",
+      "fx_match_level": "semantic",
+      "blocking": false,
+      "description": "Diagnostic observation only."
+    }
+  ]
+}

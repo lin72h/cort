@@ -1,0 +1,19 @@
+{
+  "probe": "subset0_runtime_ownership",
+  "results": [
+    { "name": "cfallocator_system_default", "classification": "required", "fx_match_level": "semantic", "success": true },
+    { "name": "cfstring_create_with_cstring", "classification": "required", "fx_match_level": "semantic", "success": true },
+    { "name": "cfdata_create", "classification": "required", "fx_match_level": "semantic", "success": true },
+    { "name": "cfnumber_create_int32", "classification": "required", "fx_match_level": "semantic", "success": true },
+    { "name": "cfboolean_true", "classification": "required", "fx_match_level": "semantic", "success": true },
+    { "name": "cfboolean_false", "classification": "required", "fx_match_level": "semantic", "success": true },
+    { "name": "cfdate_create", "classification": "required", "fx_match_level": "semantic", "success": true },
+    { "name": "cfarray_create_empty", "classification": "required", "fx_match_level": "semantic", "success": true },
+    { "name": "cfdictionary_create_empty", "classification": "required", "fx_match_level": "semantic", "success": true },
+    { "name": "cferror_create", "classification": "required", "fx_match_level": "semantic", "success": true },
+    { "name": "create_copy_get_ownership", "classification": "required", "fx_match_level": "semantic", "success": true },
+    { "name": "mutable_array_callback_ownership", "classification": "semantic-match-only", "fx_match_level": "semantic", "success": true },
+    { "name": "mutable_dictionary_callback_ownership", "classification": "semantic-match-only", "fx_match_level": "semantic", "success": true },
+    { "name": "cfcopydescription_diagnostic", "classification": "semantic-match-only", "fx_match_level": "semantic", "success": true }
+  ]
+}

@@ -1,0 +1,13 @@
+.DS_Store
+*.swp
+*.swo
+*.core
+*.pyc
+__pycache__/
+.vscode/
+.idea/
+
+# Local artifact fallbacks; defaults now write to ../<repo>-artifacts/
+cort-fx/build/
+cort-fx/runs/
+cort-mx/runs/
