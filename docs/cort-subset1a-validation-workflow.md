@@ -5,6 +5,21 @@ Date: 2026-04-16
 This document records the current operational workflow for validating the FX
 Subset 1A scalar-core implementation against the bounded MX scalar-core run.
 
+Scope of this slice:
+
+- `CFBoolean`
+- `CFData`
+- `CFNumber`
+- `CFDate`
+
+Explicitly excluded:
+
+- `CFString`
+- containers
+- plist and bplist
+- Objective-C bridge behavior
+- broad CoreFoundation archaeology
+
 ## Current State
 
 MX status:
@@ -51,8 +66,14 @@ From:
 Run:
 
 ```sh
+scripts/run_subset1_scalar_core.sh
+```
+
+If the shared artifact root should match the coordination layout:
+
+```sh
 CORT_ARTIFACTS_ROOT=/Users/me/wip-launchx/wip-cort-gpt-artifacts \
-  ./scripts/run_subset1_scalar_core.sh
+  scripts/run_subset1_scalar_core.sh
 ```
 
 Primary MX outputs:
@@ -60,9 +81,32 @@ Primary MX outputs:
 - `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/summary.md`
 - `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json`
 
+Observed MX result:
+
+- blockers: `0`
+- warnings: `0`
+- `cfnumber_cross_type_equality` observed `equal_same_value: true`
+- `cfnumber_cross_type_equality` observed `equal_different_value: true`
+- `hash_primary == hash_same_value == hash_different_value` for the tested
+  `42` row
+
 ## FX vs MX Comparison
 
 Compare the emitted FX JSON against the MX JSON with:
+
+- `tools/compare_subset1_scalar_core_json.exs`
+
+Direct invocation:
+
+```sh
+/Users/me/wip-launchx/wip-cort-gpt/tools/run_elixir.sh \
+  /Users/me/wip-launchx/wip-cort-gpt/tools/compare_subset1_scalar_core_json.exs \
+  --fx-json /path/to/subset1_scalar_core_fx.json \
+  --mx-json /path/to/subset1_scalar_core.json \
+  --output /path/to/subset1_scalar_core_fx_vs_mx_report.md
+```
+
+Current FX wrapper:
 
 ```sh
 cd /Users/me/wip-launchx/wip-cort-gpt/cort-fx
@@ -70,11 +114,7 @@ make compare-subset1a-with-mx \
   MX_JSON=/Users/me/wip-launchx/wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json
 ```
 
-This runs:
-
-- `tools/compare_subset1_scalar_core_json.exs`
-
-and writes:
+This writes:
 
 - `../wip-cort-gpt-artifacts/cort-fx/build/out/subset1_scalar_core_fx_vs_mx_report.md`
 

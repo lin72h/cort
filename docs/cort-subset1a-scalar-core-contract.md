@@ -197,6 +197,12 @@ Required interpretation rules:
 The MX gate for local FX Subset 1A implementation is now satisfied. The next
 gate is FX-vs-MX comparison on the emitted FX JSON artifact.
 
+Current MX report status for the artifact above:
+
+- blockers: `0`
+- warnings: `0`
+- report path: `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/summary.md`
+
 ## MX Probe Assets
 
 Probe source:
@@ -210,6 +216,7 @@ Expectation manifest:
 Run script:
 
 - `cort-mx/scripts/run_subset1_scalar_core.sh`
+- `tools/compare_subset1_scalar_core_json.exs` for future FX-vs-MX comparison
 
 FX source audit and pre-implementation readiness:
 

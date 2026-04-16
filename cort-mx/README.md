@@ -45,6 +45,8 @@ Elixir note:
 - the workflow reporters now run through Elixir with no third-party dependencies
 - if your default `elixir` points at the wrong OTP, set `ELIXIR=/path/to/elixir`
   and/or adjust `PATH` before running the scripts
+- `tools/run_elixir.sh` also checks `~/.elixir-install/installs` by default;
+  override that root with `ELIXIR_INSTALLS_ROOT=/path/to/installs` if needed
 
 ## One-Off Runs
 
@@ -127,6 +129,8 @@ Validated locally on the FX host:
   `fixtures/subset0_runtime_ownership_sample.json`
 - generic manifest reporter behavior against
   `fixtures/subset1_scalar_core_sample.json`
+- Subset 0 FX-vs-MX compare behavior against preserved local artifacts
+- Subset 1A FX-vs-MX compare behavior against sample JSON fixtures
 
 Not validated locally on the FX host:
 
@@ -143,6 +147,7 @@ This slice validates immutable scalar core semantics while explicitly deferring
 Contract:
 
 - `../docs/cort-subset1a-scalar-core-contract.md`
+- `../docs/cort-subset1a-validation-workflow.md`
 
 Run it with:
 
@@ -154,3 +159,13 @@ scripts/run_subset1_scalar_core.sh
 Default output:
 
 - `../wip-cort-gpt-artifacts/cort-mx/runs/subset1-mx-scalar-core/`
+
+When FX emits a Subset 1A JSON artifact, compare it against MX with:
+
+```sh
+cd ..
+tools/run_elixir.sh tools/compare_subset1_scalar_core_json.exs \
+  --fx-json /path/to/subset1_scalar_core_fx.json \
+  --mx-json /path/to/cort-mx/runs/subset1-mx-scalar-core/out/subset1_scalar_core.json \
+  --output /path/to/subset1_scalar_core_fx_vs_mx_report.md
+```
