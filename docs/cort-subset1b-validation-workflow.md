@@ -40,8 +40,16 @@ FX status:
 
 - bounded 1B `CFString` implementation exists locally in `cort-fx`
 - local FX tests, installed-consumer test, and FX JSON probe are green
-- no shared `subset1b_cfstring_fx.json` is published in-repo yet
-- MX comparison against the tightened 1B surface is still pending
+- shared `subset1b_cfstring_fx.json` is published in-repo
+- shared FX-vs-MX compare on the tightened 1B surface is clean: `0` blockers,
+  `0` warnings
+
+Refresh the shared repo-root artifact from the latest FX build output with:
+
+```sh
+cd /Users/me/wip-launchx/wip-cort-gpt/cort-fx
+make publish-subset1b-artifact
+```
 
 ## MX Run
 

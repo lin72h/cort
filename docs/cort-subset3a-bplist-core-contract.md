@@ -201,13 +201,13 @@ Required interpretation rules:
 
 | Subset | API or behavior | MX observation artifact | FX implementation status | Match level | Known variance | Test name | Migration status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 3A | ASCII string root write/read roundtrip | `../wip-cort-gpt-artifacts/cort-mx/runs/subset3a-mx-bplist-core/out/subset3a_bplist_core.json` | Not implemented | `unknown` | type numerics diagnostic | `bplist_ascii_string_roundtrip` | MX run pending |
-| 3A | UTF-16 string root write/read roundtrip | `../wip-cort-gpt-artifacts/cort-mx/runs/subset3a-mx-bplist-core/out/subset3a_bplist_core.json` | Not implemented | `unknown` | type numerics diagnostic | `bplist_unicode_string_roundtrip` | MX run pending |
-| 3A | mixed scalar array write/read roundtrip | `../wip-cort-gpt-artifacts/cort-mx/runs/subset3a-mx-bplist-core/out/subset3a_bplist_core.json` | Not implemented | `unknown` | exact container object-table ordering diagnostic | `bplist_mixed_array_roundtrip` | MX run pending |
-| 3A | string-key dictionary write/read roundtrip | `../wip-cort-gpt-artifacts/cort-mx/runs/subset3a-mx-bplist-core/out/subset3a_bplist_core.json` | Not implemented | `unknown` | exact container object-table ordering diagnostic | `bplist_string_key_dictionary_roundtrip` | MX run pending |
-| 3A | non-string dictionary key write rejection | `../wip-cort-gpt-artifacts/cort-mx/runs/subset3a-mx-bplist-core/out/subset3a_bplist_core.json` | Not implemented | `unknown` | error text diagnostic only | `bplist_non_string_dictionary_key_write_rejected` | MX run pending |
-| 3A | invalid header rejection | `../wip-cort-gpt-artifacts/cort-mx/runs/subset3a-mx-bplist-core/out/subset3a_bplist_core.json` | Not implemented | `unknown` | error text diagnostic only | `bplist_invalid_header_rejected` | MX run pending |
-| 3A | truncated trailer rejection | `../wip-cort-gpt-artifacts/cort-mx/runs/subset3a-mx-bplist-core/out/subset3a_bplist_core.json` | Not implemented | `unknown` | error text diagnostic only | `bplist_truncated_trailer_rejected` | MX run pending |
+| 3A | ASCII string root write/read roundtrip | `../wip-cort-gpt-artifacts/cort-mx/runs/subset3a-mx-bplist-core/out/subset3a_bplist_core.json` | Implemented in `cort-fx` | `match` | type numerics diagnostic | `bplist_ascii_string_roundtrip` | FX/MX compare clean |
+| 3A | UTF-16 string root write/read roundtrip | `../wip-cort-gpt-artifacts/cort-mx/runs/subset3a-mx-bplist-core/out/subset3a_bplist_core.json` | Implemented in `cort-fx` | `match` | type numerics diagnostic | `bplist_unicode_string_roundtrip` | FX/MX compare clean |
+| 3A | mixed scalar array write/read roundtrip | `../wip-cort-gpt-artifacts/cort-mx/runs/subset3a-mx-bplist-core/out/subset3a_bplist_core.json` | Implemented in `cort-fx` | `match` | exact container object-table ordering and raw type numerics diagnostic | `bplist_mixed_array_roundtrip` | FX/MX compare clean |
+| 3A | string-key dictionary write/read roundtrip | `../wip-cort-gpt-artifacts/cort-mx/runs/subset3a-mx-bplist-core/out/subset3a_bplist_core.json` | Implemented in `cort-fx` | `match` | exact container object-table ordering and raw type numerics diagnostic | `bplist_string_key_dictionary_roundtrip` | FX/MX compare clean |
+| 3A | non-string dictionary key write rejection | `../wip-cort-gpt-artifacts/cort-mx/runs/subset3a-mx-bplist-core/out/subset3a_bplist_core.json` | Implemented in `cort-fx` | `match` | error text diagnostic only | `bplist_non_string_dictionary_key_write_rejected` | FX/MX compare clean |
+| 3A | invalid header rejection | `../wip-cort-gpt-artifacts/cort-mx/runs/subset3a-mx-bplist-core/out/subset3a_bplist_core.json` | Implemented in `cort-fx` | `match` | error text diagnostic only | `bplist_invalid_header_rejected` | FX/MX compare clean |
+| 3A | truncated trailer rejection | `../wip-cort-gpt-artifacts/cort-mx/runs/subset3a-mx-bplist-core/out/subset3a_bplist_core.json` | Implemented in `cort-fx` | `match` | error text diagnostic only | `bplist_truncated_trailer_rejected` | FX/MX compare clean |
 
 ## MX Probe Assets
 
@@ -224,6 +224,10 @@ Run scripts:
 - `cort-mx/scripts/run_subset3a_bplist_core.sh`
 - `cort-mx/scripts/run_subset3a_bplist_compare.sh`
 - `cort-mx/scripts/run_subset3a_suite.sh`
+
+FX compare-artifact wrapper:
+
+- `cort-fx/scripts/run_subset3a_compare_artifact.sh`
 
 Future FX-vs-MX compare tool:
 

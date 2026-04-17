@@ -63,11 +63,15 @@ defmodule WorkflowSelfcheck do
       {"subset2a MX compare artifact wrapper", fn -> subset2a_mx_compare_artifact_check!(repo_root, artifacts_root) end},
       {"subset3a MX compare artifact wrapper", fn -> subset3a_mx_compare_artifact_check!(repo_root, artifacts_root) end},
       {"subset1 FX test target", fn -> subset1_fx_test_target_check!(repo_root, artifacts_root) end},
+      {"shared FX handoff artifacts", fn -> shared_fx_handoff_artifacts_check!(repo_root, artifacts_root) end},
+      {"subset1 FX installed target", fn -> subset1_fx_test_installed_check!(repo_root, artifacts_root) end},
       {"subset1 FX make compare wrapper", fn -> subset1_make_compare_check!(repo_root, artifacts_root) end},
       {"subset1b FX make compare wrapper", fn -> subset1b_make_compare_check!(repo_root, artifacts_root) end},
       {"subset2a FX make compare wrapper", fn -> subset2a_make_compare_check!(repo_root, artifacts_root) end},
+      {"subset3a FX make compare wrapper", fn -> subset3a_make_compare_check!(repo_root, artifacts_root) end},
       {"subset1 FX compare artifact wrapper", fn -> subset1_compare_artifact_check!(repo_root, artifacts_root) end},
-      {"subset2a FX compare artifact wrapper", fn -> subset2a_compare_artifact_check!(repo_root, artifacts_root) end}
+      {"subset2a FX compare artifact wrapper", fn -> subset2a_compare_artifact_check!(repo_root, artifacts_root) end},
+      {"subset3a FX compare artifact wrapper", fn -> subset3a_compare_artifact_check!(repo_root, artifacts_root) end}
     ]
 
     mx_checks =
@@ -112,7 +116,9 @@ defmodule WorkflowSelfcheck do
       "tools/sync_subset7a_control_corpora.sh",
       "cort-fx/scripts/run_subset0_fx_artifacts.sh",
       "cort-fx/scripts/run_subset1a_compare_artifact.sh",
-      "cort-fx/scripts/run_subset2a_compare_artifact.sh"
+      "cort-fx/scripts/run_subset2a_compare_artifact.sh",
+      "cort-fx/scripts/run_subset3a_compare_artifact.sh",
+      "cort-fx/scripts/publish_shared_json.sh"
     ]
 
     Enum.each(scripts, fn script ->
@@ -570,6 +576,46 @@ defmodule WorkflowSelfcheck do
     ensure_contains!(output, "PASS c_consumer_smoke")
   end
 
+  defp subset1_fx_test_installed_check!(repo_root, artifacts_root) do
+    output =
+      run_cmd!(
+        "make",
+        ["test-installed"],
+        cd: Path.join(repo_root, "cort-fx"),
+        env: [{"CORT_ARTIFACTS_ROOT", artifacts_root}],
+        expect_exit: 0
+      )
+
+    ensure_contains!(output, "PASS c_consumer_smoke")
+  end
+
+  defp shared_fx_handoff_artifacts_check!(repo_root, artifacts_root) do
+    shared_pairs = [
+      {"subset0_public_compare_fx.json", Path.join([artifacts_root, "cort-fx", "build", "out", "subset0_public_compare_fx.json"])},
+      {"subset1_scalar_core_fx.json", Path.join([artifacts_root, "cort-fx", "build", "out", "subset1_scalar_core_fx.json"])},
+      {"subset1b_cfstring_fx.json", Path.join([artifacts_root, "cort-fx", "build", "out", "subset1b_cfstring_fx.json"])},
+      {"subset2a_container_fx.json", Path.join([artifacts_root, "cort-fx", "build", "out", "subset2a_container_fx.json"])},
+      {"subset3a_bplist_fx.json", Path.join([artifacts_root, "cort-fx", "build", "out", "subset3a_bplist_fx.json"])}
+    ]
+
+    Enum.each(shared_pairs, fn {shared_rel, built_path} ->
+      shared_path = Path.join(repo_root, shared_rel)
+
+      unless File.exists?(shared_path) do
+        raise RuntimeError, "missing shared FX handoff artifact at #{shared_path}"
+      end
+
+      unless File.exists?(built_path) do
+        raise RuntimeError, "missing freshly built FX JSON at #{built_path}"
+      end
+
+      if File.read!(shared_path) != File.read!(built_path) do
+        raise RuntimeError,
+              "shared FX handoff artifact #{shared_rel} is out of sync with the current build output; run `make -C cort-fx publish-shared-artifacts`"
+      end
+    end)
+  end
+
   defp subset0_mx_suite_check!(repo_root, artifacts_root) do
     run_dir = Path.join([artifacts_root, "cort-mx", "runs", "subset0-mx-suite"])
     summary_path = Path.join(run_dir, "summary.md")
@@ -996,6 +1042,66 @@ defmodule WorkflowSelfcheck do
           Path.join([run_dir, "out", "subset2a_container_fx.json"]),
           Path.join([run_dir, "out", "subset2a_container_mx.json"]),
           Path.join([run_dir, "out", "subset2a_container_fx_vs_mx_report.md"]),
+          Path.join(run_dir, "sha256.txt")
+        ] do
+      unless File.exists?(path) do
+        raise RuntimeError, "missing compare artifact output at #{path}"
+      end
+    end
+
+    ensure_contains!(File.read!(summary_path), "- warnings: 0")
+    ensure_empty_or_whitespace!(File.read!(stderr_path), stderr_path)
+  end
+
+  defp subset3a_make_compare_check!(repo_root, artifacts_root) do
+    report_path = Path.join([artifacts_root, "cort-fx", "build", "out", "subset3a_bplist_fx_vs_mx_report.md"])
+
+    output =
+      run_cmd!(
+        "make",
+        [
+          "compare-subset3a-with-mx",
+          "FX_BPLIST_JSON=#{Path.join(repo_root, "tools/fixtures/subset3a_bplist_compare_fx_sample.json")}",
+          "MX_JSON=#{Path.join(repo_root, "tools/fixtures/subset3a_bplist_compare_mx_sample.json")}"
+        ],
+        cd: Path.join(repo_root, "cort-fx"),
+        env: [{"CORT_ARTIFACTS_ROOT", artifacts_root}],
+        expect_exit: 0
+      )
+
+    unless File.exists?(report_path) do
+      raise RuntimeError, "missing compare report at #{report_path}"
+    end
+
+    ensure_contains!(output, "- warnings: 0")
+    ensure_contains!(File.read!(report_path), "`bplist_string_key_dictionary_roundtrip` | match")
+  end
+
+  defp subset3a_compare_artifact_check!(repo_root, artifacts_root) do
+    run_dir = Path.join([artifacts_root, "cort-fx", "runs", "subset3a-fx-vs-mx"])
+    summary_path = Path.join(run_dir, "summary.md")
+    stderr_path = Path.join([run_dir, "out", "compare.stderr"])
+
+    run_cmd!(
+      "make",
+      [
+        "artifact-subset3a-compare",
+        "FX_BPLIST_JSON=#{Path.join(repo_root, "tools/fixtures/subset3a_bplist_compare_fx_sample.json")}",
+        "MX_JSON=#{Path.join(repo_root, "tools/fixtures/subset3a_bplist_compare_mx_sample.json")}"
+      ],
+      cd: Path.join(repo_root, "cort-fx"),
+      env: [{"CORT_ARTIFACTS_ROOT", artifacts_root}],
+      expect_exit: 0
+    )
+
+    for path <- [
+          summary_path,
+          Path.join(run_dir, "commands.txt"),
+          Path.join(run_dir, "host.txt"),
+          Path.join(run_dir, "toolchain.txt"),
+          Path.join([run_dir, "out", "subset3a_bplist_fx.json"]),
+          Path.join([run_dir, "out", "subset3a_bplist_mx.json"]),
+          Path.join([run_dir, "out", "subset3a_bplist_fx_vs_mx_report.md"]),
           Path.join(run_dir, "sha256.txt")
         ] do
       unless File.exists?(path) do

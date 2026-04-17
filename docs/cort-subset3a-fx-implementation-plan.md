@@ -2,8 +2,8 @@
 
 Date: 2026-04-17
 
-Status: planning only; do not start code changes from this document until the
-current MX Subset 3A binary-plist artifacts are back and classified.
+Status: MX gate satisfied; bounded FX implementation landed and compares clean
+against the current MX Subset 3A binary-plist artifacts.
 
 This document is the FX-side cut plan for the first bounded binary-plist
 implementation. It answers a practical question that the current contract and
@@ -26,14 +26,15 @@ It is the concrete FX execution plan that should be followed after MX returns.
 
 ## Hard Gate
 
-Do not start the actual `cort-fx` Subset 3A implementation until:
+The actual `cort-fx` Subset 3A implementation should start only after:
 
 1. MX has run `cort-mx/scripts/run_subset3a_bplist_core.sh`
 2. the MX summary is clean or any blockers are explicitly reclassified
 3. the returned `subset3a_bplist_core.json` has been reviewed against the
    current 3A contract
 
-This is a semantics-first slice. The correct order is:
+That gate is now satisfied. This is still a semantics-first slice, and the
+correct order remains:
 
 ```text
 MX probe
@@ -394,6 +395,7 @@ When implementation starts, add these `Makefile` targets:
 
 - `compare-subset3a-fx`
 - `compare-subset3a-with-mx`
+- `artifact-subset3a-compare`
 
 Do not wire them into `make test` until:
 
@@ -430,7 +432,7 @@ true:
 
 ## Current Conclusion
 
-The next real code milestone after MX comes back should be:
+The next real code milestone is:
 
 ```text
 CFError minimal support
@@ -440,5 +442,13 @@ CFError minimal support
   + FX JSON probe
 ```
 
-That is the correct first 3A implementation cut. Anything broader is the wrong
-slice.
+The current verified state is:
+
+- `make -C cort-fx clean test` passes
+- `make -C cort-fx test-installed` passes
+- real FX JSON exists at
+  `../wip-cort-gpt-artifacts/cort-fx/build/out/subset3a_bplist_fx.json`
+- shared handoff artifact exists at `../subset3a_bplist_fx.json`
+- real FX-vs-MX compare is clean with `0` blockers and `0` warnings
+
+Anything broader than this first binary-only slice is still the wrong next cut.

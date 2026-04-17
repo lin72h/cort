@@ -52,6 +52,7 @@ typedef signed long CFIndex;
 typedef const void *CFTypeRef;
 
 typedef const struct __CFAllocator *CFAllocatorRef;
+typedef const struct __CFError *CFErrorRef;
 typedef const struct __CFString *CFStringRef;
 typedef struct __CFString *CFMutableStringRef;
 typedef const struct __CFArray *CFArrayRef;

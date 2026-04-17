@@ -43,6 +43,13 @@ FX status:
 - Subset 1A and Subset 1B provide the runtime, scalar, and `CFString` base for
   this slice
 
+Refresh the shared repo-root artifact from the latest FX build output with:
+
+```sh
+cd /Users/me/wip-launchx/wip-cort-gpt/cort-fx
+make publish-subset2a-artifact
+```
+
 ## MX Run
 
 From:

@@ -2,7 +2,6 @@
 #define FX_CF_INTERNAL_H
 
 #include <CoreFoundation/CFRuntime.h>
-#include <CoreFoundation/CFPropertyList.h>
 
 #include <limits.h>
 #include <pthread.h>
@@ -63,27 +62,8 @@ const CFRuntimeClass *_FXCFStringClass(void);
 const CFRuntimeClass *_FXCFArrayClass(void);
 const CFRuntimeClass *_FXCFDictionaryClass(void);
 const CFRuntimeClass *_FXCFErrorClass(void);
-
 CFErrorRef _FXCFErrorCreateCode(CFAllocatorRef allocator, CFIndex code);
-CFDataRef _FXCFBinaryPListCreateData(
-    CFAllocatorRef allocator,
-    CFPropertyListRef propertyList,
-    CFPropertyListFormat format,
-    CFOptionFlags options,
-    CFErrorRef *error
-);
-CFPropertyListRef _FXCFBinaryPListCreateWithData(
-    CFAllocatorRef allocator,
-    CFDataRef data,
-    CFPropertyListMutabilityOptions options,
-    CFPropertyListFormat *format,
-    CFErrorRef *error
-);
-CFIndex _FXCFArrayFastCount(CFArrayRef array);
-const void *_FXCFArrayFastValueAtIndex(CFArrayRef array, CFIndex idx);
-CFIndex _FXCFDictionaryFastCount(CFDictionaryRef dictionary);
-const void *_FXCFDictionaryFastKeyAtIndex(CFDictionaryRef dictionary, CFIndex idx);
-const void *_FXCFDictionaryFastValueAtIndex(CFDictionaryRef dictionary, CFIndex idx);
+Boolean _FXCFDictionaryGetEntryAtIndex(CFDictionaryRef dictionary, CFIndex index, const void **key, const void **value);
 
 static inline CFRuntimeBase *_FXCFBaseFromRef(CFTypeRef cf) {
     return (CFRuntimeBase *)(uintptr_t)cf;

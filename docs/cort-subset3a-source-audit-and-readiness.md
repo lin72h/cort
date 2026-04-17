@@ -2,8 +2,8 @@
 
 Date: 2026-04-17
 
-Status: source audit complete; MX probe assets prepared; FX implementation has
-not started.
+Status: source audit complete; bounded FX implementation landed; real FX-vs-MX
+compare is clean.
 
 This document is the extraction and implementation-readiness note for CORT
 Subset 3A: bounded binary-plist read/write for immutable property-list-valid
@@ -226,10 +226,14 @@ FX Subset 3A implementation should not start until:
 
 Current readiness note:
 
-- this package makes Subset 3A ready for bounded MX validation
+- the bounded MX validation gate is now satisfied with a clean
+  `subset3a_bplist_core.json`
 - the concrete FX cut plan now lives in
   `docs/cort-subset3a-fx-implementation-plan.md`
 - the planned MX/FX fixture contract now lives in
   `docs/cort-subset3a-fixture-corpus.md`
-- the real FX implementation should still wait for the current MX Subset 3A
-  artifacts before starting code changes
+- the FX compare wrapper and preserved compare-artifact path exist and have
+  already been exercised with a real FX JSON against the MX 3A artifact
+- the shared FX handoff artifact now exists at `../subset3a_bplist_fx.json`
+- the current real FX-vs-MX compare is clean with `0` blockers and `0`
+  warnings

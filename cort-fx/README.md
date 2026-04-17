@@ -9,17 +9,14 @@ Subset 0, Subset 1A, Subset 1B, Subset 2A, and Subset 3A:
   bplist string paths
 - Subset 2A: bounded container core for arrays, dictionaries, and ownership
   semantics for plist-valid object graphs
-- Subset 3A: bounded binary plist core read/write work on top of the proven
+- Subset 3A: bounded binary-plist core read/write work on top of the proven
   runtime, scalar, string, and container surface
 
-The Subset 3A MX readiness and validation docs live in:
+The active 3A coordination documents live in:
 
 - `../docs/cort-subset3a-bplist-core-contract.md`
 - `../docs/cort-subset3a-source-audit-and-readiness.md`
 - `../docs/cort-subset3a-validation-workflow.md`
-
-The Subset 3A FX planning docs live in:
-
 - `../docs/cort-subset3a-fx-implementation-plan.md`
 - `../docs/cort-subset3a-fixture-corpus.md`
 
@@ -35,8 +32,6 @@ The Subset 7A docs live in:
 The shared imported packet corpora live in:
 
 - `../fixtures/control/`
-
-MX and FX contracts still live in `../docs/` and `../cort-mx/`.
 
 It is not the final repository layout. The final target remains
 `../nx/cort/cort-fx/` after explicit permission.
@@ -116,18 +111,17 @@ Implemented:
 - `CFErrorGetCode`
 - `CFPropertyListCreateData`
 - `CFPropertyListCreateWithData`
-- binary plist core for bool, int, real, date, data, string, array, and
-  dictionary with string keys
 
 Explicitly not implemented here:
 
 - XML plist
-- stream APIs
+- OpenStep plist
+- property-list stream APIs
+- mutable property-list parse modes
+- unsupported binary-plist tags such as UID / set / ordset
 - BlocksRuntime integration
 - Objective-C bridge behavior
 - Swift runtime allocation
-- broader plist tag families beyond the bounded 3A surface
-- mutable parse/write modes beyond the bounded 3A surface
 
 ## Provenance
 
@@ -138,12 +132,10 @@ This proof is based on the `CoreFoundation` source shape in
 - `include/CFRuntime.h`
 - `CFBase.c`
 - `CFRuntime.c`
-- `CFBinaryPList.c`
 
 It is not a direct copy. The implementation here was rewritten as a small
 standalone proof because the upstream translation units assume Swift-runtime
-defaults, dispatch, and a much broader object/class surface than the bounded
-CORT subsets allow.
+defaults, dispatch, and a much broader class table than Subset 0 allows.
 
 Native macOS CoreFoundation remains the semantic oracle for MX validation.
 
@@ -184,7 +176,6 @@ make compare-fx
 make compare-subset1a-fx
 make compare-subset1b-fx
 make compare-subset2a-fx
-make compare-subset3a-fx
 make compare-subset1a-with-mx
 make compare-subset1b-with-mx
 make compare-subset2a-with-mx
@@ -192,6 +183,7 @@ make compare-subset3a-with-mx
 make artifact-run
 make artifact-subset1a-compare
 make artifact-subset2a-compare
+make artifact-subset3a-compare
 make test-installed
 ```
 
@@ -205,9 +197,9 @@ What they enforce:
 - wrong-type abort coverage includes `CFDataCreateCopy`, `CFDataGetBytePtr`,
   `CFNumberGetType`, `CFArrayCreateCopy`, `CFArrayRemoveValueAtIndex`,
   `CFDictionaryCreateCopy`, `CFDictionaryGetValueIfPresent`,
-  `CFDictionaryRemoveValue`, `CFErrorGetCode`,
-  `CFPropertyListCreateWithData`, `CFEqual`, and `CFHash`
-- installed headers and static library are usable by a standalone C consumer
+  `CFDictionaryRemoveValue`, `CFErrorGetCode`, `CFEqual`, and `CFHash`
+- installed headers and static library are usable by a standalone C consumer,
+  including Subset 3A binary plist create/read and public error-code handling
 - shared allocator comparison harness emits
   `../wip-cort-gpt-artifacts/cort-fx/build/out/subset0_public_compare_fx.json`
 - FX scalar-core probe emits
@@ -218,18 +210,22 @@ What they enforce:
   `../wip-cort-gpt-artifacts/cort-fx/build/out/subset2a_container_fx.json`
 - FX binary-plist probe emits
   `../wip-cort-gpt-artifacts/cort-fx/build/out/subset3a_bplist_fx.json`
-- shared handoff artifacts may also be committed at repo root for MX
-  consumption, including `subset2a_container_fx.json` and
-  `subset3a_bplist_fx.json`
 - Subset 1A compare wrapper can compare that FX JSON against MX and preserve a
   dedicated handoff artifact run
+- shared handoff artifacts may also be committed at repo root for MX
+  consumption, including `subset0_public_compare_fx.json`,
+  `subset1_scalar_core_fx.json`, `subset1b_cfstring_fx.json`,
+  `subset2a_container_fx.json`, and `subset3a_bplist_fx.json`
 - Subset 2A compare wrapper can compare a real FX container JSON against MX and
   preserve a dedicated handoff artifact run once the FX artifact exists
+- Subset 3A compare wrapper can compare a real FX binary-plist JSON against MX
+  and preserve a dedicated handoff artifact run once the FX artifact exists
+- artifact-run packaging emits a preservable FX run directory under
+  `../wip-cort-gpt-artifacts/cort-fx/runs/`
 - repo workflow selfcheck can validate the compare/report tooling and the FX
   `make clean test` target with `../tools/run_elixir.sh ../tools/workflow_selfcheck.exs`
 - when that selfcheck runs on Darwin, it also executes the real MX Subset 0,
-  Subset 1A, Subset 1B, Subset 2A, and Subset 3A scripts under a temporary
-  artifact root
+  Subset 1A, Subset 1B, and Subset 2A scripts under a temporary artifact root
 
 ## Install
 
@@ -324,6 +320,49 @@ That produces:
 MX should compare that against:
 
 - `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json`
+
+## Binary-Plist Probe
+
+FX runs the local Subset 3A binary-plist probe with:
+
+```sh
+cd cort-fx
+make compare-subset3a-fx
+```
+
+That produces:
+
+- `../wip-cort-gpt-artifacts/cort-fx/build/out/subset3a_bplist_fx.json`
+
+The shared handoff artifact may also be published at:
+
+- `../subset3a_bplist_fx.json`
+
+MX should compare that against:
+
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset3a-mx-bplist-core/out/subset3a_bplist_core.json`
+
+## Publish Shared Handoff Artifacts
+
+Refresh the repo-root FX handoff JSONs from the latest local build outputs
+with:
+
+```sh
+cd cort-fx
+make publish-shared-artifacts
+```
+
+Subset-specific publish targets also exist:
+
+- `make publish-subset0-artifact`
+- `make publish-subset1a-artifact`
+- `make publish-subset1b-artifact`
+- `make publish-subset2a-artifact`
+- `make publish-subset3a-artifact`
+
+The workflow selfcheck treats those shared repo-root JSONs as part of the
+coordination contract and verifies that they exactly match freshly built FX
+probe output before the workflow is considered clean.
 
 ## Subset 2A Compare With MX
 
@@ -475,6 +514,49 @@ This uses:
 and writes:
 
 - `../wip-cort-gpt-artifacts/cort-fx/build/out/subset2a_container_fx_vs_mx_report.md`
+
+## Subset 3A Compare With MX
+
+Compare the FX Subset 3A binary-plist JSON against the MX JSON with:
+
+```sh
+cd cort-fx
+make compare-subset3a-with-mx \
+  FX_BPLIST_JSON=/path/to/subset3a_bplist_fx.json \
+  MX_JSON=/path/to/subset3a_bplist_core.json
+```
+
+This uses:
+
+- `../tools/compare_subset3a_bplist_json.exs`
+
+and writes:
+
+- `../wip-cort-gpt-artifacts/cort-fx/build/out/subset3a_bplist_fx_vs_mx_report.md`
+
+To preserve a compare-only handoff run:
+
+```sh
+cd cort-fx
+make artifact-subset3a-compare \
+  FX_BPLIST_JSON=/path/to/subset3a_bplist_fx.json \
+  MX_JSON=/path/to/subset3a_bplist_core.json
+```
+
+Default output:
+
+- `../wip-cort-gpt-artifacts/cort-fx/runs/subset3a-fx-vs-mx/`
+
+The compare artifact directory includes:
+
+- `host.txt`
+- `toolchain.txt`
+- `commands.txt`
+- `summary.md`
+- `sha256.txt`
+- `out/subset3a_bplist_fx.json`
+- `out/subset3a_bplist_mx.json`
+- `out/subset3a_bplist_fx_vs_mx_report.md`
 
 ## Constraints
 

@@ -7,13 +7,14 @@
 #include <string.h>
 
 enum {
-    kMaxText = 512
+    kMaxText = 1024
 };
 
 struct CaseResult {
     const char *name;
     const char *classification;
     const char *fxMatchLevel;
+    const char *semanticNote;
     bool success;
     bool hasTypeID;
     long typeID;
@@ -96,6 +97,8 @@ static void json_print_result(FILE *stream, const struct CaseResult *result, boo
     json_print_text_or_null(stream, result->hasPrimaryValueText, result->primaryValueText);
     fputs(",\n      \"alternate_value_text\": ", stream);
     json_print_text_or_null(stream, result->hasAlternateValueText, result->alternateValueText);
+    fputs(",\n      \"ownership_note\": ", stream);
+    json_print_string(stream, result->semanticNote);
     fputs("\n    }", stream);
     if (trailingComma) {
         fputc(',', stream);
@@ -104,12 +107,12 @@ static void json_print_result(FILE *stream, const struct CaseResult *result, boo
 }
 
 static void set_hex_bytes(char *buffer, size_t bufferSize, const UInt8 *bytes, size_t byteCount) {
-    size_t offset = 0u;
-    if (bufferSize == 0u) {
+    size_t offset = 0;
+    if (bufferSize == 0) {
         return;
     }
     buffer[0] = '\0';
-    for (size_t index = 0u; index < byteCount && offset + 3u <= bufferSize; ++index) {
+    for (size_t index = 0; index < byteCount && offset + 3 <= bufferSize; ++index) {
         int written = snprintf(buffer + offset, bufferSize - offset, "%02x", (unsigned int)bytes[index]);
         if (written < 0 || (size_t)written >= bufferSize - offset) {
             break;
@@ -120,12 +123,48 @@ static void set_hex_bytes(char *buffer, size_t bufferSize, const UInt8 *bytes, s
 
 static bool set_utf8_hex_for_string(char *buffer, size_t bufferSize, CFStringRef string) {
     CFIndex length = CFStringGetLength(string);
-    char text[kMaxText];
-    if (!CFStringGetCString(string, text, (CFIndex)sizeof(text), kCFStringEncodingUTF8)) {
+    CFIndex maxBytes = length * 4 + 1;
+    char *utf8 = (char *)malloc((size_t)maxBytes);
+    if (utf8 == NULL) {
         return false;
     }
-    set_hex_bytes(buffer, bufferSize, (const UInt8 *)text, strlen(text));
-    return length >= 0;
+    bool ok = CFStringGetCString(string, utf8, maxBytes, kCFStringEncodingUTF8);
+    if (ok) {
+        set_hex_bytes(buffer, bufferSize, (const UInt8 *)utf8, strlen(utf8));
+    }
+    free(utf8);
+    return ok;
+}
+
+static bool write_fixture(CFStringRef fixturesDir, const char *name, CFDataRef data) {
+    if (fixturesDir == NULL) {
+        return true;
+    }
+    char pathBuffer[4096];
+    if (!CFStringGetCString(fixturesDir, pathBuffer, (CFIndex)sizeof(pathBuffer), kCFStringEncodingUTF8)) {
+        return false;
+    }
+    size_t used = strlen(pathBuffer);
+    if (used + 1 >= sizeof(pathBuffer)) {
+        return false;
+    }
+    if (used > 0 && pathBuffer[used - 1] != '/') {
+        pathBuffer[used++] = '/';
+        pathBuffer[used] = '\0';
+    }
+    if (snprintf(pathBuffer + used, sizeof(pathBuffer) - used, "%s", name) >= (int)(sizeof(pathBuffer) - used)) {
+        return false;
+    }
+
+    FILE *stream = fopen(pathBuffer, "wb");
+    if (stream == NULL) {
+        return false;
+    }
+    CFIndex length = CFDataGetLength(data);
+    const UInt8 *bytes = CFDataGetBytePtr(data);
+    size_t written = fwrite(bytes, 1, (size_t)length, stream);
+    fclose(stream);
+    return written == (size_t)length;
 }
 
 static void record_type_identity(struct CaseResult *result, CFTypeRef object, const char *typeDescription) {
@@ -194,21 +233,22 @@ static bool data_roundtrip(CFPropertyListRef plist, CFDataRef *dataOut, CFProper
         return false;
     }
 
-    if (readError != NULL) {
-        CFRelease(readError);
-    }
     *dataOut = data;
     *readbackOut = readback;
     *formatOut = format;
+    if (readError != NULL) {
+        CFRelease(readError);
+    }
     return true;
 }
 
-static struct CaseResult observe_ascii_string_roundtrip(void) {
+static struct CaseResult observe_ascii_string_roundtrip(CFStringRef fixturesDir) {
     struct CaseResult result;
     memset(&result, 0, sizeof(result));
     result.name = "bplist_ascii_string_roundtrip";
     result.classification = "required";
     result.fxMatchLevel = "semantic";
+    result.semanticNote = "Binary create/read in immutable mode must preserve an ASCII root string and report binary format.";
 
     CFStringRef string = create_ascii_string("launchd.packet-key");
     CFDataRef data = NULL;
@@ -227,7 +267,8 @@ static struct CaseResult observe_ascii_string_roundtrip(void) {
             format == kCFPropertyListBinaryFormat_v1_0 &&
             binary_header_is_bplist00(data) &&
             CFGetTypeID(readback) == CFStringGetTypeID() &&
-            CFEqual((CFTypeRef)string, readback);
+            CFEqual((CFTypeRef)string, readback) &&
+            write_fixture(fixturesDir, "ascii_string_root.bplist", data);
     }
 
     if (error != NULL) {
@@ -240,17 +281,18 @@ static struct CaseResult observe_ascii_string_roundtrip(void) {
         CFRelease(data);
     }
     if (string != NULL) {
-        CFRelease(string);
+        CFRelease((CFTypeRef)string);
     }
     return result;
 }
 
-static struct CaseResult observe_unicode_string_roundtrip(void) {
+static struct CaseResult observe_unicode_string_roundtrip(CFStringRef fixturesDir) {
     struct CaseResult result;
     memset(&result, 0, sizeof(result));
     result.name = "bplist_unicode_string_roundtrip";
     result.classification = "required";
     result.fxMatchLevel = "semantic";
+    result.semanticNote = "Binary create/read in immutable mode must preserve a non-ASCII root string and use the UTF-16 string path for the tested case.";
 
     CFStringRef string = create_utf8_string("caf\xC3\xA9-\xE2\x98\x83-\xF0\x9F\x93\xA6");
     CFDataRef data = NULL;
@@ -269,7 +311,8 @@ static struct CaseResult observe_unicode_string_roundtrip(void) {
             format == kCFPropertyListBinaryFormat_v1_0 &&
             binary_header_is_bplist00(data) &&
             CFGetTypeID(readback) == CFStringGetTypeID() &&
-            CFEqual((CFTypeRef)string, readback);
+            CFEqual((CFTypeRef)string, readback) &&
+            write_fixture(fixturesDir, "unicode_string_root.bplist", data);
     }
 
     if (error != NULL) {
@@ -282,22 +325,25 @@ static struct CaseResult observe_unicode_string_roundtrip(void) {
         CFRelease(data);
     }
     if (string != NULL) {
-        CFRelease(string);
+        CFRelease((CFTypeRef)string);
     }
     return result;
 }
 
-static struct CaseResult observe_mixed_array_roundtrip(void) {
+static struct CaseResult observe_mixed_array_roundtrip(CFStringRef fixturesDir) {
     static const UInt8 bytes[] = {0x10u, 0x20u, 0x30u, 0x40u};
+
     struct CaseResult result;
     memset(&result, 0, sizeof(result));
     result.name = "bplist_mixed_array_roundtrip";
     result.classification = "required";
     result.fxMatchLevel = "semantic";
+    result.semanticNote = "Binary create/read in immutable mode must preserve the supported mixed scalar array surface.";
 
     SInt64 intValue = 42;
     double realValue = 42.25;
     double when = 1234.5;
+
     CFNumberRef intNumber = create_sint64_number(intValue);
     CFNumberRef realNumber = create_float64_number(realValue);
     CFDateRef date = CFDateCreate(kCFAllocatorSystemDefault, when);
@@ -308,6 +354,7 @@ static struct CaseResult observe_mixed_array_roundtrip(void) {
         (intNumber != NULL && realNumber != NULL && date != NULL && dataValue != NULL && string != NULL)
             ? CFArrayCreate(kCFAllocatorSystemDefault, values, 6, &kCFTypeArrayCallBacks)
             : NULL;
+
     CFDataRef data = NULL;
     CFPropertyListRef readback = NULL;
     CFPropertyListFormat format = 0;
@@ -315,13 +362,24 @@ static struct CaseResult observe_mixed_array_roundtrip(void) {
 
     if (array != NULL && data_roundtrip((CFPropertyListRef)array, &data, &readback, &format, &error)) {
         CFArrayRef parsed = (CFArrayRef)readback;
+        CFTypeRef element0 = CFArrayGetValueAtIndex(parsed, 0);
+        CFNumberRef element1 = (CFNumberRef)CFArrayGetValueAtIndex(parsed, 1);
+        CFNumberRef element2 = (CFNumberRef)CFArrayGetValueAtIndex(parsed, 2);
+        CFDateRef element3 = (CFDateRef)CFArrayGetValueAtIndex(parsed, 3);
+        CFDataRef element4 = (CFDataRef)CFArrayGetValueAtIndex(parsed, 4);
+        CFStringRef element5 = (CFStringRef)CFArrayGetValueAtIndex(parsed, 5);
         SInt64 parsedInt = 0;
         double parsedReal = 0.0;
         record_type_identity(&result, readback, "CFArray");
         result.hasLengthValue = true;
         result.lengthValue = (long)CFArrayGetCount(parsed);
         result.hasPrimaryValueText = true;
-        snprintf(result.primaryValueText, sizeof(result.primaryValueText), "%s", "bool=true int=42 real=42.25 date=1234.5 data=10203040 string=6c61756e6368642e7061636b65742d6b6579");
+        snprintf(
+            result.primaryValueText,
+            sizeof(result.primaryValueText),
+            "%s",
+            "bool=true int=42 real=42.25 date=1234.5 data=10203040 string=6c61756e6368642e7061636b65742d6b6579"
+        );
         result.hasAlternateValueText = true;
         snprintf(result.alternateValueText, sizeof(result.alternateValueText), "%s", "header=bplist00 root=array");
         result.success =
@@ -329,14 +387,16 @@ static struct CaseResult observe_mixed_array_roundtrip(void) {
             binary_header_is_bplist00(data) &&
             CFGetTypeID(readback) == CFArrayGetTypeID() &&
             CFArrayGetCount(parsed) == 6 &&
-            CFArrayGetValueAtIndex(parsed, 0) == (CFTypeRef)kCFBooleanTrue &&
-            CFNumberGetValue((CFNumberRef)CFArrayGetValueAtIndex(parsed, 1), kCFNumberSInt64Type, &parsedInt) &&
+            element0 == (CFTypeRef)kCFBooleanTrue &&
+            CFNumberGetValue(element1, kCFNumberSInt64Type, &parsedInt) &&
             parsedInt == intValue &&
-            CFNumberGetValue((CFNumberRef)CFArrayGetValueAtIndex(parsed, 2), kCFNumberFloat64Type, &parsedReal) &&
+            CFNumberGetValue(element2, kCFNumberFloat64Type, &parsedReal) &&
             parsedReal == realValue &&
-            CFDateGetAbsoluteTime((CFDateRef)CFArrayGetValueAtIndex(parsed, 3)) == when &&
-            CFEqual((CFTypeRef)CFArrayGetValueAtIndex(parsed, 4), (CFTypeRef)dataValue) &&
-            CFEqual((CFTypeRef)CFArrayGetValueAtIndex(parsed, 5), (CFTypeRef)string);
+            CFDateGetAbsoluteTime(element3) == when &&
+            CFDataGetLength(element4) == (CFIndex)sizeof(bytes) &&
+            memcmp(CFDataGetBytePtr(element4), bytes, sizeof(bytes)) == 0 &&
+            CFEqual((CFTypeRef)element5, (CFTypeRef)string) &&
+            write_fixture(fixturesDir, "mixed_array_root.bplist", data);
     }
 
     if (error != NULL) {
@@ -349,33 +409,35 @@ static struct CaseResult observe_mixed_array_roundtrip(void) {
         CFRelease(data);
     }
     if (array != NULL) {
-        CFRelease(array);
+        CFRelease((CFTypeRef)array);
     }
     if (string != NULL) {
-        CFRelease(string);
+        CFRelease((CFTypeRef)string);
     }
     if (dataValue != NULL) {
-        CFRelease(dataValue);
+        CFRelease((CFTypeRef)dataValue);
     }
     if (date != NULL) {
-        CFRelease(date);
+        CFRelease((CFTypeRef)date);
     }
     if (realNumber != NULL) {
-        CFRelease(realNumber);
+        CFRelease((CFTypeRef)realNumber);
     }
     if (intNumber != NULL) {
-        CFRelease(intNumber);
+        CFRelease((CFTypeRef)intNumber);
     }
     return result;
 }
 
-static struct CaseResult observe_string_key_dictionary_roundtrip(void) {
+static struct CaseResult observe_string_key_dictionary_roundtrip(CFStringRef fixturesDir) {
     static const UInt8 bytes[] = {0x10u, 0x20u, 0x30u, 0x40u};
+
     struct CaseResult result;
     memset(&result, 0, sizeof(result));
     result.name = "bplist_string_key_dictionary_roundtrip";
     result.classification = "required";
     result.fxMatchLevel = "semantic";
+    result.semanticNote = "Binary create/read in immutable mode must preserve the supported string-key dictionary surface.";
 
     CFStringRef keyAscii = create_ascii_string("ascii");
     CFStringRef keyBlob = create_ascii_string("blob");
@@ -403,32 +465,44 @@ static struct CaseResult observe_string_key_dictionary_roundtrip(void) {
                 &kCFTypeDictionaryValueCallBacks
             )
             : NULL;
+
     CFDataRef data = NULL;
     CFPropertyListRef readback = NULL;
     CFPropertyListFormat format = 0;
     CFErrorRef error = NULL;
 
     if (dictionary != NULL && data_roundtrip((CFPropertyListRef)dictionary, &data, &readback, &format, &error)) {
-        SInt64 parsedCount = 0;
+        CFDictionaryRef parsed = (CFDictionaryRef)readback;
+        CFNumberRef parsedCount = (CFNumberRef)CFDictionaryGetValue(parsed, keyCount);
+        CFDateRef parsedWhen = (CFDateRef)CFDictionaryGetValue(parsed, keyWhen);
+        SInt64 parsedCountValue = 0;
         record_type_identity(&result, readback, "CFDictionary");
         result.hasLengthValue = true;
-        result.lengthValue = (long)CFDictionaryGetCount((CFDictionaryRef)readback);
+        result.lengthValue = (long)CFDictionaryGetCount(parsed);
         result.hasPrimaryValueText = true;
-        snprintf(result.primaryValueText, sizeof(result.primaryValueText), "%s", "ascii=6c61756e6368642e7061636b65742d6b6579 blob=10203040 count=42 enabled=true utf8=636166c3a92de298832df09f93a6 when=1234.5");
+        snprintf(
+            result.primaryValueText,
+            sizeof(result.primaryValueText),
+            "%s",
+            "ascii=6c61756e6368642e7061636b65742d6b6579 blob=10203040 count=42 enabled=true utf8=636166c3a92de298832df09f93a6 when=1234.5"
+        );
         result.hasAlternateValueText = true;
         snprintf(result.alternateValueText, sizeof(result.alternateValueText), "%s", "header=bplist00 root=dict");
         result.success =
             format == kCFPropertyListBinaryFormat_v1_0 &&
             binary_header_is_bplist00(data) &&
             CFGetTypeID(readback) == CFDictionaryGetTypeID() &&
-            CFDictionaryGetCount((CFDictionaryRef)readback) == 6 &&
-            CFEqual(CFDictionaryGetValue((CFDictionaryRef)readback, keyAscii), valueAscii) &&
-            CFEqual(CFDictionaryGetValue((CFDictionaryRef)readback, keyBlob), valueBlob) &&
-            CFNumberGetValue((CFNumberRef)CFDictionaryGetValue((CFDictionaryRef)readback, keyCount), kCFNumberSInt64Type, &parsedCount) &&
-            parsedCount == 42 &&
-            CFDictionaryGetValue((CFDictionaryRef)readback, keyEnabled) == (CFTypeRef)kCFBooleanTrue &&
-            CFEqual(CFDictionaryGetValue((CFDictionaryRef)readback, keyUtf8), valueUtf8) &&
-            CFDateGetAbsoluteTime((CFDateRef)CFDictionaryGetValue((CFDictionaryRef)readback, keyWhen)) == 1234.5;
+            CFDictionaryGetCount(parsed) == 6 &&
+            CFEqual(CFDictionaryGetValue(parsed, keyAscii), (CFTypeRef)valueAscii) &&
+            CFEqual(CFDictionaryGetValue(parsed, keyBlob), (CFTypeRef)valueBlob) &&
+            parsedCount != NULL &&
+            CFNumberGetValue(parsedCount, kCFNumberSInt64Type, &parsedCountValue) &&
+            parsedCountValue == 42 &&
+            CFDictionaryGetValue(parsed, keyEnabled) == (CFTypeRef)kCFBooleanTrue &&
+            CFEqual(CFDictionaryGetValue(parsed, keyUtf8), (CFTypeRef)valueUtf8) &&
+            parsedWhen != NULL &&
+            CFDateGetAbsoluteTime(parsedWhen) == 1234.5 &&
+            write_fixture(fixturesDir, "string_key_dictionary_root.bplist", data);
     }
 
     if (error != NULL) {
@@ -441,40 +515,40 @@ static struct CaseResult observe_string_key_dictionary_roundtrip(void) {
         CFRelease(data);
     }
     if (dictionary != NULL) {
-        CFRelease(dictionary);
+        CFRelease((CFTypeRef)dictionary);
     }
     if (valueWhen != NULL) {
-        CFRelease(valueWhen);
+        CFRelease((CFTypeRef)valueWhen);
     }
     if (valueUtf8 != NULL) {
-        CFRelease(valueUtf8);
+        CFRelease((CFTypeRef)valueUtf8);
     }
     if (valueCount != NULL) {
-        CFRelease(valueCount);
+        CFRelease((CFTypeRef)valueCount);
     }
     if (valueBlob != NULL) {
-        CFRelease(valueBlob);
+        CFRelease((CFTypeRef)valueBlob);
     }
     if (valueAscii != NULL) {
-        CFRelease(valueAscii);
+        CFRelease((CFTypeRef)valueAscii);
     }
     if (keyWhen != NULL) {
-        CFRelease(keyWhen);
+        CFRelease((CFTypeRef)keyWhen);
     }
     if (keyUtf8 != NULL) {
-        CFRelease(keyUtf8);
+        CFRelease((CFTypeRef)keyUtf8);
     }
     if (keyEnabled != NULL) {
-        CFRelease(keyEnabled);
+        CFRelease((CFTypeRef)keyEnabled);
     }
     if (keyCount != NULL) {
-        CFRelease(keyCount);
+        CFRelease((CFTypeRef)keyCount);
     }
     if (keyBlob != NULL) {
-        CFRelease(keyBlob);
+        CFRelease((CFTypeRef)keyBlob);
     }
     if (keyAscii != NULL) {
-        CFRelease(keyAscii);
+        CFRelease((CFTypeRef)keyAscii);
     }
     return result;
 }
@@ -485,6 +559,7 @@ static struct CaseResult observe_non_string_dictionary_key_write_rejected(void) 
     result.name = "bplist_non_string_dictionary_key_write_rejected";
     result.classification = "required";
     result.fxMatchLevel = "error-text-flexible";
+    result.semanticNote = "Binary-plist writing must reject dictionaries with non-string keys safely.";
 
     CFNumberRef key = create_sint64_number(42);
     const void *keys[] = {key};
@@ -525,21 +600,23 @@ static struct CaseResult observe_non_string_dictionary_key_write_rejected(void) 
         CFRelease(error);
     }
     if (dictionary != NULL) {
-        CFRelease(dictionary);
+        CFRelease((CFTypeRef)dictionary);
     }
     if (key != NULL) {
-        CFRelease(key);
+        CFRelease((CFTypeRef)key);
     }
     return result;
 }
 
-static struct CaseResult observe_invalid_header_rejected(void) {
+static struct CaseResult observe_invalid_header_rejected(CFStringRef fixturesDir) {
     static const UInt8 invalidBytes[] = {'x', 'p', 'l', 'i', 's', 't', '0', '0', 0x00u};
+
     struct CaseResult result;
     memset(&result, 0, sizeof(result));
     result.name = "bplist_invalid_header_rejected";
     result.classification = "required";
     result.fxMatchLevel = "error-text-flexible";
+    result.semanticNote = "Binary-plist reading must reject an invalid header safely.";
 
     CFDataRef data = create_data(invalidBytes, (CFIndex)sizeof(invalidBytes));
     CFPropertyListFormat format = 0;
@@ -560,7 +637,12 @@ static struct CaseResult observe_invalid_header_rejected(void) {
     snprintf(result.primaryValueText, sizeof(result.primaryValueText), "%s", "returned-null error-present");
     result.hasAlternateValueText = true;
     snprintf(result.alternateValueText, sizeof(result.alternateValueText), "%s", "read-invalid-header");
-    result.success = data != NULL && readback == NULL && error != NULL && CFErrorGetCode(error) == kCFPropertyListReadCorruptError;
+    result.success =
+        data != NULL &&
+        readback == NULL &&
+        error != NULL &&
+        CFErrorGetCode(error) == kCFPropertyListReadCorruptError &&
+        write_fixture(fixturesDir, "invalid_header.bplist", data);
 
     if (readback != NULL) {
         CFRelease(readback);
@@ -574,12 +656,13 @@ static struct CaseResult observe_invalid_header_rejected(void) {
     return result;
 }
 
-static struct CaseResult observe_truncated_trailer_rejected(void) {
+static struct CaseResult observe_truncated_trailer_rejected(CFStringRef fixturesDir) {
     struct CaseResult result;
     memset(&result, 0, sizeof(result));
     result.name = "bplist_truncated_trailer_rejected";
     result.classification = "required";
     result.fxMatchLevel = "error-text-flexible";
+    result.semanticNote = "Binary-plist reading must reject truncated trailer data safely.";
 
     CFStringRef string = create_ascii_string("launchd.packet-key");
     CFErrorRef writeError = NULL;
@@ -619,7 +702,13 @@ static struct CaseResult observe_truncated_trailer_rejected(void) {
     snprintf(result.primaryValueText, sizeof(result.primaryValueText), "%s", "returned-null error-present");
     result.hasAlternateValueText = true;
     snprintf(result.alternateValueText, sizeof(result.alternateValueText), "%s", "read-truncated-trailer");
-    result.success = valid != NULL && truncated != NULL && readback == NULL && readError != NULL && CFErrorGetCode(readError) == kCFPropertyListReadCorruptError;
+    result.success =
+        valid != NULL &&
+        truncated != NULL &&
+        readback == NULL &&
+        readError != NULL &&
+        CFErrorGetCode(readError) == kCFPropertyListReadCorruptError &&
+        write_fixture(fixturesDir, "truncated_trailer.bplist", truncated);
 
     if (readback != NULL) {
         CFRelease(readback);
@@ -637,30 +726,39 @@ static struct CaseResult observe_truncated_trailer_rejected(void) {
         CFRelease(writeError);
     }
     if (string != NULL) {
-        CFRelease(string);
+        CFRelease((CFTypeRef)string);
     }
     return result;
 }
 
-int main(void) {
+int main(int argc, const char *argv[]) {
+    CFStringRef fixturesDir = NULL;
+    if (argc > 1) {
+        fixturesDir = CFStringCreateWithCString(kCFAllocatorSystemDefault, argv[1], kCFStringEncodingUTF8);
+    }
+
     struct CaseResult results[] = {
-        observe_ascii_string_roundtrip(),
-        observe_unicode_string_roundtrip(),
-        observe_mixed_array_roundtrip(),
-        observe_string_key_dictionary_roundtrip(),
+        observe_ascii_string_roundtrip(fixturesDir),
+        observe_unicode_string_roundtrip(fixturesDir),
+        observe_mixed_array_roundtrip(fixturesDir),
+        observe_string_key_dictionary_roundtrip(fixturesDir),
         observe_non_string_dictionary_key_write_rejected(),
-        observe_invalid_header_rejected(),
-        observe_truncated_trailer_rejected()
+        observe_invalid_header_rejected(fixturesDir),
+        observe_truncated_trailer_rejected(fixturesDir)
     };
     size_t caseCount = sizeof(results) / sizeof(results[0]);
 
     fputs("{\n", stdout);
     fputs("  \"probe\": \"subset3a_bplist_core\",\n", stdout);
     fputs("  \"results\": [\n", stdout);
-    for (size_t index = 0u; index < caseCount; ++index) {
-        json_print_result(stdout, &results[index], index + 1u < caseCount);
+    for (size_t index = 0; index < caseCount; ++index) {
+        json_print_result(stdout, &results[index], index + 1 < caseCount);
     }
     fputs("  ]\n", stdout);
     fputs("}\n", stdout);
+
+    if (fixturesDir != NULL) {
+        CFRelease((CFTypeRef)fixturesDir);
+    }
     return 0;
 }

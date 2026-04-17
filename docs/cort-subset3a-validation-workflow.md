@@ -29,20 +29,32 @@ MX status:
 
 - probe source, expectations, sample fixture, compare tool, and suite wrappers
   exist
-- bounded macOS validation has been run and returned 0 blockers / 0 warnings
-- real MX artifact is expected under:
-  - `../wip-cort-gpt-artifacts/cort-mx/runs/subset3a-mx-bplist-core/out/subset3a_bplist_core.json`
+- bounded macOS validation is clean: `0` blockers, `0` warnings
+- MX artifact path:
+  `../wip-cort-gpt-artifacts/cort-mx/runs/subset3a-mx-bplist-core/out/subset3a_bplist_core.json`
 
 FX status:
 
 - Subset 0, 1A, 1B, and 2A provide the runtime and object surface this slice
   depends on
-- bounded FX binary-plist implementation now exists
-- shared handoff artifact path is:
-  - `../subset3a_bplist_fx.json`
-- the planned FX file cut and fixture contract now live in:
+- real FX binary-plist implementation now exists in `cort-fx`
+- real FX probe output now exists at
+  `../wip-cort-gpt-artifacts/cort-fx/build/out/subset3a_bplist_fx.json`
+- shared handoff artifact now exists at `../subset3a_bplist_fx.json`
+- real FX-vs-MX compare is clean: `0` blockers, `0` warnings
+- preserved compare artifact run now exists at:
+  - `../wip-cort-gpt-artifacts/cort-fx/runs/subset3a-fx-vs-mx/summary.md`
+  - `../wip-cort-gpt-artifacts/cort-fx/runs/subset3a-fx-vs-mx/out/subset3a_bplist_fx_vs_mx_report.md`
+- the FX file cut and fixture contract now live in:
   - `docs/cort-subset3a-fx-implementation-plan.md`
   - `docs/cort-subset3a-fixture-corpus.md`
+
+Refresh the shared repo-root artifact from the latest FX build output with:
+
+```sh
+cd /Users/me/wip-launchx/wip-cort-gpt/cort-fx
+make publish-subset3a-artifact
+```
 
 ## MX Run
 
@@ -135,7 +147,7 @@ The suite reruns the MX core probe and then:
 
 ## FX vs MX Comparison
 
-Compare the emitted FX artifact against the MX JSON with:
+Compare the FX Subset 3A JSON artifact against the MX JSON with:
 
 - `tools/compare_subset3a_bplist_json.exs`
 
@@ -153,6 +165,31 @@ Expected FX artifact path:
 
 - `../wip-cort-gpt-artifacts/cort-fx/build/out/subset3a_bplist_fx.json`
 - shared handoff artifact: `../subset3a_bplist_fx.json`
+
+## FX Compare Wrapper
+
+The FX host can compare and package the Subset 3A result with:
+
+```sh
+cd /Users/me/wip-launchx/wip-cort-gpt/cort-fx
+make compare-subset3a-with-mx \
+  FX_BPLIST_JSON=/path/to/subset3a_bplist_fx.json \
+  MX_JSON=/path/to/subset3a_bplist_core.json
+```
+
+To preserve a compare-only handoff artifact run:
+
+```sh
+cd /Users/me/wip-launchx/wip-cort-gpt/cort-fx
+make artifact-subset3a-compare \
+  FX_BPLIST_JSON=/path/to/subset3a_bplist_fx.json \
+  MX_JSON=/path/to/subset3a_bplist_core.json
+```
+
+Default compare-artifact output:
+
+- `../wip-cort-gpt-artifacts/cort-fx/runs/subset3a-fx-vs-mx/summary.md`
+- `../wip-cort-gpt-artifacts/cort-fx/runs/subset3a-fx-vs-mx/out/subset3a_bplist_fx_vs_mx_report.md`
 
 ## Comparison Rules
 
@@ -194,12 +231,16 @@ cd /Users/me/wip-launchx/wip-cort-gpt
 tools/run_elixir.sh tools/workflow_selfcheck.exs
 ```
 
-What it should cover after the Subset 3A assets land:
+What it should cover:
 
 - shell syntax and execute-bit presence for the new MX scripts
 - the generic manifest reporter against the Subset 3A sample fixture
 - the Subset 3A FX-vs-MX compare tool against sample JSON fixtures
 - the MX Subset 3A compare wrapper against preserved sample artifacts
+- the FX `make compare-subset3a-with-mx` wrapper against preserved sample
+  fixtures
+- the FX `make artifact-subset3a-compare` wrapper against preserved sample
+  fixtures
 - on Darwin hosts only, actual execution of
   `cort-mx/scripts/run_subset3a_bplist_core.sh` under a temporary artifact root
 - on Darwin hosts only, actual execution of
@@ -212,6 +253,8 @@ What it should cover after the Subset 3A assets land:
 2. Review `summary.md` for blockers or warnings.
 3. Compare against the shared FX artifact with
    `scripts/run_subset3a_bplist_compare.sh` or `scripts/run_subset3a_suite.sh`.
-4. Record the artifact paths in the Subset 3A contract ledger.
-5. Classify rejection behavior and binary-format reporting explicitly.
-6. Only then treat the 3A slice as accepted and move to the next bounded cut.
+4. Optionally preserve an FX-host compare-only handoff run with
+   `make artifact-subset3a-compare`.
+5. Record the artifact paths in the Subset 3A contract ledger.
+6. Classify rejection behavior and binary-format reporting explicitly.
+7. Use the clean shared compare as the gate for broader slices.

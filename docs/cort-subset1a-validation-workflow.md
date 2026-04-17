@@ -67,6 +67,13 @@ Primary FX outputs:
 The repo-local copy is the preferred MX input when coordinating a shared
 compare without regenerating the FX probe locally.
 
+Refresh that shared repo-root artifact from the latest FX build output with:
+
+```sh
+cd /Users/me/wip-launchx/wip-cort-gpt/cort-fx
+make publish-subset1a-artifact
+```
+
 ## MX Run
 
 From:

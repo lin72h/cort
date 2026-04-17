@@ -15,13 +15,7 @@ static Boolean __CFErrorEqual(CFTypeRef cf1, CFTypeRef cf2) {
 
 static CFHashCode __CFErrorHash(CFTypeRef cf) {
     const struct __CFError *error = (const struct __CFError *)cf;
-    uint64_t value = (uint64_t)error->code;
-    value ^= value >> 33u;
-    value *= 0xff51afd7ed558ccdULL;
-    value ^= value >> 33u;
-    value *= 0xc4ceb9fe1a85ec53ULL;
-    value ^= value >> 33u;
-    return (CFHashCode)value;
+    return (CFHashCode)error->code;
 }
 
 static const CFRuntimeClass __CFErrorClass = {
@@ -46,14 +40,13 @@ const CFRuntimeClass *_FXCFErrorClass(void) {
 CFErrorRef _FXCFErrorCreateCode(CFAllocatorRef allocator, CFIndex code) {
     struct __CFError *error = (struct __CFError *)_CFRuntimeCreateInstance(
         allocator,
-        CFErrorGetTypeID(),
+        _kCFRuntimeIDCFError,
         (CFIndex)(sizeof(struct __CFError) - sizeof(CFRuntimeBase)),
         NULL
     );
     if (error == NULL) {
         return NULL;
     }
-
     error->code = code;
     return error;
 }

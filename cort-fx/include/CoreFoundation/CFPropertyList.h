@@ -9,8 +9,14 @@
 extern "C" {
 #endif
 
-typedef CFIndex CFPropertyListFormat;
 typedef CFOptionFlags CFPropertyListMutabilityOptions;
+typedef CFIndex CFPropertyListFormat;
+
+enum {
+    kCFPropertyListImmutable = 0,
+    kCFPropertyListMutableContainers = 1 << 0,
+    kCFPropertyListMutableContainersAndLeaves = 1 << 1
+};
 
 enum {
     kCFPropertyListOpenStepFormat = 1,
@@ -19,29 +25,25 @@ enum {
 };
 
 enum {
-    kCFPropertyListImmutable = 0,
-    kCFPropertyListMutableContainers = 1,
-    kCFPropertyListMutableContainersAndLeaves = 2
-};
-
-enum {
     kCFPropertyListReadCorruptError = 3840,
+    kCFPropertyListReadUnknownVersionError = 3841,
+    kCFPropertyListReadStreamError = 3842,
     kCFPropertyListWriteStreamError = 3851
 };
+
+CF_EXPORT CFPropertyListRef CFPropertyListCreateWithData(
+    CFAllocatorRef allocator,
+    CFDataRef data,
+    CFOptionFlags options,
+    CFPropertyListFormat *format,
+    CFErrorRef *error
+);
 
 CF_EXPORT CFDataRef CFPropertyListCreateData(
     CFAllocatorRef allocator,
     CFPropertyListRef propertyList,
     CFPropertyListFormat format,
     CFOptionFlags options,
-    CFErrorRef *error
-);
-
-CF_EXPORT CFPropertyListRef CFPropertyListCreateWithData(
-    CFAllocatorRef allocator,
-    CFDataRef data,
-    CFPropertyListMutabilityOptions options,
-    CFPropertyListFormat *format,
     CFErrorRef *error
 );
 

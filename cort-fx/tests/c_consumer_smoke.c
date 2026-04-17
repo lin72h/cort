@@ -19,6 +19,12 @@ static void fail(const char *message) {
     exit(1);
 }
 
+static int starts_with_bplist00(CFDataRef data) {
+    static const UInt8 header[] = {'b', 'p', 'l', 'i', 's', 't', '0', '0'};
+    return CFDataGetLength(data) >= (CFIndex)sizeof(header) &&
+           memcmp(CFDataGetBytePtr(data), header, sizeof(header)) == 0;
+}
+
 int main(void) {
     static const CFRuntimeClass smokeClass = {
         0,
@@ -72,14 +78,9 @@ int main(void) {
         CFNumberRef number = CFNumberCreate(kCFAllocatorSystemDefault, kCFNumberSInt32Type, &value);
         CFDateRef date = CFDateCreate(kCFAllocatorSystemDefault, when);
         CFStringRef string = CFStringCreateWithCString(kCFAllocatorSystemDefault, "launchd.packet-key", kCFStringEncodingASCII);
-        CFErrorRef error = NULL;
-        CFPropertyListFormat format = 0;
         const void *arrayValues[] = {string, data};
         CFArrayRef array = NULL;
         CFMutableDictionaryRef dictionary = NULL;
-        CFDataRef plistBytes = NULL;
-        CFPropertyListRef decoded = NULL;
-        const void *decodedValue = NULL;
 
         if (data == NULL || number == NULL || date == NULL || string == NULL) {
             fail("scalar create failed");
@@ -130,42 +131,71 @@ int main(void) {
             fail("dictionary borrowed get mismatch");
         }
 
-        plistBytes = CFPropertyListCreateData(
-            kCFAllocatorSystemDefault,
-            (CFPropertyListRef)dictionary,
-            kCFPropertyListBinaryFormat_v1_0,
-            0,
-            &error
-        );
-        if (plistBytes == NULL || error != NULL) {
-            fail("binary plist write failed");
-        }
-        decoded = CFPropertyListCreateWithData(
-            kCFAllocatorSystemDefault,
-            plistBytes,
-            kCFPropertyListImmutable,
-            &format,
-            &error
-        );
-        if (decoded == NULL || error != NULL) {
-            fail("binary plist read failed");
-        }
-        if (format != kCFPropertyListBinaryFormat_v1_0) {
-            fail("binary plist format mismatch");
-        }
-        if (CFGetTypeID(decoded) != CFDictionaryGetTypeID()) {
-            fail("decoded plist type mismatch");
-        }
-        decodedValue = CFDictionaryGetValue((CFDictionaryRef)decoded, string);
-        if (decodedValue == NULL || CFGetTypeID((CFTypeRef)decodedValue) != CFDataGetTypeID()) {
-            fail("decoded plist value type mismatch");
-        }
-        if (CFDataGetLength((CFDataRef)decodedValue) != (CFIndex)sizeof(bytes)) {
-            fail("decoded plist data length mismatch");
+        {
+            CFErrorRef writeError = NULL;
+            CFDataRef plistData = CFPropertyListCreateData(
+                kCFAllocatorSystemDefault,
+                (CFPropertyListRef)string,
+                kCFPropertyListBinaryFormat_v1_0,
+                0,
+                &writeError
+            );
+            CFPropertyListFormat format = 0;
+            CFErrorRef readError = NULL;
+            CFPropertyListRef readback = NULL;
+            static const UInt8 invalidHeader[] = {'x', 'p', 'l', 'i', 's', 't', '0', '0', 0x00u};
+            CFDataRef invalidData = CFDataCreate(kCFAllocatorSystemDefault, invalidHeader, (CFIndex)sizeof(invalidHeader));
+            CFErrorRef invalidError = NULL;
+
+            if (plistData == NULL || writeError != NULL) {
+                fail("property-list write failed");
+            }
+            if (!starts_with_bplist00(plistData)) {
+                fail("property-list binary header mismatch");
+            }
+
+            readback = CFPropertyListCreateWithData(
+                kCFAllocatorSystemDefault,
+                plistData,
+                kCFPropertyListImmutable,
+                &format,
+                &readError
+            );
+            if (readback == NULL || readError != NULL) {
+                fail("property-list readback failed");
+            }
+            if (format != kCFPropertyListBinaryFormat_v1_0) {
+                fail("property-list format mismatch");
+            }
+            if (CFGetTypeID(readback) != CFStringGetTypeID()) {
+                fail("property-list readback type mismatch");
+            }
+            if (!CFEqual(readback, (CFTypeRef)string)) {
+                fail("property-list readback value mismatch");
+            }
+
+            if (invalidData == NULL) {
+                fail("invalid-header setup failed");
+            }
+            if (CFPropertyListCreateWithData(
+                    kCFAllocatorSystemDefault,
+                    invalidData,
+                    kCFPropertyListImmutable,
+                    NULL,
+                    &invalidError
+                ) != NULL) {
+                fail("invalid-header read should fail");
+            }
+            if (invalidError == NULL || CFErrorGetCode(invalidError) != kCFPropertyListReadCorruptError) {
+                fail("invalid-header error mismatch");
+            }
+
+            CFRelease((CFTypeRef)invalidError);
+            CFRelease((CFTypeRef)invalidData);
+            CFRelease(readback);
+            CFRelease(plistData);
         }
 
-        CFRelease(decoded);
-        CFRelease(plistBytes);
         CFRelease((CFTypeRef)dictionary);
         CFRelease((CFTypeRef)array);
         CFRelease((CFTypeRef)string);
