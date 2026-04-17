@@ -1,0 +1,75 @@
+{
+  "probe": "subset3a_bplist_core",
+  "results": [
+    {
+      "name": "bplist_ascii_string_roundtrip",
+      "classification": "required",
+      "success": true,
+      "type_id": 710,
+      "type_description": "CFString",
+      "length_value": 18,
+      "primary_value_text": "6c61756e6368642e7061636b65742d6b6579",
+      "alternate_value_text": "header=bplist00 tag=ascii-string"
+    },
+    {
+      "name": "bplist_unicode_string_roundtrip",
+      "classification": "required",
+      "success": true,
+      "type_id": 710,
+      "type_description": "CFString",
+      "length_value": 9,
+      "primary_value_text": "636166c3a92de298832df09f93a6",
+      "alternate_value_text": "header=bplist00 tag=unicode16-string"
+    },
+    {
+      "name": "bplist_mixed_array_roundtrip",
+      "classification": "required",
+      "success": true,
+      "type_id": 810,
+      "type_description": "CFArray",
+      "length_value": 6,
+      "primary_value_text": "bool=true int=42 real=42.25 date=1234.5 data=10203040 string=6c61756e6368642e7061636b65742d6b6579",
+      "alternate_value_text": "header=bplist00 root=array"
+    },
+    {
+      "name": "bplist_string_key_dictionary_roundtrip",
+      "classification": "required",
+      "success": true,
+      "type_id": 910,
+      "type_description": "CFDictionary",
+      "length_value": 6,
+      "primary_value_text": "ascii=6c61756e6368642e7061636b65742d6b6579 blob=10203040 count=42 enabled=true utf8=636166c3a92de298832df09f93a6 when=1234.5",
+      "alternate_value_text": "header=bplist00 root=dict"
+    },
+    {
+      "name": "bplist_non_string_dictionary_key_write_rejected",
+      "classification": "required",
+      "success": true,
+      "type_id": null,
+      "type_description": null,
+      "length_value": 3851,
+      "primary_value_text": "returned-null error-present",
+      "alternate_value_text": "write-invalid-non-string-key"
+    },
+    {
+      "name": "bplist_invalid_header_rejected",
+      "classification": "required",
+      "success": true,
+      "type_id": null,
+      "type_description": null,
+      "length_value": 3840,
+      "primary_value_text": "returned-null error-present",
+      "alternate_value_text": "read-invalid-header"
+    },
+    {
+      "name": "bplist_truncated_trailer_rejected",
+      "classification": "required",
+      "success": true,
+      "type_id": null,
+      "type_description": null,
+      "length_value": 3840,
+      "primary_value_text": "returned-null error-present",
+      "alternate_value_text": "read-truncated-trailer"
+    }
+  ]
+}

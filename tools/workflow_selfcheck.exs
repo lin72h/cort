@@ -50,12 +50,15 @@ defmodule WorkflowSelfcheck do
       {"subset1 manifest report", fn -> subset1_manifest_report_check!(repo_root) end},
       {"subset1b manifest report", fn -> subset1b_manifest_report_check!(repo_root) end},
       {"subset2a manifest report", fn -> subset2a_manifest_report_check!(repo_root) end},
+      {"subset3a manifest report", fn -> subset3a_manifest_report_check!(repo_root) end},
       {"subset0 compare tool", fn -> subset0_compare_check!(repo_root) end},
       {"subset1 compare tool", fn -> subset1_compare_check!(repo_root) end},
       {"subset1b compare tool", fn -> subset1b_compare_check!(repo_root) end},
       {"subset2a compare tool", fn -> subset2a_compare_check!(repo_root) end},
+      {"subset3a compare tool", fn -> subset3a_compare_check!(repo_root) end},
       {"subset1 MX compare artifact wrapper", fn -> subset1_mx_compare_artifact_check!(repo_root, artifacts_root) end},
       {"subset1b MX compare artifact wrapper", fn -> subset1b_mx_compare_artifact_check!(repo_root, artifacts_root) end},
+      {"subset3a MX compare artifact wrapper", fn -> subset3a_mx_compare_artifact_check!(repo_root, artifacts_root) end},
       {"subset1 FX test target", fn -> subset1_fx_test_target_check!(repo_root, artifacts_root) end},
       {"subset1 FX make compare wrapper", fn -> subset1_make_compare_check!(repo_root, artifacts_root) end},
       {"subset1b FX make compare wrapper", fn -> subset1b_make_compare_check!(repo_root, artifacts_root) end},
@@ -73,7 +76,9 @@ defmodule WorkflowSelfcheck do
           {"subset1b MX suite script", fn -> subset1b_mx_suite_check!(repo_root, artifacts_root) end},
           {"subset2a MX compare artifact wrapper", fn -> subset2a_mx_compare_artifact_check!(repo_root, artifacts_root) end},
           {"subset2a MX container script", fn -> subset2a_mx_container_check!(repo_root, artifacts_root) end},
-          {"subset2a MX suite script", fn -> subset2a_mx_suite_check!(repo_root, artifacts_root) end}
+          {"subset2a MX suite script", fn -> subset2a_mx_suite_check!(repo_root, artifacts_root) end},
+          {"subset3a MX bplist script", fn -> subset3a_mx_bplist_check!(repo_root, artifacts_root) end},
+          {"subset3a MX suite script", fn -> subset3a_mx_suite_check!(repo_root, artifacts_root) end}
         ]
       else
         []
@@ -98,6 +103,9 @@ defmodule WorkflowSelfcheck do
       "cort-mx/scripts/run_subset2a_container_core.sh",
       "cort-mx/scripts/run_subset2a_container_compare.sh",
       "cort-mx/scripts/run_subset2a_suite.sh",
+      "cort-mx/scripts/run_subset3a_bplist_core.sh",
+      "cort-mx/scripts/run_subset3a_bplist_compare.sh",
+      "cort-mx/scripts/run_subset3a_suite.sh",
       "cort-fx/scripts/run_subset0_fx_artifacts.sh",
       "cort-fx/scripts/run_subset1a_compare_artifact.sh"
     ]
@@ -213,6 +221,31 @@ defmodule WorkflowSelfcheck do
     ensure_contains!(output, "- warnings: 0")
   end
 
+  defp subset3a_manifest_report_check!(repo_root) do
+    output =
+      run_cmd!(
+        Path.join(repo_root, "tools/run_elixir.sh"),
+        [
+          Path.join(repo_root, "tools/report_case_manifest.exs"),
+          "--title",
+          "Subset 3A Binary Plist Core Report",
+          "--json",
+          Path.join(repo_root, "cort-mx/fixtures/subset3a_bplist_core_sample.json"),
+          "--json-label",
+          "out/subset3a_bplist_core.json",
+          "--expected",
+          Path.join(repo_root, "cort-mx/expectations/subset3a_bplist_core_expected.json"),
+          "--expected-label",
+          "expectations/subset3a_bplist_core_expected.json"
+        ],
+        cd: repo_root,
+        expect_exit: 0
+      )
+
+    ensure_contains!(output, "- blockers: 0")
+    ensure_contains!(output, "- warnings: 0")
+  end
+
   defp subset0_compare_check!(repo_root) do
     output =
       run_cmd!(
@@ -291,6 +324,26 @@ defmodule WorkflowSelfcheck do
     ensure_contains!(output, "- blockers: 0")
     ensure_contains!(output, "- warnings: 0")
     ensure_contains!(output, "`cfdictionary_mutable_set_replace_remove_retains` | match")
+  end
+
+  defp subset3a_compare_check!(repo_root) do
+    output =
+      run_cmd!(
+        Path.join(repo_root, "tools/run_elixir.sh"),
+        [
+          Path.join(repo_root, "tools/compare_subset3a_bplist_json.exs"),
+          "--fx-json",
+          Path.join(repo_root, "tools/fixtures/subset3a_bplist_compare_fx_sample.json"),
+          "--mx-json",
+          Path.join(repo_root, "tools/fixtures/subset3a_bplist_compare_mx_sample.json")
+        ],
+        cd: repo_root,
+        expect_exit: 0
+      )
+
+    ensure_contains!(output, "- blockers: 0")
+    ensure_contains!(output, "- warnings: 0")
+    ensure_contains!(output, "`bplist_truncated_trailer_rejected` | match")
   end
 
   defp subset1_mx_compare_artifact_check!(repo_root, artifacts_root) do
@@ -394,6 +447,42 @@ defmodule WorkflowSelfcheck do
         ] do
       unless File.exists?(path) do
         raise RuntimeError, "missing MX Subset 2A compare artifact output at #{path}"
+      end
+    end
+
+    ensure_contains!(File.read!(summary_path), "- warnings: 0")
+    ensure_empty_or_whitespace!(File.read!(stderr_path), stderr_path)
+  end
+
+  defp subset3a_mx_compare_artifact_check!(repo_root, artifacts_root) do
+    run_dir = Path.join([artifacts_root, "cort-mx", "runs", "subset3a-mx-bplist-core-compare"])
+    summary_path = Path.join(run_dir, "summary.md")
+    stderr_path = Path.join([run_dir, "out", "compare.stderr"])
+
+    run_cmd!(
+      Path.join(repo_root, "cort-mx/scripts/run_subset3a_bplist_compare.sh"),
+      [],
+      cd: Path.join(repo_root, "cort-mx"),
+      env: [
+        {"CORT_ARTIFACTS_ROOT", artifacts_root},
+        {"FX_JSON", Path.join(repo_root, "tools/fixtures/subset3a_bplist_compare_fx_sample.json")},
+        {"MX_JSON", Path.join(repo_root, "tools/fixtures/subset3a_bplist_compare_mx_sample.json")}
+      ],
+      expect_exit: 0
+    )
+
+    for path <- [
+          summary_path,
+          Path.join(run_dir, "commands.txt"),
+          Path.join(run_dir, "host.txt"),
+          Path.join(run_dir, "toolchain.txt"),
+          Path.join([run_dir, "out", "subset3a_bplist_fx.json"]),
+          Path.join([run_dir, "out", "subset3a_bplist_mx.json"]),
+          Path.join([run_dir, "out", "subset3a_bplist_fx_vs_mx_report.md"]),
+          Path.join(run_dir, "sha256.txt")
+        ] do
+      unless File.exists?(path) do
+        raise RuntimeError, "missing MX Subset 3A compare artifact output at #{path}"
       end
     end
 
@@ -657,6 +746,70 @@ defmodule WorkflowSelfcheck do
     ensure_contains!(File.read!(suite_summary_path), "- container-core-compare exit status: `0`")
     ensure_contains!(File.read!(container_summary_path), "- blockers: 0")
     ensure_contains!(File.read!(container_summary_path), "- warnings: 0")
+    ensure_contains!(File.read!(compare_summary_path), "- blockers: 0")
+    ensure_contains!(File.read!(compare_summary_path), "- warnings: 0")
+  end
+
+  defp subset3a_mx_bplist_check!(repo_root, artifacts_root) do
+    run_dir = Path.join([artifacts_root, "cort-mx", "runs", "subset3a-mx-bplist-core"])
+    summary_path = Path.join(run_dir, "summary.md")
+    json_path = Path.join([run_dir, "out", "subset3a_bplist_core.json"])
+    stderr_path = Path.join([run_dir, "out", "report.stderr"])
+
+    run_cmd!(
+      Path.join(repo_root, "cort-mx/scripts/run_subset3a_bplist_core.sh"),
+      [],
+      cd: Path.join(repo_root, "cort-mx"),
+      env: [{"CORT_ARTIFACTS_ROOT", artifacts_root}],
+      expect_exit: 0
+    )
+
+    for path <- [summary_path, json_path, stderr_path] do
+      unless File.exists?(path) do
+        raise RuntimeError, "missing MX Subset 3A bplist output at #{path}"
+      end
+    end
+
+    ensure_contains!(File.read!(summary_path), "- blockers: 0")
+    ensure_contains!(File.read!(summary_path), "- warnings: 0")
+    ensure_empty_or_whitespace!(File.read!(stderr_path), stderr_path)
+  end
+
+  defp subset3a_mx_suite_check!(repo_root, artifacts_root) do
+    run_dir = Path.join([artifacts_root, "cort-mx", "runs", "subset3a-mx-suite"])
+    suite_summary_path = Path.join(run_dir, "summary.md")
+    bplist_summary_path = Path.join([run_dir, "bplist-core", "summary.md"])
+    bplist_json_path = Path.join([run_dir, "bplist-core", "out", "subset3a_bplist_core.json"])
+    compare_summary_path = Path.join([run_dir, "bplist-core-compare", "summary.md"])
+    compare_report_path = Path.join([run_dir, "bplist-core-compare", "out", "subset3a_bplist_fx_vs_mx_report.md"])
+
+    run_cmd!(
+      Path.join(repo_root, "cort-mx/scripts/run_subset3a_suite.sh"),
+      [],
+      cd: Path.join(repo_root, "cort-mx"),
+      env: [
+        {"CORT_ARTIFACTS_ROOT", artifacts_root},
+        {"FX_JSON", Path.join(repo_root, "tools/fixtures/subset3a_bplist_compare_fx_sample.json")}
+      ],
+      expect_exit: 0
+    )
+
+    for path <- [
+          suite_summary_path,
+          bplist_summary_path,
+          bplist_json_path,
+          compare_summary_path,
+          compare_report_path
+        ] do
+      unless File.exists?(path) do
+        raise RuntimeError, "missing MX Subset 3A suite output at #{path}"
+      end
+    end
+
+    ensure_contains!(File.read!(suite_summary_path), "- bplist-core exit status: `0`")
+    ensure_contains!(File.read!(suite_summary_path), "- bplist-core-compare exit status: `0`")
+    ensure_contains!(File.read!(bplist_summary_path), "- blockers: 0")
+    ensure_contains!(File.read!(bplist_summary_path), "- warnings: 0")
     ensure_contains!(File.read!(compare_summary_path), "- blockers: 0")
     ensure_contains!(File.read!(compare_summary_path), "- warnings: 0")
   end

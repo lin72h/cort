@@ -47,6 +47,15 @@ Subset 2A:
 - `expectations/subset2a_container_core_expected.json`
 - `fixtures/subset2a_container_core_sample.json`
 
+Subset 3A:
+
+- `src/cort_mx_subset3a_bplist_core.c`
+- `scripts/run_subset3a_bplist_core.sh`
+- `scripts/run_subset3a_bplist_compare.sh`
+- `scripts/run_subset3a_suite.sh`
+- `expectations/subset3a_bplist_core_expected.json`
+- `fixtures/subset3a_bplist_core_sample.json`
+
 ## Purpose
 
 These assets turn the MX lane from a text request into a reproducible run
@@ -153,13 +162,17 @@ Portable checks covered by `../tools/run_elixir.sh ../tools/workflow_selfcheck.e
   `fixtures/subset1b_cfstring_core_sample.json`
 - generic manifest reporter behavior against
   `fixtures/subset2a_container_core_sample.json`
+- generic manifest reporter behavior against
+  `fixtures/subset3a_bplist_core_sample.json`
 - Subset 0 FX-vs-MX compare behavior against sample JSON fixtures
 - Subset 1A FX-vs-MX compare behavior against sample JSON fixtures
 - Subset 1B FX-vs-MX compare behavior against sample JSON fixtures
 - Subset 2A FX-vs-MX compare behavior against sample JSON fixtures
+- Subset 3A FX-vs-MX compare behavior against sample JSON fixtures
 - MX-side Subset 1A compare artifact wrapper against preserved sample artifacts
 - MX-side Subset 1B compare artifact wrapper against preserved sample artifacts
 - MX-side Subset 2A compare artifact wrapper against preserved sample artifacts
+- MX-side Subset 3A compare artifact wrapper against preserved sample artifacts
 - FX-side Subset 1A compare wrappers against preserved sample artifacts
 
 Additional checks performed by the same selfcheck on Darwin hosts:
@@ -176,6 +189,10 @@ Additional checks performed by the same selfcheck on Darwin hosts:
 - actual `scripts/run_subset2a_container_core.sh` execution under a temporary
   artifact root
 - actual `scripts/run_subset2a_suite.sh` execution under a temporary artifact
+  root with preserved sample FX JSON
+- actual `scripts/run_subset3a_bplist_core.sh` execution under a temporary
+  artifact root
+- actual `scripts/run_subset3a_suite.sh` execution under a temporary artifact
   root with preserved sample FX JSON
 - preservation of MX run directories, summaries, and hashes
 
@@ -376,4 +393,74 @@ tools/run_elixir.sh tools/compare_subset2a_container_json.exs \
   --fx-json /path/to/subset2a_container_fx.json \
   --mx-json /path/to/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json \
   --output /path/to/subset2a_container_fx_vs_mx_report.md
+```
+
+## Subset 3A Binary Plist Core
+
+This slice validates the first bounded binary-plist read/write surface:
+
+- `CFPropertyListCreateData` in binary format only
+- `CFPropertyListCreateWithData` in immutable mode only
+- root values limited to the proven plist-valid scalar, string, array, and
+  dictionary surface
+- safe rejection of malformed binary input
+
+Contract:
+
+- `../docs/cort-subset3a-bplist-core-contract.md`
+- `../docs/cort-subset3a-validation-workflow.md`
+
+Run it with:
+
+```sh
+cd cort-mx
+scripts/run_subset3a_bplist_core.sh
+```
+
+Default output:
+
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset3a-mx-bplist-core/`
+
+Compare an FX Subset 3A JSON artifact against MX with:
+
+```sh
+cd cort-mx
+scripts/run_subset3a_bplist_compare.sh
+```
+
+Default output:
+
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset3a-mx-bplist-core-compare/`
+
+This defaults to:
+
+- FX JSON: `../subset3a_bplist_fx.json`
+- MX JSON:
+  `../wip-cort-gpt-artifacts/cort-mx/runs/subset3a-mx-bplist-core/out/subset3a_bplist_core.json`
+
+Run the full MX Subset 3A suite with:
+
+```sh
+cd cort-mx
+scripts/run_subset3a_suite.sh
+```
+
+Default output:
+
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset3a-mx-suite/`
+
+This reruns the MX binary-plist probe and then:
+
+- compares against the shared in-repo `subset3a_bplist_fx.json` when it is
+  present
+- or preserves a compare summary that says the FX artifact is not available yet
+
+Direct compare invocation is still available with:
+
+```sh
+cd ..
+tools/run_elixir.sh tools/compare_subset3a_bplist_json.exs \
+  --fx-json /path/to/subset3a_bplist_fx.json \
+  --mx-json /path/to/cort-mx/runs/subset3a-mx-bplist-core/out/subset3a_bplist_core.json \
+  --output /path/to/subset3a_bplist_fx_vs_mx_report.md
 ```

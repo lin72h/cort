@@ -10,10 +10,14 @@ Subset 0, Subset 1A, Subset 1B, and Subset 2A:
 - Subset 2A: bounded container core for arrays, dictionaries, and ownership
   semantics for plist-valid object graphs
 
-The next planned slice after this proof is Subset 3:
+The next planned slice after this proof is Subset 3A:
 
-- bounded binary plist read/write work on top of the proven runtime, scalar,
-  string, and container surface
+- bounded binary plist core read/write work on top of the proven runtime,
+  scalar, string, and container surface
+- the MX readiness package for that slice now lives in
+  `../docs/cort-subset3a-bplist-core-contract.md`,
+  `../docs/cort-subset3a-source-audit-and-readiness.md`, and
+  `../docs/cort-subset3a-validation-workflow.md`
 - MX and FX contracts still live in `../docs/` and `../cort-mx/`
 
 It is not the final repository layout. The final target remains
