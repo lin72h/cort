@@ -49,6 +49,23 @@ enum _FXCFControlRequestRouteKind {
     _FXCFControlRequestRouteKindNotifySuspend = 17
 };
 
+enum _FXCFControlResponseProfileKind {
+    _FXCFControlResponseProfileKindInvalid = 0,
+    _FXCFControlResponseProfileKindError = 1,
+    _FXCFControlResponseProfileKindNotifyPost = 2,
+    _FXCFControlResponseProfileKindNotifyRegistrationWrapper = 3,
+    _FXCFControlResponseProfileKindNotifyCancel = 4,
+    _FXCFControlResponseProfileKindNotifyRegistration = 5,
+    _FXCFControlResponseProfileKindNotifyNameState = 6,
+    _FXCFControlResponseProfileKindNotifyValidity = 7,
+    _FXCFControlResponseProfileKindNotifyCheck = 8,
+    _FXCFControlResponseProfileKindNotifyNameList = 9,
+    _FXCFControlResponseProfileKindControlCapabilities = 10,
+    _FXCFControlResponseProfileKindControlHealth = 11,
+    _FXCFControlResponseProfileKindDiagnosticsSnapshot = 12,
+    _FXCFControlResponseProfileKindGenericObject = 13
+};
+
 enum _FXCFControlPacketErrorKind {
     _FXCFControlPacketErrorNone = 0,
     _FXCFControlPacketErrorMissingKey = 1,
@@ -100,6 +117,38 @@ struct _FXCFControlRequestRoute {
     Boolean reuseExistingBinding;
 };
 
+struct _FXCFControlResponseProfile {
+    struct _FXCFControlResponse response;
+    enum _FXCFControlResponseProfileKind kind;
+    CFDictionaryRef resultObject;
+    CFArrayRef resultArray;
+    CFDictionaryRef registration;
+    CFDictionaryRef nameObject;
+    CFDictionaryRef capabilities;
+    CFDictionaryRef health;
+    CFDictionaryRef daemon;
+    CFArrayRef notifyNames;
+    CFArrayRef deliveredTokens;
+    CFArrayRef featureFlags;
+    CFArrayRef reasons;
+    Boolean hasGeneration;
+    CFIndex generation;
+    Boolean hasState;
+    CFIndex state;
+    Boolean hasCurrentState;
+    CFIndex currentState;
+    Boolean hasToken;
+    CFIndex token;
+    Boolean hasValid;
+    Boolean valid;
+    Boolean hasChanged;
+    Boolean changed;
+    Boolean hasCanceled;
+    Boolean canceled;
+    Boolean hasPendingGeneration;
+    CFIndex pendingGeneration;
+};
+
 Boolean _FXCFControlPacketIsBinaryPlist(CFDataRef payload);
 
 Boolean _FXCFControlPacketDecodeEnvelope(
@@ -138,6 +187,15 @@ Boolean _FXCFControlRequestRouteInit(
 void _FXCFControlRequestRouteClear(struct _FXCFControlRequestRoute *route);
 char *_FXCFControlRequestRouteCopyCanonicalJSON(const struct _FXCFControlRequestRoute *route);
 char *_FXCFControlRequestRouteCopySummary(const struct _FXCFControlRequestRoute *route);
+Boolean _FXCFControlResponseProfileInit(
+    CFAllocatorRef allocator,
+    CFDataRef payload,
+    struct _FXCFControlResponseProfile *profileOut,
+    struct _FXCFControlPacketError *errorOut
+);
+void _FXCFControlResponseProfileClear(struct _FXCFControlResponseProfile *profile);
+char *_FXCFControlResponseProfileCopyCanonicalJSON(const struct _FXCFControlResponseProfile *profile);
+char *_FXCFControlResponseProfileCopySummary(const struct _FXCFControlResponseProfile *profile);
 char *_FXCFControlPacketCopyCanonicalJSON(CFTypeRef value);
 char *_FXCFControlPacketCopyAcceptedSummary(CFDictionaryRef packet, enum _FXCFControlPacketKind kind);
 char *_FXCFControlRequestCopyEnvelopeJSON(const struct _FXCFControlRequest *request);

@@ -194,6 +194,7 @@ This builds under `../wip-cort-gpt-artifacts/cort-fx/build/` by default:
 - `bin/control_packet_tests`
 - `bin/control_envelope_tests`
 - `bin/control_request_route_tests`
+- `bin/control_response_profile_tests`
 - `bin/c_consumer_smoke`
 - `bin/subset0_public_compare_fx`
 - `bin/subset1_scalar_core_fx`
@@ -203,6 +204,7 @@ This builds under `../wip-cort-gpt-artifacts/cort-fx/build/` by default:
 - `bin/subset7a_control_packet_fx`
 - `bin/subset7b_control_envelope_fx`
 - `bin/subset7c_control_request_route_fx`
+- `bin/subset7d_control_response_profile_fx`
 
 ## Verification Targets
 
@@ -218,6 +220,7 @@ make compare-subset3a-fx
 make compare-subset7a-fx
 make compare-subset7b-fx
 make compare-subset7c-fx
+make compare-subset7d-fx
 make compare-subset1a-with-mx
 make compare-subset1b-with-mx
 make compare-subset2a-with-mx
@@ -225,6 +228,7 @@ make compare-subset3a-with-mx
 make compare-subset7a-with-expected
 make compare-subset7b-with-expected
 make compare-subset7c-with-expected
+make compare-subset7d-with-expected
 make artifact-run
 make artifact-subset1a-compare
 make artifact-subset2a-compare
@@ -267,6 +271,10 @@ What they enforce:
   `../wip-cort-gpt-artifacts/cort-fx/build/out/subset7c_control_request_route_fx.json`
 - FX control request-route compare emits
   `../wip-cort-gpt-artifacts/cort-fx/build/out/subset7c_control_request_route_fx_vs_expected_report.md`
+- FX control response-profile probe emits
+  `../wip-cort-gpt-artifacts/cort-fx/build/out/subset7d_control_response_profile_fx.json`
+- FX control response-profile compare emits
+  `../wip-cort-gpt-artifacts/cort-fx/build/out/subset7d_control_response_profile_fx_vs_expected_report.md`
 
 The 7A packet slice is implemented with:
 
@@ -294,16 +302,28 @@ The 7C control request-route slice is implemented with:
 - `tests/subset7c_control_request_route_support.h`
 - `../tools/build_subset7c_control_request_route_expected.exs`
 
+The 7D control response-profile slice is implemented with:
+
+- `src/FXCFControlPacket.c`
+- `src/FXCFControlPacket.h`
+- `tests/control_response_profile_tests.c`
+- `tests/cort_subset7d_control_response_profile_fx.c`
+- `tests/subset7d_control_response_profile_support.h`
+- `../tools/build_subset7d_control_response_profile_expected.exs`
+
 Shared handoff artifact:
 
 - `../subset7a_control_packet_fx.json`
+- `../subset7d_control_response_profile_fx.json`
 - Subset 1A compare wrapper can compare that FX JSON against MX and preserve a
   dedicated handoff artifact run
 - shared handoff artifacts may also be committed at repo root for MX
   consumption, including `subset0_public_compare_fx.json`,
   `subset1_scalar_core_fx.json`, `subset1b_cfstring_fx.json`,
   `subset2a_container_fx.json`, `subset3a_bplist_fx.json`, and
-  `subset7a_control_packet_fx.json`
+  `subset7a_control_packet_fx.json`, `subset7b_control_envelope_fx.json`,
+  `subset7c_control_request_route_fx.json`, and
+  `subset7d_control_response_profile_fx.json`
 - Subset 2A compare wrapper can compare a real FX container JSON against MX and
   preserve a dedicated handoff artifact run once the FX artifact exists
 - Subset 3A compare wrapper can compare a real FX binary-plist JSON against MX

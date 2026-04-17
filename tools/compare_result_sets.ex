@@ -184,7 +184,7 @@ defmodule CompareResultSets do
       left_value = Map.get(left_case, field)
       right_value = Map.get(right_case, field)
 
-      if is_nil(left_value) or is_nil(right_value) or left_value == right_value do
+      if is_nil(left_value) or is_nil(right_value) or field_values_equal?(field, left_value, right_value) do
         acc
       else
         {acc_notes, acc_status, acc_blockers, acc_warnings} = acc
@@ -208,6 +208,60 @@ defmodule CompareResultSets do
       end
     end)
   end
+
+  defp field_values_equal?(field, left_value, right_value) when is_binary(left_value) and is_binary(right_value) do
+    if field in ["primary_value_text"] do
+      normalized_json_text(left_value) == normalized_json_text(right_value)
+    else
+      left_value == right_value
+    end
+  end
+
+  defp field_values_equal?(_field, left_value, right_value), do: left_value == right_value
+
+  defp normalized_json_text(text) do
+    try do
+      text
+      |> :json.decode()
+      |> CortTooling.normalize_json()
+      |> canonical_json()
+    rescue
+      _ -> text
+    end
+  end
+
+  defp canonical_json(value) when is_map(value) do
+    "{" <>
+      (value
+       |> Map.keys()
+       |> Enum.sort()
+       |> Enum.map_join(",", fn key ->
+         "#{canonical_scalar(key)}:#{canonical_json(Map.fetch!(value, key))}"
+       end)) <> "}"
+  end
+
+  defp canonical_json(value) when is_list(value) do
+    "[" <> Enum.map_join(value, ",", &canonical_json/1) <> "]"
+  end
+
+  defp canonical_json(value), do: canonical_scalar(value)
+
+  defp canonical_scalar(value) when is_binary(value) do
+    escaped =
+      value
+      |> String.replace("\\", "\\\\")
+      |> String.replace("\"", "\\\"")
+      |> String.replace("\n", "\\n")
+      |> String.replace("\r", "\\r")
+      |> String.replace("\t", "\\t")
+
+    "\"#{escaped}\""
+  end
+
+  defp canonical_scalar(value) when is_boolean(value), do: if(value, do: "true", else: "false")
+  defp canonical_scalar(value) when is_integer(value), do: Integer.to_string(value)
+  defp canonical_scalar(value) when is_float(value), do: :erlang.float_to_binary(value, [:compact, decimals: 12])
+  defp canonical_scalar(nil), do: "null"
 
   defp add_diagnostic_field_notes({notes, status, blockers, warnings}, left_case, right_case, config) do
     updated_notes =

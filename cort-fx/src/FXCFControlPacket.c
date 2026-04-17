@@ -768,6 +768,28 @@ static Boolean __FXCFControlPacketRequireDictionary(CFDictionaryRef dictionary, 
     return true;
 }
 
+static Boolean __FXCFControlPacketRequireArray(CFDictionaryRef dictionary, const char *keyText, CFArrayRef *valueOut, struct _FXCFControlPacketError *error) {
+    CFStringRef key = NULL;
+    const void *raw = NULL;
+    Boolean ok = false;
+
+    key = CFStringCreateWithCString(kCFAllocatorSystemDefault, keyText, kCFStringEncodingASCII);
+    if (key == NULL) {
+        __FXCFControlPacketSetError(error, _FXCFControlPacketErrorInvalidPacket, 0, "failed to create lookup key");
+        return false;
+    }
+
+    ok = CFDictionaryGetValueIfPresent(dictionary, key, &raw);
+    CFRelease((CFTypeRef)key);
+    if (!ok || raw == NULL || CFGetTypeID((CFTypeRef)raw) != CFArrayGetTypeID()) {
+        __FXCFControlPacketSetError(error, _FXCFControlPacketErrorMissingKey, 0, keyText);
+        return false;
+    }
+
+    *valueOut = (CFArrayRef)raw;
+    return true;
+}
+
 static Boolean __FXCFControlPacketRequireValue(CFDictionaryRef dictionary, const char *keyText, CFTypeRef *valueOut, struct _FXCFControlPacketError *error) {
     CFStringRef key = NULL;
     const void *raw = NULL;
@@ -787,6 +809,34 @@ static Boolean __FXCFControlPacketRequireValue(CFDictionaryRef dictionary, const
     }
 
     *valueOut = (CFTypeRef)raw;
+    return true;
+}
+
+static Boolean __FXCFControlPacketLookupValue(
+    CFDictionaryRef dictionary,
+    const char *keyText,
+    const void **valueOut,
+    Boolean *presentOut,
+    struct _FXCFControlPacketError *error
+);
+
+static Boolean __FXCFControlPacketRequireBoolean(CFDictionaryRef dictionary, const char *keyText, Boolean *valueOut, struct _FXCFControlPacketError *error) {
+    const void *raw = NULL;
+    Boolean present = false;
+
+    if (valueOut != NULL) {
+        *valueOut = false;
+    }
+    if (!__FXCFControlPacketLookupValue(dictionary, keyText, &raw, &present, error)) {
+        return false;
+    }
+    if (!present || raw == NULL || CFGetTypeID((CFTypeRef)raw) != CFBooleanGetTypeID()) {
+        __FXCFControlPacketSetError(error, _FXCFControlPacketErrorMissingKey, 0, keyText);
+        return false;
+    }
+    if (valueOut != NULL) {
+        *valueOut = CFBooleanGetValue((CFBooleanRef)raw);
+    }
     return true;
 }
 
@@ -859,6 +909,80 @@ static Boolean __FXCFControlPacketLookupOptionalString(
     }
     if (valueOut != NULL) {
         *valueOut = (CFStringRef)raw;
+    }
+    return true;
+}
+
+static Boolean __FXCFControlPacketLookupOptionalDictionary(
+    CFDictionaryRef dictionary,
+    const char *keyText,
+    CFDictionaryRef *valueOut,
+    Boolean *presentOut,
+    struct _FXCFControlPacketError *error
+) {
+    const void *raw = NULL;
+    Boolean present = false;
+
+    if (valueOut != NULL) {
+        *valueOut = NULL;
+    }
+    if (presentOut != NULL) {
+        *presentOut = false;
+    }
+
+    if (!__FXCFControlPacketLookupValue(dictionary, keyText, &raw, &present, error)) {
+        return false;
+    }
+    if (!present || raw == NULL) {
+        return true;
+    }
+    if (CFGetTypeID((CFTypeRef)raw) != CFDictionaryGetTypeID()) {
+        __FXCFControlPacketSetError(error, _FXCFControlPacketErrorInvalidPacket, 0, keyText);
+        return false;
+    }
+
+    if (presentOut != NULL) {
+        *presentOut = true;
+    }
+    if (valueOut != NULL) {
+        *valueOut = (CFDictionaryRef)raw;
+    }
+    return true;
+}
+
+static Boolean __FXCFControlPacketLookupOptionalDate(
+    CFDictionaryRef dictionary,
+    const char *keyText,
+    CFDateRef *valueOut,
+    Boolean *presentOut,
+    struct _FXCFControlPacketError *error
+) {
+    const void *raw = NULL;
+    Boolean present = false;
+
+    if (valueOut != NULL) {
+        *valueOut = NULL;
+    }
+    if (presentOut != NULL) {
+        *presentOut = false;
+    }
+
+    if (!__FXCFControlPacketLookupValue(dictionary, keyText, &raw, &present, error)) {
+        return false;
+    }
+    if (!present || raw == NULL) {
+        return true;
+    }
+    if (CFGetTypeID((CFTypeRef)raw) != CFDateGetTypeID()) {
+        __FXCFControlPacketSetError(error, _FXCFControlPacketErrorInvalidPacket, 0, keyText);
+        return false;
+    }
+
+    if (presentOut != NULL) {
+        *presentOut = true;
+    }
+    if (valueOut != NULL) {
+        *valueOut = (CFDateRef)raw;
     }
     return true;
 }
@@ -1654,6 +1778,1072 @@ char *_FXCFControlRequestRouteCopySummary(const struct _FXCFControlRequestRoute 
     __FXCFTextBufferFree(&buffer);
     __FXCFControlPacketFreeSortedKeys(keys, count);
     return result;
+}
+
+struct __FXCFControlRegistrationFields {
+    CFStringRef deliveryMethod;
+    CFStringRef scope;
+    Boolean hasToken;
+    CFIndex token;
+    Boolean hasValid;
+    Boolean valid;
+    Boolean hasPendingGeneration;
+    CFIndex pendingGeneration;
+};
+
+static const char *__FXCFControlResponseProfileKindText(enum _FXCFControlResponseProfileKind kind) {
+    switch (kind) {
+        case _FXCFControlResponseProfileKindError:
+            return "error";
+        case _FXCFControlResponseProfileKindNotifyPost:
+            return "notify.post";
+        case _FXCFControlResponseProfileKindNotifyRegistrationWrapper:
+            return "notify.registration_wrapper";
+        case _FXCFControlResponseProfileKindNotifyCancel:
+            return "notify.cancel";
+        case _FXCFControlResponseProfileKindNotifyRegistration:
+            return "notify.registration";
+        case _FXCFControlResponseProfileKindNotifyNameState:
+            return "notify.name_state";
+        case _FXCFControlResponseProfileKindNotifyValidity:
+            return "notify.validity";
+        case _FXCFControlResponseProfileKindNotifyCheck:
+            return "notify.check";
+        case _FXCFControlResponseProfileKindNotifyNameList:
+            return "notify.name_list";
+        case _FXCFControlResponseProfileKindControlCapabilities:
+            return "control.capabilities";
+        case _FXCFControlResponseProfileKindControlHealth:
+            return "control.health";
+        case _FXCFControlResponseProfileKindDiagnosticsSnapshot:
+            return "diagnostics.snapshot";
+        case _FXCFControlResponseProfileKindGenericObject:
+            return "generic.object";
+        default:
+            return "invalid";
+    }
+}
+
+static void __FXCFControlPacketFreeCStringArray(char **items, CFIndex count) {
+    if (items == NULL) {
+        return;
+    }
+    for (CFIndex index = 0; index < count; ++index) {
+        free(items[index]);
+    }
+    free(items);
+}
+
+static Boolean __FXCFControlPacketCopySortedStringArray(CFArrayRef array, char ***itemsOut, CFIndex *countOut) {
+    CFIndex count = 0;
+    char **items = NULL;
+
+    if (itemsOut == NULL || countOut == NULL) {
+        return false;
+    }
+
+    *itemsOut = NULL;
+    *countOut = 0;
+    if (array == NULL) {
+        return false;
+    }
+
+    count = CFArrayGetCount(array);
+    if (count == 0) {
+        return true;
+    }
+
+    items = (char **)calloc((size_t)count, sizeof(char *));
+    if (items == NULL) {
+        return false;
+    }
+
+    for (CFIndex index = 0; index < count; ++index) {
+        CFTypeRef value = (CFTypeRef)CFArrayGetValueAtIndex(array, index);
+        if (value == NULL || CFGetTypeID(value) != CFStringGetTypeID()) {
+            __FXCFControlPacketFreeCStringArray(items, count);
+            return false;
+        }
+        items[index] = __FXCFControlPacketCopyCString((CFStringRef)value);
+        if (items[index] == NULL) {
+            __FXCFControlPacketFreeCStringArray(items, count);
+            return false;
+        }
+    }
+
+    qsort(items, (size_t)count, sizeof(char *), __FXCFControlPacketCompareCStringPointers);
+    *itemsOut = items;
+    *countOut = count;
+    return true;
+}
+
+static Boolean __FXCFControlPacketAppendCStringArrayJSON(struct __FXCFTextBuffer *buffer, char *const *items, CFIndex count) {
+    if (!__FXCFTextBufferAppendCString(buffer, "[")) {
+        return false;
+    }
+    for (CFIndex index = 0; index < count; ++index) {
+        if (index > 0 && !__FXCFTextBufferAppendCString(buffer, ",")) {
+            return false;
+        }
+        if (!__FXCFTextBufferAppendJSONString(buffer, items[index])) {
+            return false;
+        }
+    }
+    return __FXCFTextBufferAppendCString(buffer, "]");
+}
+
+static Boolean __FXCFControlPacketValidateNameObject(CFDictionaryRef dictionary) {
+    struct _FXCFControlPacketError ignored = {0};
+    CFStringRef scope = NULL;
+    CFStringRef name = NULL;
+    CFIndex generation = 0;
+    CFIndex state = 0;
+    CFDateRef updatedAt = NULL;
+    CFDateRef lastPostedAt = NULL;
+    Boolean present = false;
+
+    return
+        __FXCFControlPacketRequireString(dictionary, "scope", &scope, &ignored) &&
+        __FXCFControlPacketRequireString(dictionary, "name", &name, &ignored) &&
+        __FXCFControlPacketRequireInteger(dictionary, "generation", &generation, &ignored) &&
+        __FXCFControlPacketRequireInteger(dictionary, "state", &state, &ignored) &&
+        __FXCFControlPacketLookupOptionalDate(dictionary, "updated_at", &updatedAt, &present, &ignored) && present &&
+        __FXCFControlPacketLookupOptionalDate(dictionary, "last_posted_at", &lastPostedAt, &present, &ignored) && present;
+}
+
+static char *__FXCFControlPacketCopyNameSummaryText(CFDictionaryRef dictionary) {
+    struct _FXCFControlPacketError ignored = {0};
+    CFStringRef scope = NULL;
+    CFStringRef name = NULL;
+    CFIndex generation = 0;
+    CFIndex state = 0;
+    char *scopeText = NULL;
+    char *nameText = NULL;
+    char *result = NULL;
+    size_t size = 0u;
+
+    if (!__FXCFControlPacketRequireString(dictionary, "scope", &scope, &ignored) ||
+        !__FXCFControlPacketRequireString(dictionary, "name", &name, &ignored) ||
+        !__FXCFControlPacketRequireInteger(dictionary, "generation", &generation, &ignored) ||
+        !__FXCFControlPacketRequireInteger(dictionary, "state", &state, &ignored)) {
+        return NULL;
+    }
+
+    scopeText = __FXCFControlPacketCopyCString(scope);
+    nameText = __FXCFControlPacketCopyCString(name);
+    if (scopeText == NULL || nameText == NULL) {
+        free(scopeText);
+        free(nameText);
+        return NULL;
+    }
+
+    size = strlen(scopeText) + strlen(nameText) + 48u;
+    result = (char *)calloc(size, sizeof(char));
+    if (result != NULL) {
+        snprintf(result, size, "%s:%s:%ld:%ld", scopeText, nameText, (long)generation, (long)state);
+    }
+
+    free(scopeText);
+    free(nameText);
+    return result;
+}
+
+static Boolean __FXCFControlPacketCopySortedNameSummaries(CFArrayRef array, char ***itemsOut, CFIndex *countOut) {
+    CFIndex count = 0;
+    char **items = NULL;
+
+    if (itemsOut == NULL || countOut == NULL || array == NULL) {
+        return false;
+    }
+
+    *itemsOut = NULL;
+    *countOut = 0;
+    count = CFArrayGetCount(array);
+    if (count == 0) {
+        return true;
+    }
+
+    items = (char **)calloc((size_t)count, sizeof(char *));
+    if (items == NULL) {
+        return false;
+    }
+
+    for (CFIndex index = 0; index < count; ++index) {
+        CFTypeRef value = (CFTypeRef)CFArrayGetValueAtIndex(array, index);
+        if (value == NULL || CFGetTypeID(value) != CFDictionaryGetTypeID() ||
+            !__FXCFControlPacketValidateNameObject((CFDictionaryRef)value)) {
+            __FXCFControlPacketFreeCStringArray(items, count);
+            return false;
+        }
+        items[index] = __FXCFControlPacketCopyNameSummaryText((CFDictionaryRef)value);
+        if (items[index] == NULL) {
+            __FXCFControlPacketFreeCStringArray(items, count);
+            return false;
+        }
+    }
+
+    qsort(items, (size_t)count, sizeof(char *), __FXCFControlPacketCompareCStringPointers);
+    *itemsOut = items;
+    *countOut = count;
+    return true;
+}
+
+static Boolean __FXCFControlPacketValidateRegistrationObject(CFDictionaryRef dictionary, struct __FXCFControlRegistrationFields *fieldsOut) {
+    struct _FXCFControlPacketError ignored = {0};
+    CFStringRef deliveryMethod = NULL;
+    CFStringRef scope = NULL;
+    CFStringRef deliveryState = NULL;
+    CFStringRef name = NULL;
+    CFStringRef sessionID = NULL;
+    CFDateRef createdAt = NULL;
+    CFIndex token = 0;
+    CFIndex suspendDepth = 0;
+    CFIndex lastSeenGeneration = 0;
+    Boolean valid = false;
+    Boolean firstCheckPending = false;
+    Boolean present = false;
+    CFIndex pendingGeneration = 0;
+
+    if (fieldsOut != NULL) {
+        memset(fieldsOut, 0, sizeof(*fieldsOut));
+    }
+
+    if (!__FXCFControlPacketRequireString(dictionary, "delivery_method", &deliveryMethod, &ignored) ||
+        !__FXCFControlPacketRequireString(dictionary, "scope", &scope, &ignored) ||
+        !__FXCFControlPacketRequireString(dictionary, "delivery_state", &deliveryState, &ignored) ||
+        !__FXCFControlPacketRequireString(dictionary, "name", &name, &ignored) ||
+        !__FXCFControlPacketRequireString(dictionary, "session_id", &sessionID, &ignored) ||
+        !__FXCFControlPacketRequireInteger(dictionary, "token", &token, &ignored) ||
+        !__FXCFControlPacketRequireInteger(dictionary, "suspend_depth", &suspendDepth, &ignored) ||
+        !__FXCFControlPacketRequireInteger(dictionary, "last_seen_generation", &lastSeenGeneration, &ignored) ||
+        !__FXCFControlPacketLookupOptionalDate(dictionary, "created_at", &createdAt, &present, &ignored) || !present ||
+        !__FXCFControlPacketLookupOptionalBoolean(dictionary, "valid", &valid, &present, &ignored) || !present ||
+        !__FXCFControlPacketLookupOptionalBoolean(dictionary, "first_check_pending", &firstCheckPending, &present, &ignored) || !present ||
+        !__FXCFControlPacketLookupOptionalInteger(dictionary, "pending_generation", &pendingGeneration, &present, &ignored)) {
+        return false;
+    }
+
+    if (fieldsOut != NULL) {
+        fieldsOut->deliveryMethod = deliveryMethod;
+        fieldsOut->scope = scope;
+        fieldsOut->hasToken = true;
+        fieldsOut->token = token;
+        fieldsOut->hasValid = true;
+        fieldsOut->valid = valid;
+        fieldsOut->hasPendingGeneration = present;
+        fieldsOut->pendingGeneration = pendingGeneration;
+    }
+    return true;
+}
+
+static Boolean __FXCFControlPacketValidateOutputStatusObject(CFDictionaryRef dictionary) {
+    struct _FXCFControlPacketError ignored = {0};
+    CFStringRef state = NULL;
+    Boolean dirty = false;
+    Boolean retryScheduled = false;
+    Boolean present = false;
+
+    return
+        __FXCFControlPacketRequireString(dictionary, "state", &state, &ignored) &&
+        __FXCFControlPacketLookupOptionalBoolean(dictionary, "dirty", &dirty, &present, &ignored) && present &&
+        __FXCFControlPacketLookupOptionalBoolean(dictionary, "retry_scheduled", &retryScheduled, &present, &ignored) && present;
+}
+
+static Boolean __FXCFControlPacketValidateCapabilitiesObject(CFDictionaryRef dictionary) {
+    struct _FXCFControlPacketError ignored = {0};
+    CFArrayRef featureFlags = NULL;
+    Boolean present = false;
+    Boolean value = false;
+
+    if (!__FXCFControlPacketRequireArray(dictionary, "feature_flags", &featureFlags, &ignored)) {
+        return false;
+    }
+    for (CFIndex index = 0; index < CFArrayGetCount(featureFlags); ++index) {
+        CFTypeRef item = (CFTypeRef)CFArrayGetValueAtIndex(featureFlags, index);
+        if (item == NULL || CFGetTypeID(item) != CFStringGetTypeID()) {
+            return false;
+        }
+    }
+
+    return
+        __FXCFControlPacketLookupOptionalBoolean(dictionary, "supports_native_macos_passthrough", &value, &present, &ignored) && present &&
+        __FXCFControlPacketLookupOptionalBoolean(dictionary, "supports_userspace_jobs", &value, &present, &ignored) && present &&
+        __FXCFControlPacketLookupOptionalBoolean(dictionary, "supports_userspace_notify", &value, &present, &ignored) && present &&
+        __FXCFControlPacketLookupOptionalBoolean(dictionary, "supports_cluster_overlay", &value, &present, &ignored) && present &&
+        __FXCFControlPacketLookupOptionalBoolean(dictionary, "supports_notify_fast_path", &value, &present, &ignored) && present &&
+        __FXCFControlPacketLookupOptionalBoolean(dictionary, "supports_launchctl_wrapper", &value, &present, &ignored) && present;
+}
+
+static Boolean __FXCFControlPacketValidateReasonObject(CFDictionaryRef dictionary) {
+    struct _FXCFControlPacketError ignored = {0};
+    CFStringRef component = NULL;
+    CFStringRef issue = NULL;
+    return
+        __FXCFControlPacketRequireString(dictionary, "component", &component, &ignored) &&
+        __FXCFControlPacketRequireString(dictionary, "issue", &issue, &ignored);
+}
+
+static Boolean __FXCFControlPacketCopySortedReasonSummaries(CFArrayRef array, char ***itemsOut, CFIndex *countOut) {
+    CFIndex count = 0;
+    char **items = NULL;
+
+    if (itemsOut == NULL || countOut == NULL || array == NULL) {
+        return false;
+    }
+
+    *itemsOut = NULL;
+    *countOut = 0;
+    count = CFArrayGetCount(array);
+    if (count == 0) {
+        return true;
+    }
+
+    items = (char **)calloc((size_t)count, sizeof(char *));
+    if (items == NULL) {
+        return false;
+    }
+
+    for (CFIndex index = 0; index < count; ++index) {
+        struct _FXCFControlPacketError ignored = {0};
+        CFDictionaryRef item = NULL;
+        CFStringRef component = NULL;
+        CFStringRef issue = NULL;
+        char *componentText = NULL;
+        char *issueText = NULL;
+        size_t size = 0u;
+
+        item = (CFDictionaryRef)CFArrayGetValueAtIndex(array, index);
+        if (item == NULL || CFGetTypeID((CFTypeRef)item) != CFDictionaryGetTypeID() || !__FXCFControlPacketValidateReasonObject(item) ||
+            !__FXCFControlPacketRequireString(item, "component", &component, &ignored) ||
+            !__FXCFControlPacketRequireString(item, "issue", &issue, &ignored)) {
+            __FXCFControlPacketFreeCStringArray(items, count);
+            return false;
+        }
+        componentText = __FXCFControlPacketCopyCString(component);
+        issueText = __FXCFControlPacketCopyCString(issue);
+        if (componentText == NULL || issueText == NULL) {
+            free(componentText);
+            free(issueText);
+            __FXCFControlPacketFreeCStringArray(items, count);
+            return false;
+        }
+        size = strlen(componentText) + strlen(issueText) + 2u;
+        items[index] = (char *)calloc(size, sizeof(char));
+        if (items[index] == NULL) {
+            free(componentText);
+            free(issueText);
+            __FXCFControlPacketFreeCStringArray(items, count);
+            return false;
+        }
+        snprintf(items[index], size, "%s:%s", componentText, issueText);
+        free(componentText);
+        free(issueText);
+    }
+
+    qsort(items, (size_t)count, sizeof(char *), __FXCFControlPacketCompareCStringPointers);
+    *itemsOut = items;
+    *countOut = count;
+    return true;
+}
+
+static Boolean __FXCFControlPacketValidateHealthObject(CFDictionaryRef dictionary) {
+    struct _FXCFControlPacketError ignored = {0};
+    CFStringRef state = NULL;
+    CFArrayRef reasons = NULL;
+    CFDateRef observedAt = NULL;
+    CFDictionaryRef jobPersistence = NULL;
+    CFDictionaryRef notifyPersistence = NULL;
+    CFDictionaryRef notifyFastPath = NULL;
+    Boolean present = false;
+
+    if (!__FXCFControlPacketRequireString(dictionary, "state", &state, &ignored) ||
+        !__FXCFControlPacketRequireArray(dictionary, "reasons", &reasons, &ignored) ||
+        !__FXCFControlPacketLookupOptionalDate(dictionary, "observed_at", &observedAt, &present, &ignored) || !present ||
+        !__FXCFControlPacketRequireDictionary(dictionary, "job_persistence", &jobPersistence, &ignored) ||
+        !__FXCFControlPacketRequireDictionary(dictionary, "notify_persistence", &notifyPersistence, &ignored) ||
+        !__FXCFControlPacketRequireDictionary(dictionary, "notify_fast_path", &notifyFastPath, &ignored) ||
+        !__FXCFControlPacketValidateOutputStatusObject(jobPersistence) ||
+        !__FXCFControlPacketValidateOutputStatusObject(notifyPersistence) ||
+        !__FXCFControlPacketValidateOutputStatusObject(notifyFastPath)) {
+        return false;
+    }
+
+    for (CFIndex index = 0; index < CFArrayGetCount(reasons); ++index) {
+        CFTypeRef item = (CFTypeRef)CFArrayGetValueAtIndex(reasons, index);
+        if (item == NULL || CFGetTypeID(item) != CFDictionaryGetTypeID() ||
+            !__FXCFControlPacketValidateReasonObject((CFDictionaryRef)item)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+static Boolean __FXCFControlPacketValidateDaemonObject(CFDictionaryRef dictionary) {
+    struct _FXCFControlPacketError ignored = {0};
+    CFStringRef daemonID = NULL;
+    CFStringRef nodeID = NULL;
+    CFStringRef hostname = NULL;
+    CFStringRef runtimeMode = NULL;
+    CFStringRef version = NULL;
+    CFStringRef socketPath = NULL;
+    CFDateRef startedAt = NULL;
+    Boolean clusterEnabled = false;
+    Boolean notifyFastPathEnabled = false;
+    Boolean present = false;
+
+    return
+        __FXCFControlPacketRequireString(dictionary, "daemon_id", &daemonID, &ignored) &&
+        __FXCFControlPacketRequireString(dictionary, "node_id", &nodeID, &ignored) &&
+        __FXCFControlPacketRequireString(dictionary, "hostname", &hostname, &ignored) &&
+        __FXCFControlPacketRequireString(dictionary, "runtime_mode", &runtimeMode, &ignored) &&
+        __FXCFControlPacketRequireString(dictionary, "version", &version, &ignored) &&
+        __FXCFControlPacketRequireString(dictionary, "control_socket_path", &socketPath, &ignored) &&
+        __FXCFControlPacketLookupOptionalDate(dictionary, "started_at", &startedAt, &present, &ignored) && present &&
+        __FXCFControlPacketLookupOptionalBoolean(dictionary, "cluster_enabled", &clusterEnabled, &present, &ignored) && present &&
+        __FXCFControlPacketLookupOptionalBoolean(dictionary, "notify_fast_path_enabled", &notifyFastPathEnabled, &present, &ignored) && present;
+}
+
+static Boolean __FXCFControlPacketValidateDiagnosticsSnapshot(CFDictionaryRef dictionary) {
+    struct _FXCFControlPacketError ignored = {0};
+    CFDictionaryRef daemon = NULL;
+    CFDictionaryRef health = NULL;
+    CFDictionaryRef capabilities = NULL;
+    CFArrayRef jobs = NULL;
+    CFArrayRef notifyNames = NULL;
+
+    if (!__FXCFControlPacketRequireDictionary(dictionary, "daemon", &daemon, &ignored) ||
+        !__FXCFControlPacketRequireDictionary(dictionary, "health", &health, &ignored) ||
+        !__FXCFControlPacketRequireDictionary(dictionary, "capabilities", &capabilities, &ignored) ||
+        !__FXCFControlPacketRequireArray(dictionary, "jobs", &jobs, &ignored) ||
+        !__FXCFControlPacketRequireArray(dictionary, "notify_names", &notifyNames, &ignored) ||
+        !__FXCFControlPacketValidateDaemonObject(daemon) ||
+        !__FXCFControlPacketValidateHealthObject(health) ||
+        !__FXCFControlPacketValidateCapabilitiesObject(capabilities)) {
+        return false;
+    }
+
+    for (CFIndex index = 0; index < CFArrayGetCount(notifyNames); ++index) {
+        CFTypeRef item = (CFTypeRef)CFArrayGetValueAtIndex(notifyNames, index);
+        if (item == NULL || CFGetTypeID(item) != CFDictionaryGetTypeID() ||
+            !__FXCFControlPacketValidateNameObject((CFDictionaryRef)item)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void _FXCFControlResponseProfileClear(struct _FXCFControlResponseProfile *profile) {
+    if (profile == NULL) {
+        return;
+    }
+    _FXCFControlResponseClear(&profile->response);
+    memset(profile, 0, sizeof(*profile));
+}
+
+Boolean _FXCFControlResponseProfileInit(
+    CFAllocatorRef allocator,
+    CFDataRef payload,
+    struct _FXCFControlResponseProfile *profileOut,
+    struct _FXCFControlPacketError *errorOut
+) {
+    struct __FXCFControlRegistrationFields registrationFields = {0};
+
+    if (profileOut == NULL) {
+        __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "profileOut is NULL");
+        return false;
+    }
+
+    memset(profileOut, 0, sizeof(*profileOut));
+
+    if (!_FXCFControlResponseInit(allocator, payload, &profileOut->response, errorOut)) {
+        return false;
+    }
+
+    if (profileOut->response.status == _FXCFControlResponseStatusError) {
+        profileOut->kind = _FXCFControlResponseProfileKindError;
+        return true;
+    }
+
+    if (profileOut->response.result == NULL) {
+        __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "response result is NULL");
+        _FXCFControlResponseProfileClear(profileOut);
+        return false;
+    }
+
+    if (_FXCFControlPacketValueKind(profileOut->response.result) == _FXCFControlValueKindArray) {
+        CFArrayRef array = (CFArrayRef)profileOut->response.result;
+        char **items = NULL;
+        CFIndex count = 0;
+
+        if (!__FXCFControlPacketCopySortedNameSummaries(array, &items, &count)) {
+            __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "unsupported response profile");
+            _FXCFControlResponseProfileClear(profileOut);
+            return false;
+        }
+        __FXCFControlPacketFreeCStringArray(items, count);
+        profileOut->kind = _FXCFControlResponseProfileKindNotifyNameList;
+        profileOut->resultArray = array;
+        profileOut->notifyNames = array;
+        return true;
+    }
+
+    if (_FXCFControlPacketValueKind(profileOut->response.result) != _FXCFControlValueKindObject) {
+        __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "unsupported response profile");
+        _FXCFControlResponseProfileClear(profileOut);
+        return false;
+    }
+
+    profileOut->resultObject = (CFDictionaryRef)profileOut->response.result;
+
+    if (__FXCFControlPacketLookupOptionalDictionary(profileOut->resultObject, "registration", &profileOut->registration, NULL, NULL) &&
+        profileOut->registration != NULL &&
+        __FXCFControlPacketLookupOptionalBoolean(profileOut->resultObject, "canceled", &profileOut->canceled, &profileOut->hasCanceled, NULL) &&
+        profileOut->hasCanceled &&
+        __FXCFControlPacketValidateRegistrationObject(profileOut->registration, &registrationFields)) {
+        profileOut->kind = _FXCFControlResponseProfileKindNotifyCancel;
+        profileOut->hasToken = registrationFields.hasToken;
+        profileOut->token = registrationFields.token;
+        profileOut->hasValid = registrationFields.hasValid;
+        profileOut->valid = registrationFields.valid;
+        return true;
+    }
+
+    if (__FXCFControlPacketRequireDictionary(profileOut->resultObject, "registration", &profileOut->registration, NULL) &&
+        __FXCFControlPacketLookupOptionalInteger(profileOut->resultObject, "generation", &profileOut->generation, &profileOut->hasGeneration, NULL) &&
+        __FXCFControlPacketLookupOptionalInteger(profileOut->resultObject, "current_state", &profileOut->currentState, &profileOut->hasCurrentState, NULL) &&
+        __FXCFControlPacketLookupOptionalBoolean(profileOut->resultObject, "changed", &profileOut->changed, &profileOut->hasChanged, NULL) &&
+        profileOut->hasGeneration && profileOut->hasCurrentState && profileOut->hasChanged &&
+        __FXCFControlPacketValidateRegistrationObject(profileOut->registration, &registrationFields)) {
+        profileOut->kind = _FXCFControlResponseProfileKindNotifyCheck;
+        profileOut->hasToken = registrationFields.hasToken;
+        profileOut->token = registrationFields.token;
+        profileOut->hasValid = registrationFields.hasValid;
+        profileOut->valid = registrationFields.valid;
+        return true;
+    }
+
+    {
+        Boolean postedAtPresent = false;
+        if (__FXCFControlPacketRequireDictionary(profileOut->resultObject, "name", &profileOut->nameObject, NULL) &&
+            __FXCFControlPacketRequireArray(profileOut->resultObject, "delivered_tokens", &profileOut->deliveredTokens, NULL) &&
+            __FXCFControlPacketRequireInteger(profileOut->resultObject, "generation", &profileOut->generation, NULL) &&
+            __FXCFControlPacketLookupOptionalDate(profileOut->resultObject, "posted_at", NULL, &postedAtPresent, NULL) &&
+            postedAtPresent &&
+            __FXCFControlPacketValidateNameObject(profileOut->nameObject)) {
+            profileOut->kind = _FXCFControlResponseProfileKindNotifyPost;
+            profileOut->hasGeneration = true;
+            {
+                struct _FXCFControlPacketError ignored = {0};
+                if (!__FXCFControlPacketRequireInteger(profileOut->nameObject, "state", &profileOut->state, &ignored)) {
+                    __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "unsupported response profile");
+                    _FXCFControlResponseProfileClear(profileOut);
+                    return false;
+                }
+                profileOut->hasState = true;
+            }
+            return true;
+        }
+    }
+
+    if (__FXCFControlPacketRequireDictionary(profileOut->resultObject, "name", &profileOut->nameObject, NULL) &&
+        __FXCFControlPacketRequireInteger(profileOut->resultObject, "state", &profileOut->state, NULL) &&
+        __FXCFControlPacketValidateNameObject(profileOut->nameObject)) {
+        profileOut->kind = _FXCFControlResponseProfileKindNotifyNameState;
+        profileOut->hasState = true;
+        {
+            struct _FXCFControlPacketError ignored = {0};
+            if (!__FXCFControlPacketRequireInteger(profileOut->nameObject, "generation", &profileOut->generation, &ignored)) {
+                __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "unsupported response profile");
+                _FXCFControlResponseProfileClear(profileOut);
+                return false;
+            }
+            profileOut->hasGeneration = true;
+        }
+        return true;
+    }
+
+    if (__FXCFControlPacketRequireDictionary(profileOut->resultObject, "registration", &profileOut->registration, NULL) &&
+        __FXCFControlPacketValidateRegistrationObject(profileOut->registration, &registrationFields)) {
+        profileOut->kind = _FXCFControlResponseProfileKindNotifyRegistrationWrapper;
+        profileOut->hasToken = registrationFields.hasToken;
+        profileOut->token = registrationFields.token;
+        profileOut->hasValid = registrationFields.hasValid;
+        profileOut->valid = registrationFields.valid;
+        return true;
+    }
+
+    if (__FXCFControlPacketValidateRegistrationObject(profileOut->resultObject, &registrationFields)) {
+        profileOut->kind = _FXCFControlResponseProfileKindNotifyRegistration;
+        profileOut->registration = profileOut->resultObject;
+        profileOut->hasToken = registrationFields.hasToken;
+        profileOut->token = registrationFields.token;
+        profileOut->hasValid = registrationFields.hasValid;
+        profileOut->valid = registrationFields.valid;
+        profileOut->hasPendingGeneration = registrationFields.hasPendingGeneration;
+        profileOut->pendingGeneration = registrationFields.pendingGeneration;
+        return true;
+    }
+
+    if (CFDictionaryGetCount(profileOut->resultObject) == 1 &&
+        __FXCFControlPacketLookupOptionalBoolean(profileOut->resultObject, "valid", &profileOut->valid, &profileOut->hasValid, NULL) &&
+        profileOut->hasValid) {
+        profileOut->kind = _FXCFControlResponseProfileKindNotifyValidity;
+        return true;
+    }
+
+    if (__FXCFControlPacketValidateCapabilitiesObject(profileOut->resultObject) &&
+        __FXCFControlPacketRequireArray(profileOut->resultObject, "feature_flags", &profileOut->featureFlags, NULL)) {
+        profileOut->kind = _FXCFControlResponseProfileKindControlCapabilities;
+        profileOut->capabilities = profileOut->resultObject;
+        return true;
+    }
+
+    if (__FXCFControlPacketValidateHealthObject(profileOut->resultObject) &&
+        __FXCFControlPacketRequireArray(profileOut->resultObject, "reasons", &profileOut->reasons, NULL) &&
+        __FXCFControlPacketRequireDictionary(profileOut->resultObject, "job_persistence", &profileOut->health, NULL)) {
+        profileOut->kind = _FXCFControlResponseProfileKindControlHealth;
+        profileOut->health = profileOut->resultObject;
+        return true;
+    }
+
+    if (__FXCFControlPacketValidateDiagnosticsSnapshot(profileOut->resultObject) &&
+        __FXCFControlPacketRequireDictionary(profileOut->resultObject, "daemon", &profileOut->daemon, NULL) &&
+        __FXCFControlPacketRequireDictionary(profileOut->resultObject, "capabilities", &profileOut->capabilities, NULL) &&
+        __FXCFControlPacketRequireDictionary(profileOut->resultObject, "health", &profileOut->health, NULL) &&
+        __FXCFControlPacketRequireArray(profileOut->resultObject, "notify_names", &profileOut->notifyNames, NULL)) {
+        profileOut->kind = _FXCFControlResponseProfileKindDiagnosticsSnapshot;
+        return true;
+    }
+
+    profileOut->kind = _FXCFControlResponseProfileKindGenericObject;
+    return true;
+}
+
+char *_FXCFControlResponseProfileCopyCanonicalJSON(const struct _FXCFControlResponseProfile *profile) {
+    struct __FXCFTextBuffer buffer = {0};
+    const char *kindText = NULL;
+    char *result = NULL;
+    char *scopeText = NULL;
+    char *deliveryText = NULL;
+    char *nameText = NULL;
+    char **items = NULL;
+    CFIndex itemCount = 0;
+    Boolean ok = false;
+
+    if (profile == NULL || profile->response.packet == NULL) {
+        return NULL;
+    }
+
+    kindText = __FXCFControlResponseProfileKindText(profile->kind);
+    if (!__FXCFTextBufferAppendFormat(&buffer, "{\"kind\":\"%s\",\"protocol_version\":%ld,\"status\":",
+            kindText,
+            (long)profile->response.protocolVersion) ||
+        !__FXCFTextBufferAppendJSONString(&buffer,
+            profile->response.status == _FXCFControlResponseStatusError ? "error" : "ok")) {
+        __FXCFTextBufferFree(&buffer);
+        return NULL;
+    }
+
+    if (profile->kind == _FXCFControlResponseProfileKindError) {
+        char *codeText = __FXCFControlPacketCopyCString(profile->response.errorCode);
+        char *messageText = __FXCFControlPacketCopyCString(profile->response.errorMessage);
+        if (codeText == NULL || messageText == NULL ||
+            !__FXCFTextBufferAppendCString(&buffer, ",\"code\":") ||
+            !__FXCFTextBufferAppendJSONString(&buffer, codeText) ||
+            !__FXCFTextBufferAppendCString(&buffer, ",\"message\":") ||
+            !__FXCFTextBufferAppendJSONString(&buffer, messageText) ||
+            !__FXCFTextBufferAppendCString(&buffer, "}")) {
+            __FXCFTextBufferFree(&buffer);
+            free(codeText);
+            free(messageText);
+            return NULL;
+        }
+        free(codeText);
+        free(messageText);
+        result = __FXCFTextBufferDetach(&buffer);
+        __FXCFTextBufferFree(&buffer);
+        return result;
+    }
+
+    switch (profile->kind) {
+        case _FXCFControlResponseProfileKindNotifyRegistrationWrapper:
+        case _FXCFControlResponseProfileKindNotifyRegistration:
+        case _FXCFControlResponseProfileKindNotifyCancel:
+        case _FXCFControlResponseProfileKindNotifyCheck: {
+            struct _FXCFControlPacketError ignored = {0};
+            CFStringRef delivery = NULL;
+            CFStringRef scope = NULL;
+            if (!__FXCFControlPacketRequireString(profile->registration, "delivery_method", &delivery, &ignored) ||
+                !__FXCFControlPacketRequireString(profile->registration, "scope", &scope, &ignored)) {
+                __FXCFTextBufferFree(&buffer);
+                return NULL;
+            }
+            deliveryText = __FXCFControlPacketCopyCString(delivery);
+            scopeText = __FXCFControlPacketCopyCString(scope);
+            if (deliveryText == NULL || scopeText == NULL) {
+                __FXCFTextBufferFree(&buffer);
+                free(deliveryText);
+                free(scopeText);
+                return NULL;
+            }
+            ok =
+                __FXCFTextBufferAppendCString(&buffer, ",\"delivery_method\":") &&
+                __FXCFTextBufferAppendJSONString(&buffer, deliveryText) &&
+                __FXCFTextBufferAppendCString(&buffer, ",\"scope\":") &&
+                __FXCFTextBufferAppendJSONString(&buffer, scopeText) &&
+                __FXCFTextBufferAppendFormat(&buffer, ",\"token\":%ld,\"valid\":%s",
+                    (long)profile->token,
+                    profile->valid ? "true" : "false");
+            if (ok && profile->kind == _FXCFControlResponseProfileKindNotifyCancel) {
+                ok = __FXCFTextBufferAppendCString(&buffer, ",\"canceled\":") &&
+                    __FXCFTextBufferAppendCString(&buffer, profile->canceled ? "true" : "false");
+            }
+            if (ok && profile->kind == _FXCFControlResponseProfileKindNotifyCheck) {
+                ok = __FXCFTextBufferAppendFormat(&buffer,
+                    ",\"changed\":%s,\"current_state\":%ld,\"generation\":%ld",
+                    profile->changed ? "true" : "false",
+                    (long)profile->currentState,
+                    (long)profile->generation);
+            }
+            if (ok && profile->kind == _FXCFControlResponseProfileKindNotifyRegistration && profile->hasPendingGeneration) {
+                ok = __FXCFTextBufferAppendFormat(&buffer, ",\"pending_generation\":%ld", (long)profile->pendingGeneration);
+            }
+            break;
+        }
+        case _FXCFControlResponseProfileKindNotifyPost: {
+            struct _FXCFControlPacketError ignored = {0};
+            CFStringRef name = NULL;
+            CFStringRef scope = NULL;
+            if (!__FXCFControlPacketRequireString(profile->nameObject, "name", &name, &ignored) ||
+                !__FXCFControlPacketRequireString(profile->nameObject, "scope", &scope, &ignored)) {
+                __FXCFTextBufferFree(&buffer);
+                return NULL;
+            }
+            nameText = __FXCFControlPacketCopyCString(name);
+            scopeText = __FXCFControlPacketCopyCString(scope);
+            if (nameText == NULL || scopeText == NULL) {
+                __FXCFTextBufferFree(&buffer);
+                free(nameText);
+                free(scopeText);
+                return NULL;
+            }
+            ok =
+                __FXCFTextBufferAppendCString(&buffer, ",\"delivered_tokens_count\":") &&
+                __FXCFTextBufferAppendFormat(&buffer, "%ld", (long)CFArrayGetCount(profile->deliveredTokens)) &&
+                __FXCFTextBufferAppendFormat(&buffer, ",\"generation\":%ld", (long)profile->generation) &&
+                __FXCFTextBufferAppendCString(&buffer, ",\"name\":") &&
+                __FXCFTextBufferAppendJSONString(&buffer, nameText) &&
+                __FXCFTextBufferAppendCString(&buffer, ",\"scope\":") &&
+                __FXCFTextBufferAppendJSONString(&buffer, scopeText) &&
+                __FXCFTextBufferAppendFormat(&buffer, ",\"state\":%ld", (long)profile->state);
+            break;
+        }
+        case _FXCFControlResponseProfileKindNotifyNameState: {
+            struct _FXCFControlPacketError ignored = {0};
+            CFStringRef name = NULL;
+            CFStringRef scope = NULL;
+            if (!__FXCFControlPacketRequireString(profile->nameObject, "name", &name, &ignored) ||
+                !__FXCFControlPacketRequireString(profile->nameObject, "scope", &scope, &ignored)) {
+                __FXCFTextBufferFree(&buffer);
+                return NULL;
+            }
+            nameText = __FXCFControlPacketCopyCString(name);
+            scopeText = __FXCFControlPacketCopyCString(scope);
+            if (nameText == NULL || scopeText == NULL) {
+                __FXCFTextBufferFree(&buffer);
+                free(nameText);
+                free(scopeText);
+                return NULL;
+            }
+            ok =
+                __FXCFTextBufferAppendFormat(&buffer, ",\"generation\":%ld", (long)profile->generation) &&
+                __FXCFTextBufferAppendCString(&buffer, ",\"name\":") &&
+                __FXCFTextBufferAppendJSONString(&buffer, nameText) &&
+                __FXCFTextBufferAppendCString(&buffer, ",\"scope\":") &&
+                __FXCFTextBufferAppendJSONString(&buffer, scopeText) &&
+                __FXCFTextBufferAppendFormat(&buffer, ",\"state\":%ld", (long)profile->state);
+            break;
+        }
+        case _FXCFControlResponseProfileKindNotifyValidity:
+            ok = __FXCFTextBufferAppendCString(&buffer, ",\"valid\":") &&
+                __FXCFTextBufferAppendCString(&buffer, profile->valid ? "true" : "false");
+            break;
+        case _FXCFControlResponseProfileKindNotifyNameList:
+            ok = __FXCFControlPacketCopySortedNameSummaries(profile->notifyNames, &items, &itemCount) &&
+                __FXCFTextBufferAppendFormat(&buffer, ",\"count\":%ld,\"items\":", (long)itemCount) &&
+                __FXCFControlPacketAppendCStringArrayJSON(&buffer, items, itemCount);
+            break;
+        case _FXCFControlResponseProfileKindControlCapabilities:
+        {
+            struct _FXCFControlPacketError ignored = {0};
+            Boolean supportsClusterOverlay = false;
+            Boolean supportsLaunchctlWrapper = false;
+            Boolean supportsNativePassthrough = false;
+            Boolean supportsNotifyFastPath = false;
+            Boolean supportsUserspaceJobs = false;
+            Boolean supportsUserspaceNotify = false;
+
+            ok =
+                __FXCFControlPacketRequireBoolean(profile->capabilities, "supports_cluster_overlay", &supportsClusterOverlay, &ignored) &&
+                __FXCFControlPacketRequireBoolean(profile->capabilities, "supports_launchctl_wrapper", &supportsLaunchctlWrapper, &ignored) &&
+                __FXCFControlPacketRequireBoolean(profile->capabilities, "supports_native_macos_passthrough", &supportsNativePassthrough, &ignored) &&
+                __FXCFControlPacketRequireBoolean(profile->capabilities, "supports_notify_fast_path", &supportsNotifyFastPath, &ignored) &&
+                __FXCFControlPacketRequireBoolean(profile->capabilities, "supports_userspace_jobs", &supportsUserspaceJobs, &ignored) &&
+                __FXCFControlPacketRequireBoolean(profile->capabilities, "supports_userspace_notify", &supportsUserspaceNotify, &ignored) &&
+                __FXCFControlPacketCopySortedStringArray(profile->featureFlags, &items, &itemCount) &&
+                __FXCFTextBufferAppendCString(&buffer, ",\"feature_flags\":") &&
+                __FXCFControlPacketAppendCStringArrayJSON(&buffer, items, itemCount) &&
+                __FXCFTextBufferAppendCString(&buffer, ",\"supports_cluster_overlay\":") &&
+                __FXCFTextBufferAppendCString(&buffer, supportsClusterOverlay ? "true" : "false") &&
+                __FXCFTextBufferAppendCString(&buffer, ",\"supports_launchctl_wrapper\":") &&
+                __FXCFTextBufferAppendCString(&buffer, supportsLaunchctlWrapper ? "true" : "false") &&
+                __FXCFTextBufferAppendCString(&buffer, ",\"supports_native_macos_passthrough\":") &&
+                __FXCFTextBufferAppendCString(&buffer, supportsNativePassthrough ? "true" : "false") &&
+                __FXCFTextBufferAppendCString(&buffer, ",\"supports_notify_fast_path\":") &&
+                __FXCFTextBufferAppendCString(&buffer, supportsNotifyFastPath ? "true" : "false") &&
+                __FXCFTextBufferAppendCString(&buffer, ",\"supports_userspace_jobs\":") &&
+                __FXCFTextBufferAppendCString(&buffer, supportsUserspaceJobs ? "true" : "false") &&
+                __FXCFTextBufferAppendCString(&buffer, ",\"supports_userspace_notify\":") &&
+                __FXCFTextBufferAppendCString(&buffer, supportsUserspaceNotify ? "true" : "false");
+            break;
+        }
+        case _FXCFControlResponseProfileKindControlHealth: {
+            struct _FXCFControlPacketError ignored = {0};
+            CFStringRef state = NULL;
+            CFArrayRef reasons = NULL;
+            CFDictionaryRef job = NULL;
+            CFDictionaryRef notifyPersistence = NULL;
+            CFDictionaryRef notifyFastPath = NULL;
+            CFStringRef jobState = NULL;
+            CFStringRef notifyState = NULL;
+            CFStringRef fastState = NULL;
+            char *stateText = NULL;
+            char *jobText = NULL;
+            char *notifyText = NULL;
+            char *fastText = NULL;
+            if (!__FXCFControlPacketRequireString(profile->health, "state", &state, &ignored) ||
+                !__FXCFControlPacketRequireArray(profile->health, "reasons", &reasons, &ignored) ||
+                !__FXCFControlPacketRequireDictionary(profile->health, "job_persistence", &job, &ignored) ||
+                !__FXCFControlPacketRequireDictionary(profile->health, "notify_persistence", &notifyPersistence, &ignored) ||
+                !__FXCFControlPacketRequireDictionary(profile->health, "notify_fast_path", &notifyFastPath, &ignored) ||
+                !__FXCFControlPacketRequireString(job, "state", &jobState, &ignored) ||
+                !__FXCFControlPacketRequireString(notifyPersistence, "state", &notifyState, &ignored) ||
+                !__FXCFControlPacketRequireString(notifyFastPath, "state", &fastState, &ignored)) {
+                __FXCFTextBufferFree(&buffer);
+                return NULL;
+            }
+            stateText = __FXCFControlPacketCopyCString(state);
+            jobText = __FXCFControlPacketCopyCString(jobState);
+            notifyText = __FXCFControlPacketCopyCString(notifyState);
+            fastText = __FXCFControlPacketCopyCString(fastState);
+            ok = stateText != NULL && jobText != NULL && notifyText != NULL && fastText != NULL &&
+                __FXCFControlPacketCopySortedReasonSummaries(reasons, &items, &itemCount) &&
+                __FXCFTextBufferAppendCString(&buffer, ",\"job_persistence_state\":") &&
+                __FXCFTextBufferAppendJSONString(&buffer, jobText) &&
+                __FXCFTextBufferAppendCString(&buffer, ",\"notify_fast_path_state\":") &&
+                __FXCFTextBufferAppendJSONString(&buffer, fastText) &&
+                __FXCFTextBufferAppendCString(&buffer, ",\"notify_persistence_state\":") &&
+                __FXCFTextBufferAppendJSONString(&buffer, notifyText) &&
+                __FXCFTextBufferAppendFormat(&buffer, ",\"reason_count\":%ld,\"reason_keys\":", (long)itemCount) &&
+                __FXCFControlPacketAppendCStringArrayJSON(&buffer, items, itemCount) &&
+                __FXCFTextBufferAppendCString(&buffer, ",\"state\":") &&
+                __FXCFTextBufferAppendJSONString(&buffer, stateText);
+            free(stateText);
+            free(jobText);
+            free(notifyText);
+            free(fastText);
+            break;
+        }
+        case _FXCFControlResponseProfileKindDiagnosticsSnapshot: {
+            struct _FXCFControlPacketError ignored = {0};
+            CFStringRef daemonID = NULL;
+            CFStringRef healthState = NULL;
+            CFArrayRef jobs = NULL;
+            CFDictionaryRef capabilities = NULL;
+            CFDictionaryRef health = NULL;
+            CFArrayRef featureFlags = NULL;
+            char *daemonText = NULL;
+            char *healthText = NULL;
+            if (!__FXCFControlPacketRequireString(profile->daemon, "daemon_id", &daemonID, &ignored) ||
+                !__FXCFControlPacketRequireDictionary(profile->resultObject, "capabilities", &capabilities, &ignored) ||
+                !__FXCFControlPacketRequireDictionary(profile->resultObject, "health", &health, &ignored) ||
+                !__FXCFControlPacketRequireString(health, "state", &healthState, &ignored) ||
+                !__FXCFControlPacketRequireArray(capabilities, "feature_flags", &featureFlags, &ignored) ||
+                !__FXCFControlPacketRequireArray(profile->resultObject, "jobs", &jobs, &ignored)) {
+                __FXCFTextBufferFree(&buffer);
+                return NULL;
+            }
+            daemonText = __FXCFControlPacketCopyCString(daemonID);
+            healthText = __FXCFControlPacketCopyCString(healthState);
+            ok = daemonText != NULL && healthText != NULL &&
+                __FXCFControlPacketCopySortedStringArray(featureFlags, &items, &itemCount) &&
+                __FXCFTextBufferAppendCString(&buffer, ",\"daemon_id\":") &&
+                __FXCFTextBufferAppendJSONString(&buffer, daemonText) &&
+                __FXCFTextBufferAppendCString(&buffer, ",\"feature_flags\":") &&
+                __FXCFControlPacketAppendCStringArrayJSON(&buffer, items, itemCount) &&
+                __FXCFTextBufferAppendCString(&buffer, ",\"health_state\":") &&
+                __FXCFTextBufferAppendJSONString(&buffer, healthText) &&
+                __FXCFTextBufferAppendFormat(&buffer, ",\"jobs_count\":%ld,\"notify_names_count\":%ld",
+                    (long)CFArrayGetCount(jobs),
+                    (long)CFArrayGetCount(profile->notifyNames));
+            free(daemonText);
+            free(healthText);
+            break;
+        }
+        case _FXCFControlResponseProfileKindGenericObject: {
+            char **keys = NULL;
+            CFIndex count = 0;
+            ok = __FXCFControlPacketCopySortedKeys(profile->resultObject, &keys, &count) &&
+                __FXCFTextBufferAppendFormat(&buffer, ",\"result_keys\":") &&
+                __FXCFControlPacketAppendCStringArrayJSON(&buffer, keys, count);
+            __FXCFControlPacketFreeSortedKeys(keys, count);
+            break;
+        }
+        default:
+            ok = false;
+            break;
+    }
+
+    free(scopeText);
+    free(deliveryText);
+    free(nameText);
+    __FXCFControlPacketFreeCStringArray(items, itemCount);
+
+    if (!ok || !__FXCFTextBufferAppendCString(&buffer, "}")) {
+        __FXCFTextBufferFree(&buffer);
+        return NULL;
+    }
+
+    result = __FXCFTextBufferDetach(&buffer);
+    __FXCFTextBufferFree(&buffer);
+    return result;
+}
+
+char *_FXCFControlResponseProfileCopySummary(const struct _FXCFControlResponseProfile *profile) {
+    char *result = NULL;
+    size_t size = 0u;
+    const char *kindText = NULL;
+
+    if (profile == NULL || profile->response.packet == NULL) {
+        return NULL;
+    }
+
+    kindText = __FXCFControlResponseProfileKindText(profile->kind);
+    switch (profile->kind) {
+        case _FXCFControlResponseProfileKindError: {
+            char *codeText = __FXCFControlPacketCopyCString(profile->response.errorCode);
+            if (codeText == NULL) {
+                return NULL;
+            }
+            size = strlen(codeText) + 24u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "profile error code=%s", codeText);
+            }
+            free(codeText);
+            return result;
+        }
+        case _FXCFControlResponseProfileKindNotifyPost:
+            size = 64u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "profile %s delivered=%ld generation=%ld", kindText,
+                    (long)CFArrayGetCount(profile->deliveredTokens), (long)profile->generation);
+            }
+            return result;
+        case _FXCFControlResponseProfileKindNotifyRegistrationWrapper:
+        case _FXCFControlResponseProfileKindNotifyRegistration:
+            size = 64u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "profile %s token=%ld", kindText, (long)profile->token);
+            }
+            return result;
+        case _FXCFControlResponseProfileKindNotifyCancel:
+            size = 64u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "profile %s canceled=%s token=%ld", kindText, profile->canceled ? "true" : "false", (long)profile->token);
+            }
+            return result;
+        case _FXCFControlResponseProfileKindNotifyNameState:
+            size = 64u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "profile %s generation=%ld state=%ld", kindText, (long)profile->generation, (long)profile->state);
+            }
+            return result;
+        case _FXCFControlResponseProfileKindNotifyValidity:
+            size = 48u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "profile %s valid=%s", kindText, profile->valid ? "true" : "false");
+            }
+            return result;
+        case _FXCFControlResponseProfileKindNotifyCheck:
+            size = 64u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "profile %s changed=%s generation=%ld", kindText, profile->changed ? "true" : "false", (long)profile->generation);
+            }
+            return result;
+        case _FXCFControlResponseProfileKindNotifyNameList:
+            size = 48u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "profile %s count=%ld", kindText, (long)CFArrayGetCount(profile->notifyNames));
+            }
+            return result;
+        case _FXCFControlResponseProfileKindControlCapabilities:
+            size = 56u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "profile %s flags=%ld", kindText, (long)CFArrayGetCount(profile->featureFlags));
+            }
+            return result;
+        case _FXCFControlResponseProfileKindControlHealth: {
+            struct _FXCFControlPacketError ignored = {0};
+            CFStringRef state = NULL;
+            char *stateText = NULL;
+            if (!__FXCFControlPacketRequireString(profile->health, "state", &state, &ignored)) {
+                return NULL;
+            }
+            stateText = __FXCFControlPacketCopyCString(state);
+            if (stateText == NULL) {
+                return NULL;
+            }
+            size = strlen(stateText) + 48u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "profile %s state=%s reasons=%ld", kindText, stateText, (long)CFArrayGetCount(profile->reasons));
+            }
+            free(stateText);
+            return result;
+        }
+        case _FXCFControlResponseProfileKindDiagnosticsSnapshot:
+        {
+            struct _FXCFControlPacketError ignored = {0};
+            CFArrayRef jobs = NULL;
+            if (!__FXCFControlPacketRequireArray(profile->resultObject, "jobs", &jobs, &ignored)) {
+                return NULL;
+            }
+            size = 64u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "profile %s jobs=%ld notify_names=%ld", kindText, (long)CFArrayGetCount(jobs), (long)CFArrayGetCount(profile->notifyNames));
+            }
+            return result;
+        }
+        case _FXCFControlResponseProfileKindGenericObject:
+            size = 56u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "profile %s keys=%ld", kindText, (long)CFDictionaryGetCount(profile->resultObject));
+            }
+            return result;
+        default:
+            return NULL;
+    }
 }
 
 static Boolean __FXCFControlResponseAppendSuccessEnvelopeJSON(struct __FXCFTextBuffer *buffer, const struct _FXCFControlResponse *response) {
