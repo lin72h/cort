@@ -2,8 +2,8 @@
 
 Date: 2026-04-17
 
-Status: planned; MX validation assets prepared; FX implementation has not
-started.
+Status: MX validation clean on the tightened 2A surface; compare workflow is
+packaged; FX implementation has not started.
 
 This document defines the next narrow semantic slice after Subset 1B:
 minimal array and dictionary semantics for plist-valid object graphs.
@@ -252,11 +252,21 @@ Run script:
 
 - `cort-mx/scripts/run_subset2a_container_core.sh`
 
-Future FX-vs-MX compare tool:
+MX compare wrapper:
+
+- `cort-mx/scripts/run_subset2a_container_compare.sh`
+
+MX suite wrapper:
+
+- `cort-mx/scripts/run_subset2a_suite.sh`
+
+FX-vs-MX compare tool:
 
 - `tools/compare_subset2a_container_json.exs`
-- `cort-mx/scripts/run_subset2a_container_compare.sh`
-- `cort-mx/scripts/run_subset2a_suite.sh`
+
+FX compare-artifact wrapper:
+
+- `cort-fx/scripts/run_subset2a_compare_artifact.sh`
 
 FX readiness note:
 
@@ -277,6 +287,13 @@ The MX run should preserve:
 - `out/subset2a_container_core.stdout`
 - `out/subset2a_container_core.stderr`
 
+The MX compare wrapper should preserve when an FX JSON is available:
+
+- `summary.md`
+- `out/subset2a_container_fx_vs_mx_report.md`
+- `out/subset2a_container_fx.json`
+- `out/subset2a_container_mx.json`
+
 ## Exact MX Command
 
 ```sh
@@ -287,6 +304,27 @@ scripts/run_subset2a_container_core.sh
 Default output:
 
 - `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/`
+
+Preferred coordination command once FX publishes `subset2a_container_fx.json`:
+
+```sh
+cd /Users/me/wip-launchx/wip-cort-gpt/cort-mx
+scripts/run_subset2a_suite.sh
+```
+
+Default suite output:
+
+- `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-suite/`
+
+FX can also preserve a compare-only handoff run once it has a real
+`subset2a_container_fx.json`:
+
+```sh
+cd /Users/me/wip-launchx/wip-cort-gpt/cort-fx
+make artifact-subset2a-compare \
+  FX_CONTAINER_JSON=/path/to/subset2a_container_fx.json \
+  MX_JSON=/path/to/subset2a_container_core.json
+```
 
 ## Exit Gate
 
@@ -300,3 +338,9 @@ Subset 2A is ready for FX implementation when:
 - dictionary set/replace/remove ownership is recorded explicitly
 - string-key dictionary lookup is recorded explicitly
 - excluded callback modes remain excluded instead of leaking into the slice
+
+Current MX report status for the artifact above:
+
+- blockers: `0`
+- warnings: `0`
+- verdict: no blocking issues found against the current manifest

@@ -26,6 +26,7 @@ STRING_COMPARE_TOOL := $(REPO_ROOT)/tools/compare_subset1b_cfstring_json.exs
 CONTAINER_COMPARE_TOOL := $(REPO_ROOT)/tools/compare_subset2a_container_json.exs
 RUN_ARTIFACT_SCRIPT := scripts/run_subset0_fx_artifacts.sh
 SUBSET1A_COMPARE_ARTIFACT_SCRIPT := scripts/run_subset1a_compare_artifact.sh
+SUBSET2A_COMPARE_ARTIFACT_SCRIPT := scripts/run_subset2a_compare_artifact.sh
 
 LIB := $(LIB_DIR)/libcortfx.a
 LIB_OBJECTS := \
@@ -62,11 +63,12 @@ CONTAINER_COMPARE_REPORT ?= $(BUILD_DIR)/out/subset2a_container_fx_vs_mx_report.
 EXPORTS_EXPECTED := $(EXPORTS_DIR)/subset2a-exported-symbols.txt
 EXPORTS_ACTUAL := $(BUILD_DIR)/subset2a-exported-symbols.txt
 SCALAR_COMPARE_RUN_DIR ?= $(ARTIFACTS_ROOT)/cort-fx/runs/subset1a-fx-vs-mx
+CONTAINER_COMPARE_RUN_DIR ?= $(ARTIFACTS_ROOT)/cort-fx/runs/subset2a-fx-vs-mx
 INSTALL_INCLUDE_DIR := $(DESTDIR)$(PREFIX)/include/CoreFoundation
 INSTALL_LIB_DIR := $(DESTDIR)$(PREFIX)/lib
 INSTALL_DOC_DIR := $(DESTDIR)$(PREFIX)/share/doc/cort-fx
 
-.PHONY: all clean check-deps check-exports compare-fx compare-subset1a-fx compare-subset1b-fx compare-subset2a-fx compare-with-mx compare-subset1a-with-mx compare-subset1b-with-mx compare-subset2a-with-mx artifact-run artifact-subset1a-compare install install-stage test test-installed
+.PHONY: all clean check-deps check-exports compare-fx compare-subset1a-fx compare-subset1b-fx compare-subset2a-fx compare-with-mx compare-subset1a-with-mx compare-subset1b-with-mx compare-subset2a-with-mx artifact-run artifact-subset1a-compare artifact-subset2a-compare install install-stage test test-installed
 
 all: $(LIB) $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY) $(STRING_COMPARE_BINARY) $(CONTAINER_COMPARE_BINARY)
 
@@ -148,6 +150,10 @@ compare-subset1b-with-mx: compare-subset1b-fx $(STRING_COMPARE_TOOL)
 	cat $(STRING_COMPARE_REPORT)
 
 compare-subset2a-with-mx: compare-subset2a-fx $(CONTAINER_COMPARE_TOOL)
+	@if [ ! -f "$(FX_CONTAINER_JSON)" ]; then \
+		echo "set FX_CONTAINER_JSON=/path/to/subset2a_container_fx.json"; \
+		exit 1; \
+	fi
 	@if [ -z "$(MX_JSON)" ]; then \
 		echo "set MX_JSON=/path/to/subset2a_container_core.json"; \
 		exit 1; \
@@ -170,6 +176,20 @@ artifact-subset1a-compare: $(SUBSET1A_COMPARE_ARTIFACT_SCRIPT)
 	CORT_ARTIFACTS_ROOT="$(ARTIFACTS_ROOT)" BUILD_DIR="$(BUILD_DIR)" \
 		FX_SCALAR_JSON="$(FX_SCALAR_JSON)" MX_JSON="$(MX_JSON)" \
 		$(SUBSET1A_COMPARE_ARTIFACT_SCRIPT) $(SCALAR_COMPARE_RUN_DIR)
+
+test: $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(SMOKE_BINARY) check-deps check-exports compare-fx compare-subset1a-fx compare-subset1b-fx compare-subset2a-fx
+artifact-subset2a-compare: $(SUBSET2A_COMPARE_ARTIFACT_SCRIPT)
+	@if [ ! -f "$(FX_CONTAINER_JSON)" ]; then \
+		echo "set FX_CONTAINER_JSON=/path/to/subset2a_container_fx.json"; \
+		exit 1; \
+	fi
+	@if [ -z "$(MX_JSON)" ]; then \
+		echo "set MX_JSON=/path/to/subset2a_container_core.json"; \
+		exit 1; \
+	fi
+	CORT_ARTIFACTS_ROOT="$(ARTIFACTS_ROOT)" BUILD_DIR="$(BUILD_DIR)" \
+		FX_CONTAINER_JSON="$(FX_CONTAINER_JSON)" MX_JSON="$(MX_JSON)" \
+		$(SUBSET2A_COMPARE_ARTIFACT_SCRIPT) $(CONTAINER_COMPARE_RUN_DIR)
 
 test: $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(SMOKE_BINARY) check-deps check-exports compare-fx compare-subset1a-fx compare-subset1b-fx compare-subset2a-fx
 	$(TEST_BINARY)

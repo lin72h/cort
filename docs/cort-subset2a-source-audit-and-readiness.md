@@ -2,8 +2,8 @@
 
 Date: 2026-04-17
 
-Status: source audit complete; MX probe assets prepared; FX implementation has
-not started.
+Status: source audit complete; MX validation is clean; compare workflow is
+packaged; FX implementation has not started.
 
 This document is the extraction and implementation-readiness note for CORT
 Subset 2A: minimal `CFArray` and `CFDictionary` support for plist-valid object
@@ -240,3 +240,12 @@ FX Subset 2A implementation should not start until:
 - string-key lookup behavior is classified explicitly
 - the team accepts that the first implementation is a clean rewrite, not a
   `CFBasicHash` extraction project
+
+Current readiness note:
+
+- MX validation is now clean for `subset2a_container_core`: `0` blockers,
+  `0` warnings
+- the MX compare wrapper, MX suite wrapper, and FX compare wrapper are now
+  packaged in the repo
+- what remains pending is a real shared FX artifact at
+  `subset2a_container_fx.json` so MX can run the preserved FX-vs-MX compare path

@@ -162,6 +162,7 @@ make compare-subset1b-with-mx
 make compare-subset2a-with-mx
 make artifact-run
 make artifact-subset1a-compare
+make artifact-subset2a-compare
 make test-installed
 ```
 
@@ -189,6 +190,8 @@ What they enforce:
   dedicated handoff artifact run
 - shared handoff artifacts may also be committed at repo root for MX
   consumption, including `subset2a_container_fx.json`
+- Subset 2A compare wrapper can compare a real FX container JSON against MX and
+  preserve a dedicated handoff artifact run once the FX artifact exists
 - artifact-run packaging emits a preservable FX run directory under
   `../wip-cort-gpt-artifacts/cort-fx/runs/`
 - repo workflow selfcheck can validate the compare/report tooling and the FX
@@ -287,6 +290,49 @@ That produces:
 MX should compare that against:
 
 - `../wip-cort-gpt-artifacts/cort-mx/runs/subset2a-mx-container-core/out/subset2a_container_core.json`
+
+## Subset 2A Compare With MX
+
+Compare a real FX Subset 2A container JSON against the MX container JSON with:
+
+```sh
+cd cort-fx
+make compare-subset2a-with-mx \
+  FX_CONTAINER_JSON=/path/to/subset2a_container_fx.json \
+  MX_JSON=/path/to/subset2a_container_core.json
+```
+
+This uses:
+
+- `../tools/compare_subset2a_container_json.exs`
+
+and writes:
+
+- `../wip-cort-gpt-artifacts/cort-fx/build/out/subset2a_container_fx_vs_mx_report.md`
+
+To preserve a compare-only handoff run:
+
+```sh
+cd cort-fx
+make artifact-subset2a-compare \
+  FX_CONTAINER_JSON=/path/to/subset2a_container_fx.json \
+  MX_JSON=/path/to/subset2a_container_core.json
+```
+
+Default output:
+
+- `../wip-cort-gpt-artifacts/cort-fx/runs/subset2a-fx-vs-mx/`
+
+The compare artifact directory includes:
+
+- `host.txt`
+- `toolchain.txt`
+- `commands.txt`
+- `summary.md`
+- `sha256.txt`
+- `out/subset2a_container_fx.json`
+- `out/subset2a_container_mx.json`
+- `out/subset2a_container_fx_vs_mx_report.md`
 
 ## Artifact Run
 

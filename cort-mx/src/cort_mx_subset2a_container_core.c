@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -213,6 +214,13 @@ static CFStringRef create_utf8_string(const char *text) {
 
 static CFDataRef create_data(const UInt8 *bytes, CFIndex length) {
     return CFDataCreate(kCFAllocatorSystemDefault, bytes, length);
+}
+
+static bool retain_count_delta_matches_or_is_unobservable(CFIndex before, CFIndex after, CFIndex delta) {
+    if (before == LONG_MAX || after == LONG_MAX) {
+        return true;
+    }
+    return after == before + delta;
 }
 
 static struct CaseResult observe_array_empty_immutable(void) {
@@ -516,12 +524,12 @@ static struct CaseResult observe_dictionary_immutable_string_key_lookup(void) {
         (result.lengthValue == 1) &&
         foundPresent &&
         !foundMissing &&
-        (keyAfterCreate == keyBase + 1) &&
-        (valueAfterCreate == valueBase + 1) &&
-        (valueAfterGet == valueAfterCreate) &&
-        (valueAfterPresent == valueAfterCreate) &&
-        (keyAfterRelease == keyBase) &&
-        (valueAfterRelease == valueBase);
+        retain_count_delta_matches_or_is_unobservable(keyBase, keyAfterCreate, 1) &&
+        retain_count_delta_matches_or_is_unobservable(valueBase, valueAfterCreate, 1) &&
+        retain_count_delta_matches_or_is_unobservable(valueAfterCreate, valueAfterGet, 0) &&
+        retain_count_delta_matches_or_is_unobservable(valueAfterCreate, valueAfterPresent, 0) &&
+        retain_count_delta_matches_or_is_unobservable(keyAfterRelease, keyBase, 0) &&
+        retain_count_delta_matches_or_is_unobservable(valueAfterRelease, valueBase, 0);
 
     if (value != NULL) {
         CFRelease(value);
@@ -612,19 +620,19 @@ static struct CaseResult observe_dictionary_mutable_set_replace_remove_retains(v
         (value2 != NULL) &&
         (dictionary != NULL) &&
         result.pointerIdentitySame &&
-        (keyAfterSet == keyBase + 1) &&
-        (value1AfterSet == value1Base + 1) &&
-        (value1AfterGet == value1AfterSet) &&
-        (keyAfterReplace == keyBase + 1) &&
-        (value1AfterReplace == value1Base) &&
-        (value2AfterReplace == value2Base + 1) &&
-        (keyAfterRemove == keyBase) &&
-        (value2AfterRemove == value2Base) &&
+        retain_count_delta_matches_or_is_unobservable(keyBase, keyAfterSet, 1) &&
+        retain_count_delta_matches_or_is_unobservable(value1Base, value1AfterSet, 1) &&
+        retain_count_delta_matches_or_is_unobservable(value1AfterSet, value1AfterGet, 0) &&
+        retain_count_delta_matches_or_is_unobservable(keyBase, keyAfterReplace, 1) &&
+        retain_count_delta_matches_or_is_unobservable(value1AfterReplace, value1Base, 0) &&
+        retain_count_delta_matches_or_is_unobservable(value2Base, value2AfterReplace, 1) &&
+        retain_count_delta_matches_or_is_unobservable(keyAfterRemove, keyBase, 0) &&
+        retain_count_delta_matches_or_is_unobservable(value2AfterRemove, value2Base, 0) &&
         (result.lengthValue == 0) &&
-        (keyAfterReseed == keyBase + 1) &&
-        (value1AfterReseed == value1Base + 1) &&
-        (keyAfterDealloc == keyBase) &&
-        (value1AfterDealloc == value1Base);
+        retain_count_delta_matches_or_is_unobservable(keyBase, keyAfterReseed, 1) &&
+        retain_count_delta_matches_or_is_unobservable(value1Base, value1AfterReseed, 1) &&
+        retain_count_delta_matches_or_is_unobservable(keyAfterDealloc, keyBase, 0) &&
+        retain_count_delta_matches_or_is_unobservable(value1AfterDealloc, value1Base, 0);
 
     if (value2 != NULL) {
         CFRelease(value2);
