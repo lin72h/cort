@@ -28,6 +28,27 @@ enum _FXCFControlValueKind {
     _FXCFControlValueKindData = 8
 };
 
+enum _FXCFControlRequestRouteKind {
+    _FXCFControlRequestRouteKindInvalid = 0,
+    _FXCFControlRequestRouteKindControlCapabilities = 1,
+    _FXCFControlRequestRouteKindControlHealth = 2,
+    _FXCFControlRequestRouteKindDiagnosticsSnapshot = 3,
+    _FXCFControlRequestRouteKindNotifyCancel = 4,
+    _FXCFControlRequestRouteKindNotifyCheck = 5,
+    _FXCFControlRequestRouteKindNotifyGetState = 6,
+    _FXCFControlRequestRouteKindNotifyIsValidToken = 7,
+    _FXCFControlRequestRouteKindNotifyListNames = 8,
+    _FXCFControlRequestRouteKindNotifyPost = 9,
+    _FXCFControlRequestRouteKindNotifyPrepareFileDescriptorDelivery = 10,
+    _FXCFControlRequestRouteKindNotifyRegisterCheck = 11,
+    _FXCFControlRequestRouteKindNotifyRegisterDispatch = 12,
+    _FXCFControlRequestRouteKindNotifyRegisterFileDescriptor = 13,
+    _FXCFControlRequestRouteKindNotifyRegisterSignal = 14,
+    _FXCFControlRequestRouteKindNotifyResume = 15,
+    _FXCFControlRequestRouteKindNotifySetState = 16,
+    _FXCFControlRequestRouteKindNotifySuspend = 17
+};
+
 enum _FXCFControlPacketErrorKind {
     _FXCFControlPacketErrorNone = 0,
     _FXCFControlPacketErrorMissingKey = 1,
@@ -59,6 +80,26 @@ struct _FXCFControlResponse {
     CFStringRef errorMessage;
 };
 
+struct _FXCFControlRequestRoute {
+    struct _FXCFControlRequest request;
+    enum _FXCFControlRequestRouteKind kind;
+    CFStringRef name;
+    CFStringRef scope;
+    CFStringRef expectedSessionID;
+    CFStringRef clientRegistrationID;
+    CFStringRef queueName;
+    Boolean hasToken;
+    CFIndex token;
+    Boolean hasSignal;
+    CFIndex signal;
+    Boolean hasTargetPID;
+    CFIndex targetPID;
+    Boolean hasState;
+    CFIndex state;
+    Boolean hasReuseExistingBinding;
+    Boolean reuseExistingBinding;
+};
+
 Boolean _FXCFControlPacketIsBinaryPlist(CFDataRef payload);
 
 Boolean _FXCFControlPacketDecodeEnvelope(
@@ -88,6 +129,15 @@ Boolean _FXCFControlResponseInit(
 void _FXCFControlResponseClear(struct _FXCFControlResponse *response);
 
 enum _FXCFControlValueKind _FXCFControlPacketValueKind(CFTypeRef value);
+Boolean _FXCFControlRequestRouteInit(
+    CFAllocatorRef allocator,
+    CFDataRef payload,
+    struct _FXCFControlRequestRoute *routeOut,
+    struct _FXCFControlPacketError *errorOut
+);
+void _FXCFControlRequestRouteClear(struct _FXCFControlRequestRoute *route);
+char *_FXCFControlRequestRouteCopyCanonicalJSON(const struct _FXCFControlRequestRoute *route);
+char *_FXCFControlRequestRouteCopySummary(const struct _FXCFControlRequestRoute *route);
 char *_FXCFControlPacketCopyCanonicalJSON(CFTypeRef value);
 char *_FXCFControlPacketCopyAcceptedSummary(CFDictionaryRef packet, enum _FXCFControlPacketKind kind);
 char *_FXCFControlRequestCopyEnvelopeJSON(const struct _FXCFControlRequest *request);

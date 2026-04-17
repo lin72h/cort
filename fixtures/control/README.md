@@ -11,6 +11,7 @@ Files:
 - `bplist_packet_rejection_corpus_v1.json`
 - `subset7a_control_packet_expected_v1.json`
 - `subset7b_control_envelope_expected_v1.json`
+- `subset7c_control_request_route_expected_v1.json`
 
 Provenance:
 
@@ -52,3 +53,12 @@ source corpora by:
 That file carries the internal typed-envelope expected surface for the next
 packet-facing FX slice. It is generated from the source corpora and should not
 be hand-edited.
+
+`subset7c_control_request_route_expected_v1.json` is derived from the shared
+request and rejection source corpora by:
+
+- `tools/build_subset7c_control_request_route_expected.exs`
+
+That file carries the internal request-route expected surface for the first
+consumer-facing packet cut. It is generated from the source corpora and should
+not be hand-edited.

@@ -1,4 +1,4 @@
-# cort-fx Subset 0, 1A, 1B, 2A, 3A, 7A, And 7B Proof
+# cort-fx Subset 0, 1A, 1B, 2A, 3A, 7A, 7B, And 7C Proof
 
 This directory holds the temporary standalone `cort-fx` proof for CORT
 Subset 0, Subset 1A, Subset 1B, Subset 2A, Subset 3A, and Subset 7A:
@@ -15,6 +15,8 @@ Subset 0, Subset 1A, Subset 1B, Subset 2A, Subset 3A, and Subset 7A:
   imported Swift packet corpora
 - Subset 7B: internal request/response control-envelope accessors and semantic
   summaries on top of the proven packet decode surface
+- Subset 7C: internal request-route classification and typed known-parameter
+  extraction on top of the proven request envelope surface
 
 The active 3A coordination documents live in:
 
@@ -38,6 +40,12 @@ The Subset 7B docs live in:
 - `../docs/cort-subset7b-control-envelope-contract.md`
 - `../docs/cort-subset7b-source-audit-and-readiness.md`
 - `../docs/cort-subset7b-validation-workflow.md`
+
+The Subset 7C docs live in:
+
+- `../docs/cort-subset7c-control-request-route-contract.md`
+- `../docs/cort-subset7c-source-audit-and-readiness.md`
+- `../docs/cort-subset7c-validation-workflow.md`
 
 The shared imported packet corpora live in:
 
@@ -127,6 +135,8 @@ Implemented:
   request/response packet corpora
 - internal request/response control-envelope accessors and semantic summaries
   for the imported packet corpora
+- internal request-route classification and typed known-parameter extraction
+  for the imported request packet corpus
 
 Explicitly not implemented here:
 
@@ -143,6 +153,7 @@ Explicitly not implemented here:
 - packet encode parity
 - transport/session behavior beyond the bounded decode/rejection surface
 - public packet-specific APIs beyond the bounded internal envelope layer
+- response/result consumer logic beyond the bounded request-route layer
 
 ## Provenance
 
@@ -182,6 +193,7 @@ This builds under `../wip-cort-gpt-artifacts/cort-fx/build/` by default:
 - `bin/bplist_core_tests`
 - `bin/control_packet_tests`
 - `bin/control_envelope_tests`
+- `bin/control_request_route_tests`
 - `bin/c_consumer_smoke`
 - `bin/subset0_public_compare_fx`
 - `bin/subset1_scalar_core_fx`
@@ -190,6 +202,7 @@ This builds under `../wip-cort-gpt-artifacts/cort-fx/build/` by default:
 - `bin/subset3a_bplist_fx`
 - `bin/subset7a_control_packet_fx`
 - `bin/subset7b_control_envelope_fx`
+- `bin/subset7c_control_request_route_fx`
 
 ## Verification Targets
 
@@ -204,12 +217,14 @@ make compare-subset2a-fx
 make compare-subset3a-fx
 make compare-subset7a-fx
 make compare-subset7b-fx
+make compare-subset7c-fx
 make compare-subset1a-with-mx
 make compare-subset1b-with-mx
 make compare-subset2a-with-mx
 make compare-subset3a-with-mx
 make compare-subset7a-with-expected
 make compare-subset7b-with-expected
+make compare-subset7c-with-expected
 make artifact-run
 make artifact-subset1a-compare
 make artifact-subset2a-compare
@@ -248,6 +263,10 @@ What they enforce:
   `../wip-cort-gpt-artifacts/cort-fx/build/out/subset7b_control_envelope_fx.json`
 - FX control-envelope compare emits
   `../wip-cort-gpt-artifacts/cort-fx/build/out/subset7b_control_envelope_fx_vs_expected_report.md`
+- FX control request-route probe emits
+  `../wip-cort-gpt-artifacts/cort-fx/build/out/subset7c_control_request_route_fx.json`
+- FX control request-route compare emits
+  `../wip-cort-gpt-artifacts/cort-fx/build/out/subset7c_control_request_route_fx_vs_expected_report.md`
 
 The 7A packet slice is implemented with:
 
@@ -265,6 +284,15 @@ The 7B control-envelope slice is implemented with:
 - `tests/cort_subset7b_control_envelope_fx.c`
 - `tests/subset7b_control_envelope_support.h`
 - `../tools/build_subset7b_control_envelope_expected.exs`
+
+The 7C control request-route slice is implemented with:
+
+- `src/FXCFControlPacket.c`
+- `src/FXCFControlPacket.h`
+- `tests/control_request_route_tests.c`
+- `tests/cort_subset7c_control_request_route_fx.c`
+- `tests/subset7c_control_request_route_support.h`
+- `../tools/build_subset7c_control_request_route_expected.exs`
 
 Shared handoff artifact:
 

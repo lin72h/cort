@@ -219,6 +219,39 @@ static char *__FXCFControlPacketCopyCString(CFStringRef string) {
     return buffer;
 }
 
+static Boolean __FXCFControlPacketStringEqualsCString(CFStringRef string, const char *expected) {
+    char *text = NULL;
+    Boolean matches = false;
+
+    if (string == NULL || expected == NULL) {
+        return false;
+    }
+
+    text = __FXCFControlPacketCopyCString(string);
+    if (text == NULL) {
+        return false;
+    }
+    matches = strcmp(text, expected) == 0;
+    free(text);
+    return matches;
+}
+
+static Boolean __FXCFTextBufferAppendJSONFieldPrefix(
+    struct __FXCFTextBuffer *buffer,
+    const char *key,
+    Boolean *needsComma
+) {
+    if (*needsComma && !__FXCFTextBufferAppendCString(buffer, ",")) {
+        return false;
+    }
+    if (!__FXCFTextBufferAppendJSONString(buffer, key) ||
+        !__FXCFTextBufferAppendCString(buffer, ":")) {
+        return false;
+    }
+    *needsComma = true;
+    return true;
+}
+
 static int __FXCFControlPacketCompareDictionaryEntries(const void *left, const void *right) {
     const struct __FXCFDictionarySortEntry {
         const char *keyText;
@@ -757,6 +790,157 @@ static Boolean __FXCFControlPacketRequireValue(CFDictionaryRef dictionary, const
     return true;
 }
 
+static Boolean __FXCFControlPacketLookupValue(
+    CFDictionaryRef dictionary,
+    const char *keyText,
+    const void **valueOut,
+    Boolean *presentOut,
+    struct _FXCFControlPacketError *error
+) {
+    CFStringRef key = NULL;
+    const void *raw = NULL;
+    Boolean present = false;
+
+    if (valueOut != NULL) {
+        *valueOut = NULL;
+    }
+    if (presentOut != NULL) {
+        *presentOut = false;
+    }
+
+    key = CFStringCreateWithCString(kCFAllocatorSystemDefault, keyText, kCFStringEncodingASCII);
+    if (key == NULL) {
+        __FXCFControlPacketSetError(error, _FXCFControlPacketErrorInvalidPacket, 0, "failed to create lookup key");
+        return false;
+    }
+
+    present = CFDictionaryGetValueIfPresent(dictionary, key, &raw);
+    CFRelease((CFTypeRef)key);
+
+    if (presentOut != NULL) {
+        *presentOut = present;
+    }
+    if (present && valueOut != NULL) {
+        *valueOut = raw;
+    }
+    return true;
+}
+
+static Boolean __FXCFControlPacketLookupOptionalString(
+    CFDictionaryRef dictionary,
+    const char *keyText,
+    CFStringRef *valueOut,
+    Boolean *presentOut,
+    struct _FXCFControlPacketError *error
+) {
+    const void *raw = NULL;
+    Boolean present = false;
+
+    if (valueOut != NULL) {
+        *valueOut = NULL;
+    }
+    if (presentOut != NULL) {
+        *presentOut = false;
+    }
+
+    if (!__FXCFControlPacketLookupValue(dictionary, keyText, &raw, &present, error)) {
+        return false;
+    }
+    if (!present || raw == NULL) {
+        return true;
+    }
+    if (CFGetTypeID((CFTypeRef)raw) != CFStringGetTypeID()) {
+        __FXCFControlPacketSetError(error, _FXCFControlPacketErrorInvalidPacket, 0, keyText);
+        return false;
+    }
+
+    if (presentOut != NULL) {
+        *presentOut = true;
+    }
+    if (valueOut != NULL) {
+        *valueOut = (CFStringRef)raw;
+    }
+    return true;
+}
+
+static Boolean __FXCFControlPacketLookupOptionalInteger(
+    CFDictionaryRef dictionary,
+    const char *keyText,
+    CFIndex *valueOut,
+    Boolean *presentOut,
+    struct _FXCFControlPacketError *error
+) {
+    const void *raw = NULL;
+    Boolean present = false;
+    SInt64 integerValue = 0;
+
+    if (valueOut != NULL) {
+        *valueOut = 0;
+    }
+    if (presentOut != NULL) {
+        *presentOut = false;
+    }
+
+    if (!__FXCFControlPacketLookupValue(dictionary, keyText, &raw, &present, error)) {
+        return false;
+    }
+    if (!present || raw == NULL) {
+        return true;
+    }
+    if (CFGetTypeID((CFTypeRef)raw) != CFNumberGetTypeID() ||
+        CFGetTypeID((CFTypeRef)raw) == CFBooleanGetTypeID() ||
+        CFNumberGetType((CFNumberRef)raw) == kCFNumberFloat64Type ||
+        !CFNumberGetValue((CFNumberRef)raw, kCFNumberSInt64Type, &integerValue)) {
+        __FXCFControlPacketSetError(error, _FXCFControlPacketErrorInvalidPacket, 0, keyText);
+        return false;
+    }
+
+    if (presentOut != NULL) {
+        *presentOut = true;
+    }
+    if (valueOut != NULL) {
+        *valueOut = (CFIndex)integerValue;
+    }
+    return true;
+}
+
+static Boolean __FXCFControlPacketLookupOptionalBoolean(
+    CFDictionaryRef dictionary,
+    const char *keyText,
+    Boolean *valueOut,
+    Boolean *presentOut,
+    struct _FXCFControlPacketError *error
+) {
+    const void *raw = NULL;
+    Boolean present = false;
+
+    if (valueOut != NULL) {
+        *valueOut = false;
+    }
+    if (presentOut != NULL) {
+        *presentOut = false;
+    }
+
+    if (!__FXCFControlPacketLookupValue(dictionary, keyText, &raw, &present, error)) {
+        return false;
+    }
+    if (!present || raw == NULL) {
+        return true;
+    }
+    if (CFGetTypeID((CFTypeRef)raw) != CFBooleanGetTypeID()) {
+        __FXCFControlPacketSetError(error, _FXCFControlPacketErrorInvalidPacket, 0, keyText);
+        return false;
+    }
+
+    if (presentOut != NULL) {
+        *presentOut = true;
+    }
+    if (valueOut != NULL) {
+        *valueOut = CFBooleanGetValue((CFBooleanRef)raw);
+    }
+    return true;
+}
+
 static Boolean __FXCFControlPacketValidateRequest(CFDictionaryRef packet, struct _FXCFControlPacketError *error) {
     CFIndex protocolVersion = 0;
     CFStringRef service = NULL;
@@ -925,6 +1109,116 @@ static const char *__FXCFControlValueKindText(enum _FXCFControlValueKind kind) {
         default:
             return "invalid";
     }
+}
+
+static const char *__FXCFControlRequestRouteKindText(enum _FXCFControlRequestRouteKind kind) {
+    switch (kind) {
+        case _FXCFControlRequestRouteKindControlCapabilities:
+            return "control.capabilities";
+        case _FXCFControlRequestRouteKindControlHealth:
+            return "control.health";
+        case _FXCFControlRequestRouteKindDiagnosticsSnapshot:
+            return "diagnostics.snapshot";
+        case _FXCFControlRequestRouteKindNotifyCancel:
+            return "notify.cancel";
+        case _FXCFControlRequestRouteKindNotifyCheck:
+            return "notify.check";
+        case _FXCFControlRequestRouteKindNotifyGetState:
+            return "notify.get_state";
+        case _FXCFControlRequestRouteKindNotifyIsValidToken:
+            return "notify.is_valid_token";
+        case _FXCFControlRequestRouteKindNotifyListNames:
+            return "notify.list_names";
+        case _FXCFControlRequestRouteKindNotifyPost:
+            return "notify.post";
+        case _FXCFControlRequestRouteKindNotifyPrepareFileDescriptorDelivery:
+            return "notify.prepare_file_descriptor_delivery";
+        case _FXCFControlRequestRouteKindNotifyRegisterCheck:
+            return "notify.register_check";
+        case _FXCFControlRequestRouteKindNotifyRegisterDispatch:
+            return "notify.register_dispatch";
+        case _FXCFControlRequestRouteKindNotifyRegisterFileDescriptor:
+            return "notify.register_file_descriptor";
+        case _FXCFControlRequestRouteKindNotifyRegisterSignal:
+            return "notify.register_signal";
+        case _FXCFControlRequestRouteKindNotifyResume:
+            return "notify.resume";
+        case _FXCFControlRequestRouteKindNotifySetState:
+            return "notify.set_state";
+        case _FXCFControlRequestRouteKindNotifySuspend:
+            return "notify.suspend";
+        default:
+            return "invalid";
+    }
+}
+
+static enum _FXCFControlRequestRouteKind __FXCFControlRequestRouteKindForEnvelope(
+    CFStringRef service,
+    CFStringRef method
+) {
+    if (__FXCFControlPacketStringEqualsCString(service, "control")) {
+        if (__FXCFControlPacketStringEqualsCString(method, "capabilities")) {
+            return _FXCFControlRequestRouteKindControlCapabilities;
+        }
+        if (__FXCFControlPacketStringEqualsCString(method, "health")) {
+            return _FXCFControlRequestRouteKindControlHealth;
+        }
+        return _FXCFControlRequestRouteKindInvalid;
+    }
+
+    if (__FXCFControlPacketStringEqualsCString(service, "diagnostics")) {
+        if (__FXCFControlPacketStringEqualsCString(method, "snapshot")) {
+            return _FXCFControlRequestRouteKindDiagnosticsSnapshot;
+        }
+        return _FXCFControlRequestRouteKindInvalid;
+    }
+
+    if (__FXCFControlPacketStringEqualsCString(service, "notify")) {
+        if (__FXCFControlPacketStringEqualsCString(method, "cancel")) {
+            return _FXCFControlRequestRouteKindNotifyCancel;
+        }
+        if (__FXCFControlPacketStringEqualsCString(method, "check")) {
+            return _FXCFControlRequestRouteKindNotifyCheck;
+        }
+        if (__FXCFControlPacketStringEqualsCString(method, "get_state")) {
+            return _FXCFControlRequestRouteKindNotifyGetState;
+        }
+        if (__FXCFControlPacketStringEqualsCString(method, "is_valid_token")) {
+            return _FXCFControlRequestRouteKindNotifyIsValidToken;
+        }
+        if (__FXCFControlPacketStringEqualsCString(method, "list_names")) {
+            return _FXCFControlRequestRouteKindNotifyListNames;
+        }
+        if (__FXCFControlPacketStringEqualsCString(method, "post")) {
+            return _FXCFControlRequestRouteKindNotifyPost;
+        }
+        if (__FXCFControlPacketStringEqualsCString(method, "prepare_file_descriptor_delivery")) {
+            return _FXCFControlRequestRouteKindNotifyPrepareFileDescriptorDelivery;
+        }
+        if (__FXCFControlPacketStringEqualsCString(method, "register_check")) {
+            return _FXCFControlRequestRouteKindNotifyRegisterCheck;
+        }
+        if (__FXCFControlPacketStringEqualsCString(method, "register_dispatch")) {
+            return _FXCFControlRequestRouteKindNotifyRegisterDispatch;
+        }
+        if (__FXCFControlPacketStringEqualsCString(method, "register_file_descriptor")) {
+            return _FXCFControlRequestRouteKindNotifyRegisterFileDescriptor;
+        }
+        if (__FXCFControlPacketStringEqualsCString(method, "register_signal")) {
+            return _FXCFControlRequestRouteKindNotifyRegisterSignal;
+        }
+        if (__FXCFControlPacketStringEqualsCString(method, "resume")) {
+            return _FXCFControlRequestRouteKindNotifyResume;
+        }
+        if (__FXCFControlPacketStringEqualsCString(method, "set_state")) {
+            return _FXCFControlRequestRouteKindNotifySetState;
+        }
+        if (__FXCFControlPacketStringEqualsCString(method, "suspend")) {
+            return _FXCFControlRequestRouteKindNotifySuspend;
+        }
+    }
+
+    return _FXCFControlRequestRouteKindInvalid;
 }
 
 void _FXCFControlRequestClear(struct _FXCFControlRequest *request) {
@@ -1141,6 +1435,224 @@ char *_FXCFControlRequestCopyEnvelopeSummary(const struct _FXCFControlRequest *r
 
     free(serviceText);
     free(methodText);
+    return result;
+}
+
+void _FXCFControlRequestRouteClear(struct _FXCFControlRequestRoute *route) {
+    if (route == NULL) {
+        return;
+    }
+    _FXCFControlRequestClear(&route->request);
+    memset(route, 0, sizeof(*route));
+}
+
+Boolean _FXCFControlRequestRouteInit(
+    CFAllocatorRef allocator,
+    CFDataRef payload,
+    struct _FXCFControlRequestRoute *routeOut,
+    struct _FXCFControlPacketError *errorOut
+) {
+    CFDictionaryRef params = NULL;
+
+    if (routeOut == NULL) {
+        __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "routeOut is NULL");
+        return false;
+    }
+
+    memset(routeOut, 0, sizeof(*routeOut));
+
+    if (!_FXCFControlRequestInit(allocator, payload, &routeOut->request, errorOut)) {
+        return false;
+    }
+
+    routeOut->kind = __FXCFControlRequestRouteKindForEnvelope(routeOut->request.service, routeOut->request.method);
+    if (routeOut->kind == _FXCFControlRequestRouteKindInvalid) {
+        __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "unsupported request route");
+        _FXCFControlRequestRouteClear(routeOut);
+        return false;
+    }
+
+    params = routeOut->request.params;
+    if (!__FXCFControlPacketLookupOptionalString(params, "name", &routeOut->name, NULL, errorOut) ||
+        !__FXCFControlPacketLookupOptionalString(params, "scope", &routeOut->scope, NULL, errorOut) ||
+        !__FXCFControlPacketLookupOptionalString(params, "expected_session_id", &routeOut->expectedSessionID, NULL, errorOut) ||
+        !__FXCFControlPacketLookupOptionalString(params, "client_registration_id", &routeOut->clientRegistrationID, NULL, errorOut) ||
+        !__FXCFControlPacketLookupOptionalString(params, "queue_name", &routeOut->queueName, NULL, errorOut) ||
+        !__FXCFControlPacketLookupOptionalInteger(params, "token", &routeOut->token, &routeOut->hasToken, errorOut) ||
+        !__FXCFControlPacketLookupOptionalInteger(params, "signal", &routeOut->signal, &routeOut->hasSignal, errorOut) ||
+        !__FXCFControlPacketLookupOptionalInteger(params, "target_pid", &routeOut->targetPID, &routeOut->hasTargetPID, errorOut) ||
+        !__FXCFControlPacketLookupOptionalInteger(params, "state", &routeOut->state, &routeOut->hasState, errorOut) ||
+        !__FXCFControlPacketLookupOptionalBoolean(params, "reuse_existing_binding", &routeOut->reuseExistingBinding, &routeOut->hasReuseExistingBinding, errorOut)) {
+        _FXCFControlRequestRouteClear(routeOut);
+        return false;
+    }
+
+    return true;
+}
+
+static Boolean __FXCFControlRequestRouteAppendOptionalStringJSON(
+    struct __FXCFTextBuffer *buffer,
+    const char *key,
+    CFStringRef value,
+    Boolean *needsComma
+) {
+    char *text = NULL;
+    Boolean ok = false;
+
+    if (value == NULL) {
+        return true;
+    }
+
+    text = __FXCFControlPacketCopyCString(value);
+    if (text == NULL) {
+        return false;
+    }
+    ok =
+        __FXCFTextBufferAppendJSONFieldPrefix(buffer, key, needsComma) &&
+        __FXCFTextBufferAppendJSONString(buffer, text);
+    free(text);
+    return ok;
+}
+
+static Boolean __FXCFControlRequestRouteAppendOptionalIntegerJSON(
+    struct __FXCFTextBuffer *buffer,
+    const char *key,
+    Boolean present,
+    CFIndex value,
+    Boolean *needsComma
+) {
+    if (!present) {
+        return true;
+    }
+    return __FXCFTextBufferAppendJSONFieldPrefix(buffer, key, needsComma) &&
+        __FXCFTextBufferAppendFormat(buffer, "%ld", (long)value);
+}
+
+static Boolean __FXCFControlRequestRouteAppendOptionalBooleanJSON(
+    struct __FXCFTextBuffer *buffer,
+    const char *key,
+    Boolean present,
+    Boolean value,
+    Boolean *needsComma
+) {
+    if (!present) {
+        return true;
+    }
+    return __FXCFTextBufferAppendJSONFieldPrefix(buffer, key, needsComma) &&
+        __FXCFTextBufferAppendCString(buffer, value ? "true" : "false");
+}
+
+char *_FXCFControlRequestRouteCopyCanonicalJSON(const struct _FXCFControlRequestRoute *route) {
+    struct __FXCFTextBuffer buffer = {0};
+    char **keys = NULL;
+    CFIndex count = 0;
+    char *serviceText = NULL;
+    char *methodText = NULL;
+    char *result = NULL;
+    const char *kindText = NULL;
+    Boolean needsComma = false;
+
+    if (route == NULL || route->request.packet == NULL) {
+        return NULL;
+    }
+
+    if (!__FXCFControlPacketCopySortedKeys(route->request.params, &keys, &count)) {
+        return NULL;
+    }
+
+    serviceText = __FXCFControlPacketCopyRequestServiceText(&route->request);
+    methodText = __FXCFControlPacketCopyRequestMethodText(&route->request);
+    kindText = __FXCFControlRequestRouteKindText(route->kind);
+    if (serviceText == NULL || methodText == NULL || kindText == NULL) {
+        __FXCFControlPacketFreeSortedKeys(keys, count);
+        free(serviceText);
+        free(methodText);
+        return NULL;
+    }
+
+    if (!__FXCFTextBufferAppendCString(&buffer, "{") ||
+        !__FXCFControlRequestRouteAppendOptionalStringJSON(&buffer, "client_registration_id", route->clientRegistrationID, &needsComma) ||
+        !__FXCFControlRequestRouteAppendOptionalStringJSON(&buffer, "expected_session_id", route->expectedSessionID, &needsComma) ||
+        !__FXCFTextBufferAppendJSONFieldPrefix(&buffer, "kind", &needsComma) ||
+        !__FXCFTextBufferAppendJSONString(&buffer, kindText) ||
+        !__FXCFTextBufferAppendJSONFieldPrefix(&buffer, "method", &needsComma) ||
+        !__FXCFTextBufferAppendJSONString(&buffer, methodText) ||
+        !__FXCFControlRequestRouteAppendOptionalStringJSON(&buffer, "name", route->name, &needsComma) ||
+        !__FXCFTextBufferAppendJSONFieldPrefix(&buffer, "param_keys", &needsComma) ||
+        !__FXCFControlPacketAppendKeyArrayJSON(&buffer, keys, count) ||
+        !__FXCFTextBufferAppendJSONFieldPrefix(&buffer, "protocol_version", &needsComma) ||
+        !__FXCFTextBufferAppendFormat(&buffer, "%ld", (long)route->request.protocolVersion) ||
+        !__FXCFControlRequestRouteAppendOptionalStringJSON(&buffer, "queue_name", route->queueName, &needsComma) ||
+        !__FXCFControlRequestRouteAppendOptionalBooleanJSON(&buffer, "reuse_existing_binding", route->hasReuseExistingBinding, route->reuseExistingBinding, &needsComma) ||
+        !__FXCFControlRequestRouteAppendOptionalStringJSON(&buffer, "scope", route->scope, &needsComma) ||
+        !__FXCFTextBufferAppendJSONFieldPrefix(&buffer, "service", &needsComma) ||
+        !__FXCFTextBufferAppendJSONString(&buffer, serviceText) ||
+        !__FXCFControlRequestRouteAppendOptionalIntegerJSON(&buffer, "signal", route->hasSignal, route->signal, &needsComma) ||
+        !__FXCFControlRequestRouteAppendOptionalIntegerJSON(&buffer, "state", route->hasState, route->state, &needsComma) ||
+        !__FXCFControlRequestRouteAppendOptionalIntegerJSON(&buffer, "target_pid", route->hasTargetPID, route->targetPID, &needsComma) ||
+        !__FXCFControlRequestRouteAppendOptionalIntegerJSON(&buffer, "token", route->hasToken, route->token, &needsComma) ||
+        !__FXCFTextBufferAppendCString(&buffer, "}")) {
+        __FXCFTextBufferFree(&buffer);
+        __FXCFControlPacketFreeSortedKeys(keys, count);
+        free(serviceText);
+        free(methodText);
+        return NULL;
+    }
+
+    result = __FXCFTextBufferDetach(&buffer);
+    __FXCFTextBufferFree(&buffer);
+    __FXCFControlPacketFreeSortedKeys(keys, count);
+    free(serviceText);
+    free(methodText);
+    return result;
+}
+
+char *_FXCFControlRequestRouteCopySummary(const struct _FXCFControlRequestRoute *route) {
+    struct __FXCFTextBuffer buffer = {0};
+    char **keys = NULL;
+    CFIndex count = 0;
+    char *result = NULL;
+    const char *kindText = NULL;
+
+    if (route == NULL || route->request.packet == NULL) {
+        return NULL;
+    }
+
+    if (!__FXCFControlPacketCopySortedKeys(route->request.params, &keys, &count)) {
+        return NULL;
+    }
+
+    kindText = __FXCFControlRequestRouteKindText(route->kind);
+    if (!__FXCFTextBufferAppendFormat(&buffer, "route %s params=", kindText)) {
+        __FXCFTextBufferFree(&buffer);
+        __FXCFControlPacketFreeSortedKeys(keys, count);
+        return NULL;
+    }
+
+    if (count == 0) {
+        if (!__FXCFTextBufferAppendCString(&buffer, "none")) {
+            __FXCFTextBufferFree(&buffer);
+            __FXCFControlPacketFreeSortedKeys(keys, count);
+            return NULL;
+        }
+    } else {
+        for (CFIndex index = 0; index < count; ++index) {
+            if (index > 0 && !__FXCFTextBufferAppendCString(&buffer, ",")) {
+                __FXCFTextBufferFree(&buffer);
+                __FXCFControlPacketFreeSortedKeys(keys, count);
+                return NULL;
+            }
+            if (!__FXCFTextBufferAppendCString(&buffer, keys[index])) {
+                __FXCFTextBufferFree(&buffer);
+                __FXCFControlPacketFreeSortedKeys(keys, count);
+                return NULL;
+            }
+        }
+    }
+
+    result = __FXCFTextBufferDetach(&buffer);
+    __FXCFTextBufferFree(&buffer);
+    __FXCFControlPacketFreeSortedKeys(keys, count);
     return result;
 }
 
