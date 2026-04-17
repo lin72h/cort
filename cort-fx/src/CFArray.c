@@ -258,3 +258,11 @@ void CFArrayRemoveValueAtIndex(CFMutableArrayRef theArray, CFIndex idx) {
         array->values[array->count] = NULL;
     }
 }
+
+CFIndex _FXCFArrayFastCount(CFArrayRef array) {
+    return ((const struct __CFArray *)array)->count;
+}
+
+const void *_FXCFArrayFastValueAtIndex(CFArrayRef array, CFIndex idx) {
+    return ((const struct __CFArray *)array)->values[idx];
+}

@@ -53,6 +53,7 @@ static void __FXCFInitializeRuntime(void) {
     __FXCFPublishClass(_kCFRuntimeIDCFString, _FXCFStringClass());
     __FXCFPublishClass(_kCFRuntimeIDCFArray, _FXCFArrayClass());
     __FXCFPublishClass(_kCFRuntimeIDCFDictionary, _FXCFDictionaryClass());
+    __FXCFPublishClass(_kCFRuntimeIDCFError, _FXCFErrorClass());
 }
 
 static void __FXCFInitialize(void) {

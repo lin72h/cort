@@ -262,6 +262,24 @@ static void case_dictionary_remove_value_non_dictionary(void) {
     CFDictionaryRemoveValue((CFMutableDictionaryRef)object, kCFBooleanTrue);
 }
 
+static void case_error_get_code_non_error(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonErrorCode");
+    (void)CFErrorGetCode((CFErrorRef)object);
+}
+
+static void case_property_list_create_with_data_non_data(void) {
+    struct TestObject *object = create_abort_test_object("AbortNonPropertyListData");
+    CFPropertyListFormat format = 0;
+    CFErrorRef error = NULL;
+    (void)CFPropertyListCreateWithData(
+        kCFAllocatorSystemDefault,
+        (CFDataRef)object,
+        kCFPropertyListImmutable,
+        &format,
+        &error
+    );
+}
+
 static void case_cfequal_null(void) {
     (void)CFEqual(NULL, (CFTypeRef)kCFBooleanTrue);
 }
@@ -351,6 +369,8 @@ int main(void) {
     expect_abort(case_dictionary_get_value_if_present_non_dictionary, "CFDictionaryGetValueIfPresent(non-dictionary)");
     expect_abort(case_dictionary_set_value_non_dictionary, "CFDictionarySetValue(non-dictionary)");
     expect_abort(case_dictionary_remove_value_non_dictionary, "CFDictionaryRemoveValue(non-dictionary)");
+    expect_abort(case_error_get_code_non_error, "CFErrorGetCode(non-error)");
+    expect_abort(case_property_list_create_with_data_non_data, "CFPropertyListCreateWithData(non-data)");
     expect_abort(case_cfequal_null, "CFEqual(NULL, object)");
     expect_abort(case_cfhash_null, "CFHash(NULL)");
     expect_abort(case_cfequal_non_cort_same_pointer, "CFEqual(non-CORT same pointer)");

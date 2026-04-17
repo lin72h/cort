@@ -72,9 +72,14 @@ int main(void) {
         CFNumberRef number = CFNumberCreate(kCFAllocatorSystemDefault, kCFNumberSInt32Type, &value);
         CFDateRef date = CFDateCreate(kCFAllocatorSystemDefault, when);
         CFStringRef string = CFStringCreateWithCString(kCFAllocatorSystemDefault, "launchd.packet-key", kCFStringEncodingASCII);
+        CFErrorRef error = NULL;
+        CFPropertyListFormat format = 0;
         const void *arrayValues[] = {string, data};
         CFArrayRef array = NULL;
         CFMutableDictionaryRef dictionary = NULL;
+        CFDataRef plistBytes = NULL;
+        CFPropertyListRef decoded = NULL;
+        const void *decodedValue = NULL;
 
         if (data == NULL || number == NULL || date == NULL || string == NULL) {
             fail("scalar create failed");
@@ -125,6 +130,42 @@ int main(void) {
             fail("dictionary borrowed get mismatch");
         }
 
+        plistBytes = CFPropertyListCreateData(
+            kCFAllocatorSystemDefault,
+            (CFPropertyListRef)dictionary,
+            kCFPropertyListBinaryFormat_v1_0,
+            0,
+            &error
+        );
+        if (plistBytes == NULL || error != NULL) {
+            fail("binary plist write failed");
+        }
+        decoded = CFPropertyListCreateWithData(
+            kCFAllocatorSystemDefault,
+            plistBytes,
+            kCFPropertyListImmutable,
+            &format,
+            &error
+        );
+        if (decoded == NULL || error != NULL) {
+            fail("binary plist read failed");
+        }
+        if (format != kCFPropertyListBinaryFormat_v1_0) {
+            fail("binary plist format mismatch");
+        }
+        if (CFGetTypeID(decoded) != CFDictionaryGetTypeID()) {
+            fail("decoded plist type mismatch");
+        }
+        decodedValue = CFDictionaryGetValue((CFDictionaryRef)decoded, string);
+        if (decodedValue == NULL || CFGetTypeID((CFTypeRef)decodedValue) != CFDataGetTypeID()) {
+            fail("decoded plist value type mismatch");
+        }
+        if (CFDataGetLength((CFDataRef)decodedValue) != (CFIndex)sizeof(bytes)) {
+            fail("decoded plist data length mismatch");
+        }
+
+        CFRelease(decoded);
+        CFRelease(plistBytes);
         CFRelease((CFTypeRef)dictionary);
         CFRelease((CFTypeRef)array);
         CFRelease((CFTypeRef)string);

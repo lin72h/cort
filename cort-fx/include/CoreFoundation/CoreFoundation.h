@@ -6,7 +6,9 @@
 #include "CFData.h"
 #include "CFDate.h"
 #include "CFDictionary.h"
+#include "CFError.h"
 #include "CFNumber.h"
+#include "CFPropertyList.h"
 #include "CFString.h"
 #include "CFRuntime.h"
 

@@ -29,14 +29,17 @@ MX status:
 
 - probe source, expectations, sample fixture, compare tool, and suite wrappers
   exist
-- bounded macOS validation has not been run yet
+- bounded macOS validation has been run and returned 0 blockers / 0 warnings
+- real MX artifact is expected under:
+  - `../wip-cort-gpt-artifacts/cort-mx/runs/subset3a-mx-bplist-core/out/subset3a_bplist_core.json`
 
 FX status:
 
 - Subset 0, 1A, 1B, and 2A provide the runtime and object surface this slice
   depends on
-- no FX binary-plist implementation exists yet
-- no shared `subset3a_bplist_fx.json` artifact exists yet
+- bounded FX binary-plist implementation now exists
+- shared handoff artifact path is:
+  - `../subset3a_bplist_fx.json`
 - the planned FX file cut and fixture contract now live in:
   - `docs/cort-subset3a-fx-implementation-plan.md`
   - `docs/cort-subset3a-fixture-corpus.md`
@@ -130,9 +133,9 @@ The suite reruns the MX core probe and then:
 - or preserves a compare stub that explicitly says the shared FX artifact is
   missing
 
-## Future FX vs MX Comparison
+## FX vs MX Comparison
 
-Once FX emits a Subset 3A JSON artifact, compare it against the MX JSON with:
+Compare the emitted FX artifact against the MX JSON with:
 
 - `tools/compare_subset3a_bplist_json.exs`
 
@@ -146,7 +149,7 @@ Direct invocation:
   --output /path/to/subset3a_bplist_fx_vs_mx_report.md
 ```
 
-Expected future FX artifact path:
+Expected FX artifact path:
 
 - `../wip-cort-gpt-artifacts/cort-fx/build/out/subset3a_bplist_fx.json`
 - shared handoff artifact: `../subset3a_bplist_fx.json`
@@ -207,8 +210,8 @@ What it should cover after the Subset 3A assets land:
 
 1. Run `scripts/run_subset3a_bplist_core.sh` on MX.
 2. Review `summary.md` for blockers or warnings.
-3. Compare against the shared FX artifact later with
+3. Compare against the shared FX artifact with
    `scripts/run_subset3a_bplist_compare.sh` or `scripts/run_subset3a_suite.sh`.
 4. Record the artifact paths in the Subset 3A contract ledger.
 5. Classify rejection behavior and binary-format reporting explicitly.
-6. Only then start the FX binary-plist implementation.
+6. Only then treat the 3A slice as accepted and move to the next bounded cut.

@@ -1,7 +1,7 @@
-# cort-fx Subset 0, 1A, 1B, And 2A Proof
+# cort-fx Subset 0, 1A, 1B, 2A, And 3A Proof
 
 This directory holds the temporary standalone `cort-fx` proof for CORT
-Subset 0, Subset 1A, Subset 1B, and Subset 2A:
+Subset 0, Subset 1A, Subset 1B, Subset 2A, and Subset 3A:
 
 - Subset 0: runtime and ownership core
 - Subset 1A: immutable scalar core without `CFString`
@@ -9,19 +9,22 @@ Subset 0, Subset 1A, Subset 1B, and Subset 2A:
   bplist string paths
 - Subset 2A: bounded container core for arrays, dictionaries, and ownership
   semantics for plist-valid object graphs
+- Subset 3A: bounded binary plist core read/write work on top of the proven
+  runtime, scalar, string, and container surface
 
-The next planned slice after this proof is Subset 3A:
+The Subset 3A MX readiness and validation docs live in:
 
-- bounded binary plist core read/write work on top of the proven runtime,
-  scalar, string, and container surface
-- the MX readiness package for that slice now lives in
-  `../docs/cort-subset3a-bplist-core-contract.md`,
-  `../docs/cort-subset3a-source-audit-and-readiness.md`, and
-  `../docs/cort-subset3a-validation-workflow.md`
-- the FX cut plan and fixture contract for that slice now live in
-  `../docs/cort-subset3a-fx-implementation-plan.md` and
-  `../docs/cort-subset3a-fixture-corpus.md`
-- MX and FX contracts still live in `../docs/` and `../cort-mx/`
+- `../docs/cort-subset3a-bplist-core-contract.md`
+- `../docs/cort-subset3a-source-audit-and-readiness.md`
+- `../docs/cort-subset3a-validation-workflow.md`
+
+The Subset 3A FX planning docs live in:
+
+- `../docs/cort-subset3a-fx-implementation-plan.md`
+- `../docs/cort-subset3a-fixture-corpus.md`
+
+The next planned slice after this proof is the next bounded plist/packet cut
+above 3A. MX and FX contracts still live in `../docs/` and `../cort-mx/`.
 
 It is not the final repository layout. The final target remains
 `../nx/cort/cort-fx/` after explicit permission.
@@ -97,14 +100,22 @@ Implemented:
 - `CFDictionaryRemoveValue`
 - `kCFTypeDictionaryKeyCallBacks`
 - `kCFTypeDictionaryValueCallBacks`
+- `CFErrorGetTypeID`
+- `CFErrorGetCode`
+- `CFPropertyListCreateData`
+- `CFPropertyListCreateWithData`
+- binary plist core for bool, int, real, date, data, string, array, and
+  dictionary with string keys
 
 Explicitly not implemented here:
 
-- plist/bplist
 - XML plist
+- stream APIs
 - BlocksRuntime integration
 - Objective-C bridge behavior
 - Swift runtime allocation
+- broader plist tag families beyond the bounded 3A surface
+- mutable parse/write modes beyond the bounded 3A surface
 
 ## Provenance
 
@@ -115,10 +126,12 @@ This proof is based on the `CoreFoundation` source shape in
 - `include/CFRuntime.h`
 - `CFBase.c`
 - `CFRuntime.c`
+- `CFBinaryPList.c`
 
 It is not a direct copy. The implementation here was rewritten as a small
 standalone proof because the upstream translation units assume Swift-runtime
-defaults, dispatch, and a much broader class table than Subset 0 allows.
+defaults, dispatch, and a much broader object/class surface than the bounded
+CORT subsets allow.
 
 Native macOS CoreFoundation remains the semantic oracle for MX validation.
 
@@ -141,11 +154,13 @@ This builds under `../wip-cort-gpt-artifacts/cort-fx/build/` by default:
 - `bin/scalar_core_tests`
 - `bin/string_core_tests`
 - `bin/container_core_tests`
+- `bin/bplist_core_tests`
 - `bin/c_consumer_smoke`
 - `bin/subset0_public_compare_fx`
 - `bin/subset1_scalar_core_fx`
 - `bin/subset1b_cfstring_fx`
 - `bin/subset2a_container_fx`
+- `bin/subset3a_bplist_fx`
 
 ## Verification Targets
 
@@ -157,9 +172,11 @@ make compare-fx
 make compare-subset1a-fx
 make compare-subset1b-fx
 make compare-subset2a-fx
+make compare-subset3a-fx
 make compare-subset1a-with-mx
 make compare-subset1b-with-mx
 make compare-subset2a-with-mx
+make compare-subset3a-with-mx
 make artifact-run
 make artifact-subset1a-compare
 make artifact-subset2a-compare
@@ -169,14 +186,15 @@ make test-installed
 What they enforce:
 
 - no Swift, Objective-C, dispatch, ICU, or CoreFoundation link/symbol coupling
-- public exported symbol set matches `exports/subset2a-exported-symbols.txt`
+- public exported symbol set matches `exports/subset3a-exported-symbols.txt`
 - abort-on-misuse policy remains enforced for invalid public calls and
   ownership failures
 - dependency/export audits are normalized across Darwin and `ldd`-based hosts
 - wrong-type abort coverage includes `CFDataCreateCopy`, `CFDataGetBytePtr`,
   `CFNumberGetType`, `CFArrayCreateCopy`, `CFArrayRemoveValueAtIndex`,
   `CFDictionaryCreateCopy`, `CFDictionaryGetValueIfPresent`,
-  `CFDictionaryRemoveValue`, `CFEqual`, and `CFHash`
+  `CFDictionaryRemoveValue`, `CFErrorGetCode`,
+  `CFPropertyListCreateWithData`, `CFEqual`, and `CFHash`
 - installed headers and static library are usable by a standalone C consumer
 - shared allocator comparison harness emits
   `../wip-cort-gpt-artifacts/cort-fx/build/out/subset0_public_compare_fx.json`
@@ -186,18 +204,20 @@ What they enforce:
   `../wip-cort-gpt-artifacts/cort-fx/build/out/subset1b_cfstring_fx.json`
 - FX container probe emits
   `../wip-cort-gpt-artifacts/cort-fx/build/out/subset2a_container_fx.json`
+- FX binary-plist probe emits
+  `../wip-cort-gpt-artifacts/cort-fx/build/out/subset3a_bplist_fx.json`
+- shared handoff artifacts may also be committed at repo root for MX
+  consumption, including `subset2a_container_fx.json` and
+  `subset3a_bplist_fx.json`
 - Subset 1A compare wrapper can compare that FX JSON against MX and preserve a
   dedicated handoff artifact run
-- shared handoff artifacts may also be committed at repo root for MX
-  consumption, including `subset2a_container_fx.json`
 - Subset 2A compare wrapper can compare a real FX container JSON against MX and
   preserve a dedicated handoff artifact run once the FX artifact exists
-- artifact-run packaging emits a preservable FX run directory under
-  `../wip-cort-gpt-artifacts/cort-fx/runs/`
 - repo workflow selfcheck can validate the compare/report tooling and the FX
   `make clean test` target with `../tools/run_elixir.sh ../tools/workflow_selfcheck.exs`
 - when that selfcheck runs on Darwin, it also executes the real MX Subset 0,
-  Subset 1A, Subset 1B, and Subset 2A scripts under a temporary artifact root
+  Subset 1A, Subset 1B, Subset 2A, and Subset 3A scripts under a temporary
+  artifact root
 
 ## Install
 
@@ -213,7 +233,9 @@ Installed files:
 - `include/CoreFoundation/CFData.h`
 - `include/CoreFoundation/CFDate.h`
 - `include/CoreFoundation/CFDictionary.h`
+- `include/CoreFoundation/CFError.h`
 - `include/CoreFoundation/CFNumber.h`
+- `include/CoreFoundation/CFPropertyList.h`
 - `include/CoreFoundation/CFString.h`
 - `include/CoreFoundation/CFRuntime.h`
 - `include/CoreFoundation/CoreFoundation.h`

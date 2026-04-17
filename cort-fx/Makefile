@@ -24,6 +24,7 @@ COMPARE_TOOL := $(REPO_ROOT)/tools/compare_subset0_json.exs
 SCALAR_COMPARE_TOOL := $(REPO_ROOT)/tools/compare_subset1_scalar_core_json.exs
 STRING_COMPARE_TOOL := $(REPO_ROOT)/tools/compare_subset1b_cfstring_json.exs
 CONTAINER_COMPARE_TOOL := $(REPO_ROOT)/tools/compare_subset2a_container_json.exs
+BPLIST_COMPARE_TOOL := $(REPO_ROOT)/tools/compare_subset3a_bplist_json.exs
 RUN_ARTIFACT_SCRIPT := scripts/run_subset0_fx_artifacts.sh
 SUBSET1A_COMPARE_ARTIFACT_SCRIPT := scripts/run_subset1a_compare_artifact.sh
 SUBSET2A_COMPARE_ARTIFACT_SCRIPT := scripts/run_subset2a_compare_artifact.sh
@@ -32,50 +33,65 @@ LIB := $(LIB_DIR)/libcortfx.a
 LIB_OBJECTS := \
 	$(OBJ_DIR)/src/CFBase.o \
 	$(OBJ_DIR)/src/CFArray.o \
+	$(OBJ_DIR)/src/CFBinaryPList.o \
 	$(OBJ_DIR)/src/CFData.o \
 	$(OBJ_DIR)/src/CFDate.o \
 	$(OBJ_DIR)/src/CFDictionary.o \
+	$(OBJ_DIR)/src/CFError.o \
 	$(OBJ_DIR)/src/CFNumber.o \
+	$(OBJ_DIR)/src/CFPropertyList.o \
 	$(OBJ_DIR)/src/CFString.o \
 	$(OBJ_DIR)/src/CFRuntime.o
+
 TEST_BINARY := $(BIN_DIR)/runtime_ownership_tests
 ABORT_TEST_BINARY := $(BIN_DIR)/runtime_abort_tests
 SCALAR_TEST_BINARY := $(BIN_DIR)/scalar_core_tests
 STRING_TEST_BINARY := $(BIN_DIR)/string_core_tests
 CONTAINER_TEST_BINARY := $(BIN_DIR)/container_core_tests
+BPLIST_TEST_BINARY := $(BIN_DIR)/bplist_core_tests
 SMOKE_BINARY := $(BIN_DIR)/c_consumer_smoke
 COMPARE_BINARY := $(BIN_DIR)/subset0_public_compare_fx
 SCALAR_COMPARE_BINARY := $(BIN_DIR)/subset1_scalar_core_fx
 STRING_COMPARE_BINARY := $(BIN_DIR)/subset1b_cfstring_fx
 CONTAINER_COMPARE_BINARY := $(BIN_DIR)/subset2a_container_fx
+BPLIST_COMPARE_BINARY := $(BIN_DIR)/subset3a_bplist_fx
+
 COMPARE_OUTPUT := $(BUILD_DIR)/out/subset0_public_compare_fx.json
 SCALAR_COMPARE_OUTPUT := $(BUILD_DIR)/out/subset1_scalar_core_fx.json
 STRING_COMPARE_OUTPUT := $(BUILD_DIR)/out/subset1b_cfstring_fx.json
 CONTAINER_COMPARE_OUTPUT := $(BUILD_DIR)/out/subset2a_container_fx.json
+BPLIST_COMPARE_OUTPUT := $(BUILD_DIR)/out/subset3a_bplist_fx.json
+
 FX_JSON ?= $(COMPARE_OUTPUT)
 FX_SCALAR_JSON ?= $(SCALAR_COMPARE_OUTPUT)
 FX_STRING_JSON ?= $(STRING_COMPARE_OUTPUT)
 FX_CONTAINER_JSON ?= $(CONTAINER_COMPARE_OUTPUT)
+FX_BPLIST_JSON ?= $(BPLIST_COMPARE_OUTPUT)
+
 COMPARE_REPORT ?= $(BUILD_DIR)/out/subset0_fx_vs_mx_report.md
 SCALAR_COMPARE_REPORT ?= $(BUILD_DIR)/out/subset1_scalar_core_fx_vs_mx_report.md
 STRING_COMPARE_REPORT ?= $(BUILD_DIR)/out/subset1b_cfstring_fx_vs_mx_report.md
 CONTAINER_COMPARE_REPORT ?= $(BUILD_DIR)/out/subset2a_container_fx_vs_mx_report.md
-EXPORTS_EXPECTED := $(EXPORTS_DIR)/subset2a-exported-symbols.txt
-EXPORTS_ACTUAL := $(BUILD_DIR)/subset2a-exported-symbols.txt
+BPLIST_COMPARE_REPORT ?= $(BUILD_DIR)/out/subset3a_bplist_fx_vs_mx_report.md
+
+EXPORTS_EXPECTED := $(EXPORTS_DIR)/subset3a-exported-symbols.txt
+EXPORTS_ACTUAL := $(BUILD_DIR)/subset3a-exported-symbols.txt
+
 SCALAR_COMPARE_RUN_DIR ?= $(ARTIFACTS_ROOT)/cort-fx/runs/subset1a-fx-vs-mx
 CONTAINER_COMPARE_RUN_DIR ?= $(ARTIFACTS_ROOT)/cort-fx/runs/subset2a-fx-vs-mx
+
 INSTALL_INCLUDE_DIR := $(DESTDIR)$(PREFIX)/include/CoreFoundation
 INSTALL_LIB_DIR := $(DESTDIR)$(PREFIX)/lib
 INSTALL_DOC_DIR := $(DESTDIR)$(PREFIX)/share/doc/cort-fx
 
-.PHONY: all clean check-deps check-exports compare-fx compare-subset1a-fx compare-subset1b-fx compare-subset2a-fx compare-with-mx compare-subset1a-with-mx compare-subset1b-with-mx compare-subset2a-with-mx artifact-run artifact-subset1a-compare artifact-subset2a-compare install install-stage test test-installed
+.PHONY: all clean check-deps check-exports compare-fx compare-subset1a-fx compare-subset1b-fx compare-subset2a-fx compare-subset3a-fx compare-with-mx compare-subset1a-with-mx compare-subset1b-with-mx compare-subset2a-with-mx compare-subset3a-with-mx artifact-run artifact-subset1a-compare artifact-subset2a-compare install install-stage test test-installed
 
-all: $(LIB) $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY) $(STRING_COMPARE_BINARY) $(CONTAINER_COMPARE_BINARY)
+all: $(LIB) $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(BPLIST_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY) $(STRING_COMPARE_BINARY) $(CONTAINER_COMPARE_BINARY) $(BPLIST_COMPARE_BINARY)
 
-check-deps: $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY) $(STRING_COMPARE_BINARY) $(CONTAINER_COMPARE_BINARY) $(LIB)
+check-deps: $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(BPLIST_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY) $(STRING_COMPARE_BINARY) $(CONTAINER_COMPARE_BINARY) $(BPLIST_COMPARE_BINARY) $(LIB)
 	@set -eu; \
 	host_uname_s=$$(uname -s 2>/dev/null || printf Unknown); \
-	for file in $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY) $(STRING_COMPARE_BINARY) $(CONTAINER_COMPARE_BINARY); do \
+	for file in $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(BPLIST_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY) $(STRING_COMPARE_BINARY) $(CONTAINER_COMPARE_BINARY) $(BPLIST_COMPARE_BINARY); do \
 		if [ "$$host_uname_s" = "Darwin" ]; then \
 			if otool -L "$$file" | sed '1d' | rg -q 'dispatch|swift|objc|icu|CoreFoundation'; then \
 				echo "forbidden dynamic dependency detected in $$file"; \
@@ -91,7 +107,7 @@ check-deps: $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_T
 			exit 1; \
 		fi; \
 	done
-	@if nm -a $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY) $(STRING_COMPARE_BINARY) $(CONTAINER_COMPARE_BINARY) $(LIB) | rg -q 'swift|dispatch|objc|icu|CoreFoundation'; then \
+	@if nm -a $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(BPLIST_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY) $(STRING_COMPARE_BINARY) $(CONTAINER_COMPARE_BINARY) $(BPLIST_COMPARE_BINARY) $(LIB) | rg -q 'swift|dispatch|objc|icu|CoreFoundation'; then \
 		echo "forbidden symbol detected"; \
 		exit 1; \
 	fi
@@ -124,6 +140,10 @@ compare-subset1b-fx: $(STRING_COMPARE_BINARY)
 compare-subset2a-fx: $(CONTAINER_COMPARE_BINARY)
 	mkdir -p $(BUILD_DIR)/out
 	$(CONTAINER_COMPARE_BINARY) > $(CONTAINER_COMPARE_OUTPUT)
+
+compare-subset3a-fx: $(BPLIST_COMPARE_BINARY)
+	mkdir -p $(BUILD_DIR)/out
+	$(BPLIST_COMPARE_BINARY) > $(BPLIST_COMPARE_OUTPUT)
 
 compare-with-mx: compare-fx $(COMPARE_TOOL)
 	@if [ -z "$(MX_JSON)" ]; then \
@@ -161,6 +181,18 @@ compare-subset2a-with-mx: compare-subset2a-fx $(CONTAINER_COMPARE_TOOL)
 	$(ELIXIR_RUN) $(CONTAINER_COMPARE_TOOL) --fx-json $(FX_CONTAINER_JSON) --mx-json $(MX_JSON) --output $(CONTAINER_COMPARE_REPORT)
 	cat $(CONTAINER_COMPARE_REPORT)
 
+compare-subset3a-with-mx: compare-subset3a-fx $(BPLIST_COMPARE_TOOL)
+	@if [ ! -f "$(FX_BPLIST_JSON)" ]; then \
+		echo "set FX_BPLIST_JSON=/path/to/subset3a_bplist_fx.json"; \
+		exit 1; \
+	fi
+	@if [ -z "$(MX_JSON)" ]; then \
+		echo "set MX_JSON=/path/to/subset3a_bplist_core.json"; \
+		exit 1; \
+	fi
+	$(ELIXIR_RUN) $(BPLIST_COMPARE_TOOL) --fx-json $(FX_BPLIST_JSON) --mx-json $(MX_JSON) --output $(BPLIST_COMPARE_REPORT)
+	cat $(BPLIST_COMPARE_REPORT)
+
 artifact-run: $(RUN_ARTIFACT_SCRIPT)
 	CORT_ARTIFACTS_ROOT="$(ARTIFACTS_ROOT)" BUILD_DIR="$(BUILD_DIR)" STAGE_DIR="$(STAGE_DIR)" $(RUN_ARTIFACT_SCRIPT) $(RUN_DIR)
 
@@ -177,7 +209,6 @@ artifact-subset1a-compare: $(SUBSET1A_COMPARE_ARTIFACT_SCRIPT)
 		FX_SCALAR_JSON="$(FX_SCALAR_JSON)" MX_JSON="$(MX_JSON)" \
 		$(SUBSET1A_COMPARE_ARTIFACT_SCRIPT) $(SCALAR_COMPARE_RUN_DIR)
 
-test: $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(SMOKE_BINARY) check-deps check-exports compare-fx compare-subset1a-fx compare-subset1b-fx compare-subset2a-fx
 artifact-subset2a-compare: $(SUBSET2A_COMPARE_ARTIFACT_SCRIPT)
 	@if [ ! -f "$(FX_CONTAINER_JSON)" ]; then \
 		echo "set FX_CONTAINER_JSON=/path/to/subset2a_container_fx.json"; \
@@ -191,12 +222,13 @@ artifact-subset2a-compare: $(SUBSET2A_COMPARE_ARTIFACT_SCRIPT)
 		FX_CONTAINER_JSON="$(FX_CONTAINER_JSON)" MX_JSON="$(MX_JSON)" \
 		$(SUBSET2A_COMPARE_ARTIFACT_SCRIPT) $(CONTAINER_COMPARE_RUN_DIR)
 
-test: $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(SMOKE_BINARY) check-deps check-exports compare-fx compare-subset1a-fx compare-subset1b-fx compare-subset2a-fx
+test: $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(BPLIST_TEST_BINARY) $(SMOKE_BINARY) check-deps check-exports compare-fx compare-subset1a-fx compare-subset1b-fx compare-subset2a-fx compare-subset3a-fx
 	$(TEST_BINARY)
 	$(ABORT_TEST_BINARY)
 	$(SCALAR_TEST_BINARY)
 	$(STRING_TEST_BINARY)
 	$(CONTAINER_TEST_BINARY)
+	$(BPLIST_TEST_BINARY)
 	$(SMOKE_BINARY)
 
 test-installed: install-stage
@@ -215,7 +247,9 @@ install: $(LIB) README.md
 	$(INSTALL) -m 644 include/CoreFoundation/CFData.h $(INSTALL_INCLUDE_DIR)/CFData.h
 	$(INSTALL) -m 644 include/CoreFoundation/CFDate.h $(INSTALL_INCLUDE_DIR)/CFDate.h
 	$(INSTALL) -m 644 include/CoreFoundation/CFDictionary.h $(INSTALL_INCLUDE_DIR)/CFDictionary.h
+	$(INSTALL) -m 644 include/CoreFoundation/CFError.h $(INSTALL_INCLUDE_DIR)/CFError.h
 	$(INSTALL) -m 644 include/CoreFoundation/CFNumber.h $(INSTALL_INCLUDE_DIR)/CFNumber.h
+	$(INSTALL) -m 644 include/CoreFoundation/CFPropertyList.h $(INSTALL_INCLUDE_DIR)/CFPropertyList.h
 	$(INSTALL) -m 644 include/CoreFoundation/CFString.h $(INSTALL_INCLUDE_DIR)/CFString.h
 	$(INSTALL) -m 644 include/CoreFoundation/CFRuntime.h $(INSTALL_INCLUDE_DIR)/CFRuntime.h
 	$(INSTALL) -m 644 include/CoreFoundation/CoreFoundation.h $(INSTALL_INCLUDE_DIR)/CoreFoundation.h
@@ -250,6 +284,10 @@ $(CONTAINER_TEST_BINARY): $(OBJ_DIR)/tests/container_core_tests.o $(LIB)
 	mkdir -p $(BIN_DIR)
 	$(CC) $(CFLAGS) $(STRICT_CFLAGS) $(LDFLAGS) -o $(CONTAINER_TEST_BINARY) $(OBJ_DIR)/tests/container_core_tests.o $(LIB) -pthread
 
+$(BPLIST_TEST_BINARY): $(OBJ_DIR)/tests/bplist_core_tests.o $(LIB)
+	mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) $(STRICT_CFLAGS) $(LDFLAGS) -o $(BPLIST_TEST_BINARY) $(OBJ_DIR)/tests/bplist_core_tests.o $(LIB) -pthread
+
 $(SMOKE_BINARY): $(OBJ_DIR)/tests/c_consumer_smoke.o $(LIB)
 	mkdir -p $(BIN_DIR)
 	$(CC) $(CFLAGS) $(STRICT_CFLAGS) $(LDFLAGS) -o $(SMOKE_BINARY) $(OBJ_DIR)/tests/c_consumer_smoke.o $(LIB) -pthread
@@ -270,6 +308,10 @@ $(CONTAINER_COMPARE_BINARY): $(OBJ_DIR)/tests/cort_subset2a_container_fx.o $(LIB
 	mkdir -p $(BIN_DIR)
 	$(CC) $(CFLAGS) $(STRICT_CFLAGS) $(LDFLAGS) -o $(CONTAINER_COMPARE_BINARY) $(OBJ_DIR)/tests/cort_subset2a_container_fx.o $(LIB) -pthread
 
+$(BPLIST_COMPARE_BINARY): $(OBJ_DIR)/tests/cort_subset3a_bplist_fx.o $(LIB)
+	mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) $(STRICT_CFLAGS) $(LDFLAGS) -o $(BPLIST_COMPARE_BINARY) $(OBJ_DIR)/tests/cort_subset3a_bplist_fx.o $(LIB) -pthread
+
 $(OBJ_DIR)/src/CFBase.o: src/CFBase.c src/FXCFInternal.h include/CoreFoundation/CFBase.h include/CoreFoundation/CFRuntime.h
 	mkdir -p $(OBJ_DIR)/src
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(STRICT_CFLAGS) -c src/CFBase.c -o $(OBJ_DIR)/src/CFBase.o
@@ -277,6 +319,10 @@ $(OBJ_DIR)/src/CFBase.o: src/CFBase.c src/FXCFInternal.h include/CoreFoundation/
 $(OBJ_DIR)/src/CFArray.o: src/CFArray.c src/FXCFInternal.h include/CoreFoundation/CFArray.h include/CoreFoundation/CFBase.h include/CoreFoundation/CFRuntime.h
 	mkdir -p $(OBJ_DIR)/src
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(STRICT_CFLAGS) -c src/CFArray.c -o $(OBJ_DIR)/src/CFArray.o
+
+$(OBJ_DIR)/src/CFBinaryPList.o: src/CFBinaryPList.c src/FXCFInternal.h include/CoreFoundation/CoreFoundation.h include/CoreFoundation/CFPropertyList.h
+	mkdir -p $(OBJ_DIR)/src
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(STRICT_CFLAGS) -c src/CFBinaryPList.c -o $(OBJ_DIR)/src/CFBinaryPList.o
 
 $(OBJ_DIR)/src/CFData.o: src/CFData.c src/FXCFInternal.h include/CoreFoundation/CFBase.h include/CoreFoundation/CFData.h include/CoreFoundation/CFRuntime.h
 	mkdir -p $(OBJ_DIR)/src
@@ -290,9 +336,17 @@ $(OBJ_DIR)/src/CFDictionary.o: src/CFDictionary.c src/FXCFInternal.h include/Cor
 	mkdir -p $(OBJ_DIR)/src
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(STRICT_CFLAGS) -c src/CFDictionary.c -o $(OBJ_DIR)/src/CFDictionary.o
 
+$(OBJ_DIR)/src/CFError.o: src/CFError.c src/FXCFInternal.h include/CoreFoundation/CFBase.h include/CoreFoundation/CFError.h include/CoreFoundation/CFRuntime.h
+	mkdir -p $(OBJ_DIR)/src
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(STRICT_CFLAGS) -c src/CFError.c -o $(OBJ_DIR)/src/CFError.o
+
 $(OBJ_DIR)/src/CFNumber.o: src/CFNumber.c src/FXCFInternal.h include/CoreFoundation/CFBase.h include/CoreFoundation/CFNumber.h include/CoreFoundation/CFRuntime.h
 	mkdir -p $(OBJ_DIR)/src
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(STRICT_CFLAGS) -c src/CFNumber.c -o $(OBJ_DIR)/src/CFNumber.o
+
+$(OBJ_DIR)/src/CFPropertyList.o: src/CFPropertyList.c src/FXCFInternal.h include/CoreFoundation/CFBase.h include/CoreFoundation/CFData.h include/CoreFoundation/CFError.h include/CoreFoundation/CFPropertyList.h
+	mkdir -p $(OBJ_DIR)/src
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(STRICT_CFLAGS) -c src/CFPropertyList.c -o $(OBJ_DIR)/src/CFPropertyList.o
 
 $(OBJ_DIR)/src/CFString.o: src/CFString.c src/FXCFInternal.h include/CoreFoundation/CFBase.h include/CoreFoundation/CFString.h include/CoreFoundation/CFRuntime.h
 	mkdir -p $(OBJ_DIR)/src
@@ -322,6 +376,10 @@ $(OBJ_DIR)/tests/container_core_tests.o: tests/container_core_tests.c include/Co
 	mkdir -p $(OBJ_DIR)/tests
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(STRICT_CFLAGS) -c tests/container_core_tests.c -o $(OBJ_DIR)/tests/container_core_tests.o
 
+$(OBJ_DIR)/tests/bplist_core_tests.o: tests/bplist_core_tests.c include/CoreFoundation/CoreFoundation.h include/CoreFoundation/CFData.h include/CoreFoundation/CFError.h include/CoreFoundation/CFPropertyList.h
+	mkdir -p $(OBJ_DIR)/tests
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(STRICT_CFLAGS) -c tests/bplist_core_tests.c -o $(OBJ_DIR)/tests/bplist_core_tests.o
+
 $(OBJ_DIR)/tests/c_consumer_smoke.o: tests/c_consumer_smoke.c include/CoreFoundation/CoreFoundation.h include/CoreFoundation/CFBase.h include/CoreFoundation/CFRuntime.h
 	mkdir -p $(OBJ_DIR)/tests
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(STRICT_CFLAGS) -c tests/c_consumer_smoke.c -o $(OBJ_DIR)/tests/c_consumer_smoke.o
@@ -341,6 +399,10 @@ $(OBJ_DIR)/tests/cort_subset1b_cfstring_fx.o: tests/cort_subset1b_cfstring_fx.c 
 $(OBJ_DIR)/tests/cort_subset2a_container_fx.o: tests/cort_subset2a_container_fx.c include/CoreFoundation/CoreFoundation.h include/CoreFoundation/CFArray.h include/CoreFoundation/CFBase.h include/CoreFoundation/CFData.h include/CoreFoundation/CFDictionary.h include/CoreFoundation/CFString.h include/CoreFoundation/CFRuntime.h
 	mkdir -p $(OBJ_DIR)/tests
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(STRICT_CFLAGS) -c tests/cort_subset2a_container_fx.c -o $(OBJ_DIR)/tests/cort_subset2a_container_fx.o
+
+$(OBJ_DIR)/tests/cort_subset3a_bplist_fx.o: tests/cort_subset3a_bplist_fx.c include/CoreFoundation/CoreFoundation.h include/CoreFoundation/CFData.h include/CoreFoundation/CFError.h include/CoreFoundation/CFPropertyList.h
+	mkdir -p $(OBJ_DIR)/tests
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(STRICT_CFLAGS) -c tests/cort_subset3a_bplist_fx.c -o $(OBJ_DIR)/tests/cort_subset3a_bplist_fx.o
 
 clean:
 	rm -rf $(BUILD_DIR) $(STAGE_DIR)

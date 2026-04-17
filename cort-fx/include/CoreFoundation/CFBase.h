@@ -58,6 +58,7 @@ typedef const struct __CFArray *CFArrayRef;
 typedef struct __CFArray *CFMutableArrayRef;
 typedef const struct __CFDictionary *CFDictionaryRef;
 typedef struct __CFDictionary *CFMutableDictionaryRef;
+typedef const struct __CFError *CFErrorRef;
 
 typedef CFTypeRef CFPropertyListRef;
 

@@ -506,7 +506,8 @@ defmodule WorkflowSelfcheck do
           Path.join([artifacts_root, "cort-fx", "build", "out", "subset1_scalar_core_fx.json"]),
           Path.join([artifacts_root, "cort-fx", "build", "out", "subset1b_cfstring_fx.json"]),
           Path.join([artifacts_root, "cort-fx", "build", "out", "subset2a_container_fx.json"]),
-          Path.join([artifacts_root, "cort-fx", "build", "subset2a-exported-symbols.txt"])
+          Path.join([artifacts_root, "cort-fx", "build", "out", "subset3a_bplist_fx.json"]),
+          Path.join([artifacts_root, "cort-fx", "build", "subset3a-exported-symbols.txt"])
         ] do
       unless File.exists?(path) do
         raise RuntimeError, "missing FX test output at #{path}"
@@ -518,6 +519,7 @@ defmodule WorkflowSelfcheck do
     ensure_contains!(output, "PASS scalar_core_tests")
     ensure_contains!(output, "PASS string_core_tests")
     ensure_contains!(output, "PASS container_core_tests")
+    ensure_contains!(output, "PASS bplist_core_tests")
     ensure_contains!(output, "PASS c_consumer_smoke")
   end
 

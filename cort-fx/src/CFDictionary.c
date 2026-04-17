@@ -374,3 +374,15 @@ void CFDictionaryRemoveValue(CFMutableDictionaryRef theDictionary, const void *k
         dictionary->entries[dictionary->count].value = NULL;
     }
 }
+
+CFIndex _FXCFDictionaryFastCount(CFDictionaryRef dictionary) {
+    return ((const struct __CFDictionary *)dictionary)->count;
+}
+
+const void *_FXCFDictionaryFastKeyAtIndex(CFDictionaryRef dictionary, CFIndex idx) {
+    return ((const struct __CFDictionary *)dictionary)->entries[idx].key;
+}
+
+const void *_FXCFDictionaryFastValueAtIndex(CFDictionaryRef dictionary, CFIndex idx) {
+    return ((const struct __CFDictionary *)dictionary)->entries[idx].value;
+}
