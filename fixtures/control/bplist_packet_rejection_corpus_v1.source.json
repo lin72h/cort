@@ -1,0 +1,214 @@
+{
+  "version": 1,
+  "validation_mode": "reject",
+  "format": "LaunchX ControlProtocol binary plist rejection corpus source",
+  "output_format": "LaunchX ControlProtocol binary plist rejection corpus",
+  "generated_from": "tests/fixtures/control/bplist_packet_rejection_corpus_v1.source.json",
+  "cases": [
+    {
+      "id": "request.missing_protocol_version",
+      "kind": "request",
+      "description": "request packet missing protocol_version",
+      "expected_error": {
+        "type": "missing_key",
+        "key": "protocol_version"
+      },
+      "packet": {
+        "service": "control",
+        "method": "health",
+        "params": {}
+      }
+    },
+    {
+      "id": "request.unsupported_version",
+      "kind": "request",
+      "description": "request packet with unsupported protocol_version",
+      "expected_error": {
+        "type": "unsupported_version",
+        "version": 99
+      },
+      "packet": {
+        "protocol_version": 99,
+        "service": "control",
+        "method": "health",
+        "params": {}
+      }
+    },
+    {
+      "id": "request.missing_service",
+      "kind": "request",
+      "description": "request packet missing service",
+      "expected_error": {
+        "type": "missing_key",
+        "key": "service"
+      },
+      "packet": {
+        "protocol_version": 1,
+        "method": "health",
+        "params": {}
+      }
+    },
+    {
+      "id": "request.missing_method",
+      "kind": "request",
+      "description": "request packet missing method",
+      "expected_error": {
+        "type": "missing_key",
+        "key": "method"
+      },
+      "packet": {
+        "protocol_version": 1,
+        "service": "control",
+        "params": {}
+      }
+    },
+    {
+      "id": "request.params_not_object",
+      "kind": "request",
+      "description": "request packet with non-object params",
+      "expected_error": {
+        "type": "missing_key",
+        "key": "params"
+      },
+      "packet": {
+        "protocol_version": 1,
+        "service": "control",
+        "method": "health",
+        "params": "not-an-object"
+      }
+    },
+    {
+      "id": "request.root_not_dictionary",
+      "kind": "request",
+      "description": "request packet whose plist root is an array",
+      "expected_error": {
+        "type": "invalid_packet",
+        "detail": "root property list must be a dictionary"
+      },
+      "packet": [
+        "control",
+        "health"
+      ]
+    },
+    {
+      "id": "response.missing_protocol_version",
+      "kind": "response",
+      "description": "response packet missing protocol_version",
+      "expected_error": {
+        "type": "missing_key",
+        "key": "protocol_version"
+      },
+      "packet": {
+        "status": "ok",
+        "result": {
+          "message": "pong"
+        }
+      }
+    },
+    {
+      "id": "response.unsupported_version",
+      "kind": "response",
+      "description": "response packet with unsupported protocol_version",
+      "expected_error": {
+        "type": "unsupported_version",
+        "version": 99
+      },
+      "packet": {
+        "protocol_version": 99,
+        "status": "ok",
+        "result": {
+          "message": "pong"
+        }
+      }
+    },
+    {
+      "id": "response.missing_status",
+      "kind": "response",
+      "description": "response packet missing status",
+      "expected_error": {
+        "type": "missing_key",
+        "key": "status"
+      },
+      "packet": {
+        "protocol_version": 1,
+        "result": {
+          "message": "pong"
+        }
+      }
+    },
+    {
+      "id": "response.ok_missing_result",
+      "kind": "response",
+      "description": "response packet ok without result",
+      "expected_error": {
+        "type": "missing_key",
+        "key": "result"
+      },
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok"
+      }
+    },
+    {
+      "id": "response.error_missing_error",
+      "kind": "response",
+      "description": "response packet error without error object",
+      "expected_error": {
+        "type": "missing_key",
+        "key": "error"
+      },
+      "packet": {
+        "protocol_version": 1,
+        "status": "error"
+      }
+    },
+    {
+      "id": "response.error_missing_code",
+      "kind": "response",
+      "description": "response packet error missing error.code",
+      "expected_error": {
+        "type": "missing_key",
+        "key": "error.code"
+      },
+      "packet": {
+        "protocol_version": 1,
+        "status": "error",
+        "error": {
+          "message": "missing code"
+        }
+      }
+    },
+    {
+      "id": "response.error_missing_message",
+      "kind": "response",
+      "description": "response packet error missing error.message",
+      "expected_error": {
+        "type": "missing_key",
+        "key": "error.message"
+      },
+      "packet": {
+        "protocol_version": 1,
+        "status": "error",
+        "error": {
+          "code": "failed"
+        }
+      }
+    },
+    {
+      "id": "response.unsupported_status",
+      "kind": "response",
+      "description": "response packet with unsupported status",
+      "expected_error": {
+        "type": "invalid_packet",
+        "detail": "unsupported status partial"
+      },
+      "packet": {
+        "protocol_version": 1,
+        "status": "partial",
+        "result": {
+          "message": "pong"
+        }
+      }
+    }
+  ]
+}

@@ -23,8 +23,20 @@ The Subset 3A FX planning docs live in:
 - `../docs/cort-subset3a-fx-implementation-plan.md`
 - `../docs/cort-subset3a-fixture-corpus.md`
 
-The next planned slice after this proof is the next bounded plist/packet cut
-above 3A. MX and FX contracts still live in `../docs/` and `../cort-mx/`.
+The next planned slice after this proof is Subset 7A control-packet decode
+compatibility on top of the proven plist surface.
+
+The Subset 7A docs live in:
+
+- `../docs/cort-subset7a-control-packet-contract.md`
+- `../docs/cort-subset7a-source-audit-and-readiness.md`
+- `../docs/cort-subset7a-validation-workflow.md`
+
+The shared imported packet corpora live in:
+
+- `../fixtures/control/`
+
+MX and FX contracts still live in `../docs/` and `../cort-mx/`.
 
 It is not the final repository layout. The final target remains
 `../nx/cort/cort-fx/` after explicit permission.

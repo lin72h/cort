@@ -1,0 +1,148 @@
+{
+  "version": 1,
+  "validation_mode": "reject",
+  "format": "LaunchX ControlProtocol binary plist rejection corpus",
+  "generated_from": "tests/fixtures/control/bplist_packet_rejection_corpus_v1.source.json",
+  "cases": [
+    {
+      "id": "request.missing_protocol_version",
+      "kind": "request",
+      "description": "request packet missing protocol_version",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUGVm1ldGhvZFZwYXJhbXNXc2VydmljZVZoZWFsdGjQV2NvbnRyb2wIDxYdJSwtAAAAAAAAAQEAAAAAAAAABwAAAAAAAAAAAAAAAAAAADU=",
+      "expected_error": {
+        "type": "missing_key",
+        "key": "protocol_version"
+      }
+    },
+    {
+      "id": "request.unsupported_version",
+      "kind": "request",
+      "description": "request packet with unsupported protocol_version",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGBwhWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZVZoZWFsdGjQEGNXY29udHJvbAgRGB8yOkFCRAAAAAAAAAEBAAAAAAAAAAkAAAAAAAAAAAAAAAAAAABM",
+      "expected_error": {
+        "type": "unsupported_version",
+        "version": 99
+      }
+    },
+    {
+      "id": "request.missing_service",
+      "kind": "request",
+      "description": "request packet missing service",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUGVm1ldGhvZFZwYXJhbXNfEBBwcm90b2NvbF92ZXJzaW9uVmhlYWx0aNAQAQgPFh0wNzgAAAAAAAABAQAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAOg==",
+      "expected_error": {
+        "type": "missing_key",
+        "key": "service"
+      }
+    },
+    {
+      "id": "request.missing_method",
+      "kind": "request",
+      "description": "request packet missing method",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUGVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZdAQAVdjb250cm9sCA8WKTEyNAAAAAAAAAEBAAAAAAAAAAcAAAAAAAAAAAAAAAAAAAA8",
+      "expected_error": {
+        "type": "missing_key",
+        "key": "method"
+      }
+    },
+    {
+      "id": "request.params_not_object",
+      "kind": "request",
+      "description": "request packet with non-object params",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGBwhWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZVZoZWFsdGhdbm90LWFuLW9iamVjdBABV2NvbnRyb2wIERgfMjpBT1EAAAAAAAABAQAAAAAAAAAJAAAAAAAAAAAAAAAAAAAAWQ==",
+      "expected_error": {
+        "type": "missing_key",
+        "key": "params"
+      }
+    },
+    {
+      "id": "request.root_not_dictionary",
+      "kind": "request",
+      "description": "request packet whose plist root is an array",
+      "payload_base64": "YnBsaXN0MDCiAQJXY29udHJvbFZoZWFsdGgICxMAAAAAAAABAQAAAAAAAAADAAAAAAAAAAAAAAAAAAAAGg==",
+      "expected_error": {
+        "type": "invalid_packet",
+        "detail": "root property list must be a dictionary"
+      }
+    },
+    {
+      "id": "response.missing_protocol_version",
+      "kind": "response",
+      "description": "response packet missing protocol_version",
+      "payload_base64": "YnBsaXN0MDDSAQIDBlZyZXN1bHRWc3RhdHVz0QQFV21lc3NhZ2VUcG9uZ1JvawgNFBseJisAAAAAAAABAQAAAAAAAAAHAAAAAAAAAAAAAAAAAAAALg==",
+      "expected_error": {
+        "type": "missing_key",
+        "key": "protocol_version"
+      }
+    },
+    {
+      "id": "response.unsupported_version",
+      "kind": "response",
+      "description": "response packet with unsupported protocol_version",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUIXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEGPRBgdXbWVzc2FnZVRwb25nUm9rCA8iKTAyNT1CAAAAAAAAAQEAAAAAAAAACQAAAAAAAAAAAAAAAAAAAEU=",
+      "expected_error": {
+        "type": "unsupported_version",
+        "version": 99
+      }
+    },
+    {
+      "id": "response.missing_status",
+      "kind": "response",
+      "description": "response packet missing status",
+      "payload_base64": "YnBsaXN0MDDSAQIDBF8QEHByb3RvY29sX3ZlcnNpb25WcmVzdWx0EAHRBQZXbWVzc2FnZVRwb25nCA0gJyksNAAAAAAAAAEBAAAAAAAAAAcAAAAAAAAAAAAAAAAAAAA5",
+      "expected_error": {
+        "type": "missing_key",
+        "key": "status"
+      }
+    },
+    {
+      "id": "response.ok_missing_result",
+      "kind": "response",
+      "description": "response packet ok without result",
+      "payload_base64": "YnBsaXN0MDDSAQIDBF8QEHByb3RvY29sX3ZlcnNpb25Wc3RhdHVzEAFSb2sIDSAnKQAAAAAAAAEBAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAs",
+      "expected_error": {
+        "type": "missing_key",
+        "key": "result"
+      }
+    },
+    {
+      "id": "response.error_missing_error",
+      "kind": "response",
+      "description": "response packet error without error object",
+      "payload_base64": "YnBsaXN0MDDSAQIDBF8QEHByb3RvY29sX3ZlcnNpb25Wc3RhdHVzEAFVZXJyb3IIDSAnKQAAAAAAAAEBAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAv",
+      "expected_error": {
+        "type": "missing_key",
+        "key": "error"
+      }
+    },
+    {
+      "id": "response.error_missing_code",
+      "kind": "response",
+      "description": "response packet error missing error.code",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAcBVWVycm9yXxAQcHJvdG9jb2xfdmVyc2lvblZzdGF0dXPRBQZXbWVzc2FnZVxtaXNzaW5nIGNvZGUQAQgPFSgvMjpHAAAAAAAAAQEAAAAAAAAACAAAAAAAAAAAAAAAAAAAAEk=",
+      "expected_error": {
+        "type": "missing_key",
+        "key": "error.code"
+      }
+    },
+    {
+      "id": "response.error_missing_message",
+      "kind": "response",
+      "description": "response packet error missing error.message",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAcBVWVycm9yXxAQcHJvdG9jb2xfdmVyc2lvblZzdGF0dXPRBQZUY29kZVZmYWlsZWQQAQgPFSgvMjc+AAAAAAAAAQEAAAAAAAAACAAAAAAAAAAAAAAAAAAAAEA=",
+      "expected_error": {
+        "type": "missing_key",
+        "key": "error.message"
+      }
+    },
+    {
+      "id": "response.unsupported_status",
+      "kind": "response",
+      "description": "response packet with unsupported status",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUIXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHRBgdXbWVzc2FnZVRwb25nV3BhcnRpYWwIDyIpMDI1PUIAAAAAAAABAQAAAAAAAAAJAAAAAAAAAAAAAAAAAAAASg==",
+      "expected_error": {
+        "type": "invalid_packet",
+        "detail": "unsupported status partial"
+      }
+    }
+  ]
+}

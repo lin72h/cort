@@ -1,0 +1,1535 @@
+{
+  "version": 1,
+  "validation_mode": "accept",
+  "format": "LaunchX ControlProtocol binary plist corpus source",
+  "output_format": "LaunchX ControlProtocol binary plist corpus",
+  "generated_from": "tests/fixtures/control/bplist_packet_corpus_v1.source.json",
+  "cases": [
+    {
+      "id": "request.control.health",
+      "kind": "request",
+      "description": "control health request",
+      "packet": {
+        "protocol_version": 1,
+        "service": "control",
+        "method": "health",
+        "params": {}
+      }
+    },
+    {
+      "id": "request.control.capabilities",
+      "kind": "request",
+      "description": "control capabilities request",
+      "packet": {
+        "protocol_version": 1,
+        "service": "control",
+        "method": "capabilities",
+        "params": {}
+      }
+    },
+    {
+      "id": "request.diagnostics.snapshot",
+      "kind": "request",
+      "description": "diagnostics snapshot request",
+      "packet": {
+        "protocol_version": 1,
+        "service": "diagnostics",
+        "method": "snapshot",
+        "params": {}
+      }
+    },
+    {
+      "id": "request.notify.register_check.local",
+      "kind": "request",
+      "description": "notify register_check local request",
+      "packet": {
+        "protocol_version": 1,
+        "service": "notify",
+        "method": "register_check",
+        "params": {
+          "name": "com.launchx.fixture.check",
+          "scope": "local"
+        }
+      }
+    },
+    {
+      "id": "request.notify.register_check.default_scope",
+      "kind": "request",
+      "description": "notify register_check request using default local scope",
+      "packet": {
+        "protocol_version": 1,
+        "service": "notify",
+        "method": "register_check",
+        "params": {
+          "name": "com.launchx.fixture.check"
+        }
+      }
+    },
+    {
+      "id": "request.notify.register_check.cluster",
+      "kind": "request",
+      "description": "notify register_check cluster request",
+      "packet": {
+        "protocol_version": 1,
+        "service": "notify",
+        "method": "register_check",
+        "params": {
+          "name": "com.launchx.fixture.check",
+          "scope": "cluster"
+        }
+      }
+    },
+    {
+      "id": "request.notify.post.local",
+      "kind": "request",
+      "description": "notify post local request",
+      "packet": {
+        "protocol_version": 1,
+        "service": "notify",
+        "method": "post",
+        "params": {
+          "name": "com.launchx.fixture.check",
+          "scope": "local"
+        }
+      }
+    },
+    {
+      "id": "request.notify.post.default_scope",
+      "kind": "request",
+      "description": "notify post request using default local scope",
+      "packet": {
+        "protocol_version": 1,
+        "service": "notify",
+        "method": "post",
+        "params": {
+          "name": "com.launchx.fixture.check"
+        }
+      }
+    },
+    {
+      "id": "request.notify.post.cluster",
+      "kind": "request",
+      "description": "notify post cluster request",
+      "packet": {
+        "protocol_version": 1,
+        "service": "notify",
+        "method": "post",
+        "params": {
+          "name": "com.launchx.fixture.check",
+          "scope": "cluster"
+        }
+      }
+    },
+    {
+      "id": "request.notify.check.expected_session",
+      "kind": "request",
+      "description": "notify check with expected daemon session",
+      "packet": {
+        "protocol_version": 1,
+        "service": "notify",
+        "method": "check",
+        "params": {
+          "token": 42,
+          "expected_session_id": "session-alpha"
+        }
+      }
+    },
+    {
+      "id": "request.notify.cancel.expected_session",
+      "kind": "request",
+      "description": "notify cancel with expected daemon session",
+      "packet": {
+        "protocol_version": 1,
+        "service": "notify",
+        "method": "cancel",
+        "params": {
+          "token": 42,
+          "expected_session_id": "session-alpha"
+        }
+      }
+    },
+    {
+      "id": "request.notify.suspend.expected_session",
+      "kind": "request",
+      "description": "notify suspend with expected daemon session",
+      "packet": {
+        "protocol_version": 1,
+        "service": "notify",
+        "method": "suspend",
+        "params": {
+          "token": 42,
+          "expected_session_id": "session-alpha"
+        }
+      }
+    },
+    {
+      "id": "request.notify.resume.expected_session",
+      "kind": "request",
+      "description": "notify resume with expected daemon session",
+      "packet": {
+        "protocol_version": 1,
+        "service": "notify",
+        "method": "resume",
+        "params": {
+          "token": 77,
+          "expected_session_id": "session-fd"
+        }
+      }
+    },
+    {
+      "id": "request.notify.set_state.expected_session",
+      "kind": "request",
+      "description": "notify set_state with expected daemon session and signed state payload",
+      "packet": {
+        "protocol_version": 1,
+        "service": "notify",
+        "method": "set_state",
+        "params": {
+          "token": 42,
+          "state": -1,
+          "expected_session_id": "session-alpha"
+        }
+      }
+    },
+    {
+      "id": "request.notify.get_state.expected_session",
+      "kind": "request",
+      "description": "notify get_state with expected daemon session",
+      "packet": {
+        "protocol_version": 1,
+        "service": "notify",
+        "method": "get_state",
+        "params": {
+          "token": 42,
+          "expected_session_id": "session-alpha"
+        }
+      }
+    },
+    {
+      "id": "request.notify.is_valid_token.expected_session",
+      "kind": "request",
+      "description": "notify is_valid_token with expected daemon session",
+      "packet": {
+        "protocol_version": 1,
+        "service": "notify",
+        "method": "is_valid_token",
+        "params": {
+          "token": 42,
+          "expected_session_id": "session-alpha"
+        }
+      }
+    },
+    {
+      "id": "request.notify.list_names",
+      "kind": "request",
+      "description": "notify list_names request",
+      "packet": {
+        "protocol_version": 1,
+        "service": "notify",
+        "method": "list_names",
+        "params": {}
+      }
+    },
+    {
+      "id": "request.notify.register_dispatch.default_scope",
+      "kind": "request",
+      "description": "notify dispatch registration request using default local scope",
+      "packet": {
+        "protocol_version": 1,
+        "service": "notify",
+        "method": "register_dispatch",
+        "params": {
+          "name": "com.launchx.fixture.dispatch",
+          "queue_name": "main"
+        }
+      }
+    },
+    {
+      "id": "request.notify.register_signal.targeted",
+      "kind": "request",
+      "description": "notify signal registration request with explicit target pid",
+      "packet": {
+        "protocol_version": 1,
+        "service": "notify",
+        "method": "register_signal",
+        "params": {
+          "name": "com.launchx.fixture.signal",
+          "scope": "local",
+          "signal": 30,
+          "target_pid": 4321
+        }
+      }
+    },
+    {
+      "id": "request.notify.register_signal.default_scope",
+      "kind": "request",
+      "description": "notify signal registration request using default local scope",
+      "packet": {
+        "protocol_version": 1,
+        "service": "notify",
+        "method": "register_signal",
+        "params": {
+          "name": "com.launchx.fixture.signal",
+          "signal": 30
+        }
+      }
+    },
+    {
+      "id": "request.notify.register_file_descriptor.new_binding",
+      "kind": "request",
+      "description": "notify fd registration request creating a new binding",
+      "packet": {
+        "protocol_version": 1,
+        "service": "notify",
+        "method": "register_file_descriptor",
+        "params": {
+          "client_registration_id": "binding-alpha",
+          "name": "com.launchx.fixture.fd.new",
+          "scope": "local"
+        }
+      }
+    },
+    {
+      "id": "request.notify.register_file_descriptor.new_binding.default_scope",
+      "kind": "request",
+      "description": "notify fd registration request creating a new binding using default local scope",
+      "packet": {
+        "protocol_version": 1,
+        "service": "notify",
+        "method": "register_file_descriptor",
+        "params": {
+          "client_registration_id": "binding-alpha",
+          "name": "com.launchx.fixture.fd.new"
+        }
+      }
+    },
+    {
+      "id": "request.notify.register_file_descriptor.reuse",
+      "kind": "request",
+      "description": "notify fd registration reuse request",
+      "packet": {
+        "protocol_version": 1,
+        "service": "notify",
+        "method": "register_file_descriptor",
+        "params": {
+          "client_registration_id": "binding-alpha",
+          "name": "com.launchx.fixture.fd",
+          "reuse_existing_binding": true,
+          "scope": "local"
+        }
+      }
+    },
+    {
+      "id": "request.notify.prepare_file_descriptor_delivery.reuse",
+      "kind": "request",
+      "description": "notify fd delivery preparation reuse request",
+      "packet": {
+        "protocol_version": 1,
+        "service": "notify",
+        "method": "prepare_file_descriptor_delivery",
+        "params": {
+          "client_registration_id": "binding-alpha",
+          "name": "com.launchx.fixture.fd",
+          "reuse_existing_binding": true,
+          "scope": "local"
+        }
+      }
+    },
+    {
+      "id": "request.notify.prepare_file_descriptor_delivery.reuse.default_scope",
+      "kind": "request",
+      "description": "notify fd delivery preparation reuse request using default local scope",
+      "packet": {
+        "protocol_version": 1,
+        "service": "notify",
+        "method": "prepare_file_descriptor_delivery",
+        "params": {
+          "client_registration_id": "binding-alpha",
+          "name": "com.launchx.fixture.fd",
+          "reuse_existing_binding": true
+        }
+      }
+    },
+    {
+      "id": "response.notify.post.success",
+      "kind": "response",
+      "description": "notify post success with generation and delivered tokens",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "name": {
+            "scope": "local",
+            "name": "com.launchx.fixture.check",
+            "generation": 5,
+            "state": 7,
+            "updated_at": {
+              "$date": "2026-04-16T12:00:06Z"
+            },
+            "last_posted_at": {
+              "$date": "2026-04-16T12:00:06Z"
+            }
+          },
+          "generation": 5,
+          "posted_at": {
+            "$date": "2026-04-16T12:00:06Z"
+          },
+          "delivered_tokens": [
+            42
+          ]
+        }
+      }
+    },
+    {
+      "id": "response.notify.post.cluster.success",
+      "kind": "response",
+      "description": "notify cluster post success with generation and delivered tokens",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "name": {
+            "scope": "cluster",
+            "name": "com.launchx.fixture.check",
+            "generation": 1,
+            "state": 29,
+            "updated_at": {
+              "$date": "2026-04-16T12:00:11Z"
+            },
+            "last_posted_at": {
+              "$date": "2026-04-16T12:00:11Z"
+            }
+          },
+          "generation": 1,
+          "posted_at": {
+            "$date": "2026-04-16T12:00:11Z"
+          },
+          "delivered_tokens": []
+        }
+      }
+    },
+    {
+      "id": "response.notify.registration.signal.success",
+      "kind": "response",
+      "description": "notify signal registration success",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "registration": {
+            "token": 51,
+            "session_id": "session-signal",
+            "scope": "local",
+            "name": "com.launchx.fixture.signal",
+            "delivery_method": "signal",
+            "delivery_state": "active",
+            "signal": 30,
+            "target_pid": 4321,
+            "queue_name": null,
+            "local_transport_binding_id": null,
+            "local_transport_handle": null,
+            "suspend_depth": 0,
+            "valid": true,
+            "created_at": {
+              "$date": "2026-04-16T12:00:07Z"
+            },
+            "last_seen_generation": 0,
+            "first_check_pending": true,
+            "pending_generation": null,
+            "last_checked_at": null
+          }
+        }
+      }
+    },
+    {
+      "id": "response.notify.registration.file_descriptor.success",
+      "kind": "response",
+      "description": "notify file descriptor registration success",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "registration": {
+            "token": 77,
+            "session_id": "session-fd",
+            "scope": "local",
+            "name": "com.launchx.fixture.fd.new",
+            "delivery_method": "file_descriptor",
+            "delivery_state": "active",
+            "signal": null,
+            "target_pid": null,
+            "queue_name": null,
+            "local_transport_binding_id": "binding-alpha",
+            "local_transport_handle": "/tmp/launchx-notify-fixture.sock",
+            "suspend_depth": 0,
+            "valid": true,
+            "created_at": {
+              "$date": "2026-04-16T12:00:07Z"
+            },
+            "last_seen_generation": 0,
+            "first_check_pending": true,
+            "pending_generation": null,
+            "last_checked_at": null
+          }
+        }
+      }
+    },
+    {
+      "id": "response.notify.registration.file_descriptor.reuse.success",
+      "kind": "response",
+      "description": "notify file descriptor reuse registration success",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "registration": {
+            "token": 78,
+            "session_id": "session-fd",
+            "scope": "local",
+            "name": "com.launchx.fixture.fd",
+            "delivery_method": "file_descriptor",
+            "delivery_state": "active",
+            "signal": null,
+            "target_pid": null,
+            "queue_name": null,
+            "local_transport_binding_id": "binding-alpha",
+            "local_transport_handle": "/tmp/launchx-notify-fixture.sock",
+            "suspend_depth": 0,
+            "valid": true,
+            "created_at": {
+              "$date": "2026-04-16T12:00:08Z"
+            },
+            "last_seen_generation": 0,
+            "first_check_pending": true,
+            "pending_generation": null,
+            "last_checked_at": null
+          }
+        }
+      }
+    },
+    {
+      "id": "response.notify.cancel.success",
+      "kind": "response",
+      "description": "notify cancel success with invalidated registration",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "canceled": true,
+          "registration": {
+            "token": 42,
+            "session_id": "session-alpha",
+            "scope": "local",
+            "name": "com.launchx.fixture.check",
+            "delivery_method": "check",
+            "delivery_state": "active",
+            "signal": null,
+            "target_pid": null,
+            "queue_name": null,
+            "local_transport_binding_id": null,
+            "local_transport_handle": null,
+            "suspend_depth": 0,
+            "valid": false,
+            "created_at": {
+              "$date": "2026-04-16T12:00:04Z"
+            },
+            "last_seen_generation": 4,
+            "first_check_pending": false,
+            "pending_generation": null,
+            "last_checked_at": {
+              "$date": "2026-04-16T12:00:05Z"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "response.notify.suspend.success",
+      "kind": "response",
+      "description": "notify suspend success increases suspend depth",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "token": 42,
+          "session_id": "session-alpha",
+          "scope": "local",
+          "name": "com.launchx.fixture.check",
+          "delivery_method": "check",
+          "delivery_state": "active",
+          "signal": null,
+          "target_pid": null,
+          "queue_name": null,
+          "local_transport_binding_id": null,
+          "local_transport_handle": null,
+          "suspend_depth": 1,
+          "valid": true,
+          "created_at": {
+            "$date": "2026-04-16T12:00:04Z"
+          },
+          "last_seen_generation": 4,
+          "first_check_pending": false,
+          "pending_generation": null,
+          "last_checked_at": {
+            "$date": "2026-04-16T12:00:05Z"
+          }
+        }
+      }
+    },
+    {
+      "id": "response.notify.set_state.success",
+      "kind": "response",
+      "description": "notify set_state success preserving signed state payload",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "state": -1,
+          "name": {
+            "scope": "local",
+            "name": "com.launchx.fixture.check",
+            "generation": 4,
+            "state": -1,
+            "updated_at": {
+              "$date": "2026-04-16T12:00:05Z"
+            },
+            "last_posted_at": {
+              "$date": "2026-04-16T12:00:06Z"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "response.notify.get_state.success",
+      "kind": "response",
+      "description": "notify get_state success preserving signed state payload",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "state": -1,
+          "name": {
+            "scope": "local",
+            "name": "com.launchx.fixture.check",
+            "generation": 4,
+            "state": -1,
+            "updated_at": {
+              "$date": "2026-04-16T12:00:05Z"
+            },
+            "last_posted_at": {
+              "$date": "2026-04-16T12:00:06Z"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "response.notify.registration.dispatch.success",
+      "kind": "response",
+      "description": "notify dispatch registration success",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "registration": {
+            "token": 88,
+            "session_id": "session-dispatch",
+            "scope": "local",
+            "name": "com.launchx.fixture.dispatch",
+            "delivery_method": "dispatch",
+            "delivery_state": "active",
+            "signal": null,
+            "target_pid": null,
+            "queue_name": "main",
+            "local_transport_binding_id": null,
+            "local_transport_handle": null,
+            "suspend_depth": 0,
+            "valid": true,
+            "created_at": {
+              "$date": "2026-04-16T12:00:09Z"
+            },
+            "last_seen_generation": 0,
+            "first_check_pending": true,
+            "pending_generation": null,
+            "last_checked_at": null
+          }
+        }
+      }
+    },
+    {
+      "id": "response.notify.is_valid_token.false",
+      "kind": "response",
+      "description": "notify is_valid_token false response",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "valid": false
+        }
+      }
+    },
+    {
+      "id": "response.notify.post.dispatch.success",
+      "kind": "response",
+      "description": "notify post success for dispatch shape with no delivered tokens",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "name": {
+            "scope": "local",
+            "name": "com.launchx.fixture.dispatch",
+            "generation": 1,
+            "state": 0,
+            "updated_at": {
+              "$date": "2026-04-16T12:00:10Z"
+            },
+            "last_posted_at": {
+              "$date": "2026-04-16T12:00:10Z"
+            }
+          },
+          "generation": 1,
+          "posted_at": {
+            "$date": "2026-04-16T12:00:10Z"
+          },
+          "delivered_tokens": []
+        }
+      }
+    },
+    {
+      "id": "response.notify.resume.success",
+      "kind": "response",
+      "description": "notify resume success for healthy signal delivery",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "token": 51,
+          "session_id": "session-signal",
+          "scope": "local",
+          "name": "com.launchx.fixture.signal",
+          "delivery_method": "signal",
+          "delivery_state": "active",
+          "signal": 30,
+          "target_pid": 4321,
+          "queue_name": null,
+          "local_transport_binding_id": null,
+          "local_transport_handle": null,
+          "suspend_depth": 0,
+          "valid": true,
+          "created_at": {
+            "$date": "2026-04-16T12:00:07Z"
+          },
+          "last_seen_generation": 0,
+          "first_check_pending": true,
+          "pending_generation": null,
+          "last_checked_at": null
+        }
+      }
+    },
+    {
+      "id": "response.notify.list_names.scoped",
+      "kind": "response",
+      "description": "notify list_names response with local and cluster scope entries",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": [
+          {
+            "scope": "local",
+            "name": "com.launchx.fixture.check",
+            "generation": 4,
+            "state": -1,
+            "updated_at": {
+              "$date": "2026-04-16T12:00:05Z"
+            },
+            "last_posted_at": {
+              "$date": "2026-04-16T12:00:06Z"
+            }
+          },
+          {
+            "scope": "cluster",
+            "name": "com.launchx.fixture.check",
+            "generation": 1,
+            "state": 29,
+            "updated_at": {
+              "$date": "2026-04-16T12:00:08Z"
+            },
+            "last_posted_at": {
+              "$date": "2026-04-16T12:00:08Z"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "response.notify.resume.failed_after_pending_suspend",
+      "kind": "response",
+      "description": "notify resume exposes failed_after_pending_suspend and pending generation",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "token": 77,
+          "session_id": "session-fd",
+          "scope": "local",
+          "name": "com.launchx.fixture.fd.new",
+          "delivery_method": "file_descriptor",
+          "delivery_state": "failed_after_pending_suspend",
+          "signal": null,
+          "target_pid": null,
+          "queue_name": null,
+          "local_transport_binding_id": "binding-alpha",
+          "local_transport_handle": "/tmp/launchx-notify-fixture.sock",
+          "suspend_depth": 0,
+          "valid": true,
+          "created_at": {
+            "$date": "2026-04-16T12:00:07Z"
+          },
+          "last_seen_generation": 0,
+          "first_check_pending": true,
+          "pending_generation": 5,
+          "last_checked_at": null
+        }
+      }
+    },
+    {
+      "id": "response.notify.registration.check.success",
+      "kind": "response",
+      "description": "notify check registration success",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "registration": {
+            "token": 42,
+            "session_id": "session-alpha",
+            "scope": "local",
+            "name": "com.launchx.fixture.check",
+            "delivery_method": "check",
+            "delivery_state": "active",
+            "signal": null,
+            "target_pid": null,
+            "queue_name": null,
+            "local_transport_binding_id": null,
+            "local_transport_handle": null,
+            "suspend_depth": 0,
+            "valid": true,
+            "created_at": {
+              "$date": "2026-04-16T12:00:04Z"
+            },
+            "last_seen_generation": 0,
+            "first_check_pending": true,
+            "pending_generation": null,
+            "last_checked_at": null
+          }
+        }
+      }
+    },
+    {
+      "id": "response.notify.registration.check.cluster.success",
+      "kind": "response",
+      "description": "notify check registration success for cluster scope",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "registration": {
+            "token": 43,
+            "session_id": "session-cluster",
+            "scope": "cluster",
+            "name": "com.launchx.fixture.check",
+            "delivery_method": "check",
+            "delivery_state": "active",
+            "signal": null,
+            "target_pid": null,
+            "queue_name": null,
+            "local_transport_binding_id": null,
+            "local_transport_handle": null,
+            "suspend_depth": 0,
+            "valid": true,
+            "created_at": {
+              "$date": "2026-04-16T12:00:04Z"
+            },
+            "last_seen_generation": 0,
+            "first_check_pending": true,
+            "pending_generation": null,
+            "last_checked_at": null
+          }
+        }
+      }
+    },
+    {
+      "id": "response.notify.check.changed.success",
+      "kind": "response",
+      "description": "notify check changed success",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "changed": true,
+          "generation": 4,
+          "current_state": 7,
+          "registration": {
+            "token": 42,
+            "session_id": "session-alpha",
+            "scope": "local",
+            "name": "com.launchx.fixture.check",
+            "delivery_method": "check",
+            "delivery_state": "active",
+            "signal": null,
+            "target_pid": null,
+            "queue_name": null,
+            "local_transport_binding_id": null,
+            "local_transport_handle": null,
+            "suspend_depth": 0,
+            "valid": true,
+            "created_at": {
+              "$date": "2026-04-16T12:00:04Z"
+            },
+            "last_seen_generation": 4,
+            "first_check_pending": false,
+            "pending_generation": null,
+            "last_checked_at": {
+              "$date": "2026-04-16T12:00:05Z"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "response.notify.check.cluster.changed.success",
+      "kind": "response",
+      "description": "notify cluster check changed success after cluster post",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "changed": true,
+          "generation": 1,
+          "current_state": 29,
+          "registration": {
+            "token": 43,
+            "session_id": "session-cluster",
+            "scope": "cluster",
+            "name": "com.launchx.fixture.check",
+            "delivery_method": "check",
+            "delivery_state": "active",
+            "signal": null,
+            "target_pid": null,
+            "queue_name": null,
+            "local_transport_binding_id": null,
+            "local_transport_handle": null,
+            "suspend_depth": 0,
+            "valid": true,
+            "created_at": {
+              "$date": "2026-04-16T12:00:04Z"
+            },
+            "last_seen_generation": 1,
+            "first_check_pending": false,
+            "pending_generation": null,
+            "last_checked_at": {
+              "$date": "2026-04-16T12:00:11Z"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "response.notify.check.unchanged.success",
+      "kind": "response",
+      "description": "notify check unchanged success for cluster token after local-only post",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "changed": false,
+          "generation": 0,
+          "current_state": 29,
+          "registration": {
+            "token": 43,
+            "session_id": "session-cluster",
+            "scope": "cluster",
+            "name": "com.launchx.fixture.check",
+            "delivery_method": "check",
+            "delivery_state": "active",
+            "signal": null,
+            "target_pid": null,
+            "queue_name": null,
+            "local_transport_binding_id": null,
+            "local_transport_handle": null,
+            "suspend_depth": 0,
+            "valid": true,
+            "created_at": {
+              "$date": "2026-04-16T12:00:04Z"
+            },
+            "last_seen_generation": 0,
+            "first_check_pending": false,
+            "pending_generation": null,
+            "last_checked_at": {
+              "$date": "2026-04-16T12:00:06Z"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "response.control.capabilities.notify.enabled",
+      "kind": "response",
+      "description": "control capabilities response with notify support enabled",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "feature_flags": [
+            "control_socket_bootstrap",
+            "userspace_jobs",
+            "seqpacket_control",
+            "native_process_lifecycle_v1",
+            "native_spawn_setup_v1",
+            "launchctl_wrapper_v1",
+            "userspace_notify",
+            "notify_registry_v1"
+          ],
+          "supports_native_macos_passthrough": false,
+          "supports_userspace_jobs": true,
+          "supports_userspace_notify": true,
+          "supports_cluster_overlay": false,
+          "supports_notify_fast_path": false,
+          "supports_launchctl_wrapper": true
+        }
+      }
+    },
+    {
+      "id": "response.control.health.healthy",
+      "kind": "response",
+      "description": "control health healthy response with omitted optional output-status fields",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "state": "healthy",
+          "reasons": [],
+          "observed_at": {
+            "$date": "2026-04-16T12:00:00Z"
+          },
+          "job_persistence": {
+            "state": "healthy",
+            "dirty": false,
+            "last_error": null,
+            "last_attempted_at": null,
+            "last_persisted_at": null,
+            "retry_scheduled": false
+          },
+          "notify_persistence": {
+            "state": "healthy",
+            "dirty": false,
+            "last_error": null,
+            "last_attempted_at": null,
+            "last_persisted_at": null,
+            "retry_scheduled": false
+          },
+          "notify_fast_path": {
+            "state": "healthy",
+            "dirty": false,
+            "last_error": null,
+            "last_attempted_at": null,
+            "last_persisted_at": null,
+            "retry_scheduled": false
+          }
+        }
+      }
+    },
+    {
+      "id": "response.control.health.notify_persistence.degraded",
+      "kind": "response",
+      "description": "control health degraded notify persistence",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "state": "degraded",
+          "reasons": [
+            {
+              "component": "notify_persistence",
+              "issue": "persistence_retry_pending",
+              "last_error": "simulated_notify_disk_full"
+            }
+          ],
+          "observed_at": {
+            "$date": "2026-04-16T12:00:00Z"
+          },
+          "job_persistence": {
+            "state": "healthy",
+            "dirty": false,
+            "last_error": null,
+            "last_attempted_at": {
+              "$date": "2026-04-16T12:00:01Z"
+            },
+            "last_persisted_at": {
+              "$date": "2026-04-16T12:00:02Z"
+            },
+            "retry_scheduled": false
+          },
+          "notify_persistence": {
+            "state": "degraded",
+            "dirty": true,
+            "last_error": "simulated_notify_disk_full",
+            "last_attempted_at": {
+              "$date": "2026-04-16T12:00:01Z"
+            },
+            "last_persisted_at": null,
+            "retry_scheduled": true
+          },
+          "notify_fast_path": {
+            "state": "healthy",
+            "dirty": false,
+            "last_error": null,
+            "last_attempted_at": {
+              "$date": "2026-04-16T12:00:01Z"
+            },
+            "last_persisted_at": {
+              "$date": "2026-04-16T12:00:02Z"
+            },
+            "retry_scheduled": false
+          }
+        }
+      }
+    },
+    {
+      "id": "response.diagnostics.snapshot.notify_fast_path.degraded",
+      "kind": "response",
+      "description": "diagnostics snapshot degraded notify fast path",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "daemon": {
+            "daemon_id": "daemon-fixture",
+            "node_id": "launchx-swift@fixture-host",
+            "hostname": "fixture-host",
+            "runtime_mode": "standalone",
+            "version": "dev-fixture",
+            "control_socket_path": "/tmp/launchx-fixture.sock",
+            "started_at": {
+              "$date": "2026-04-16T12:00:00Z"
+            },
+            "cluster_enabled": false,
+            "notify_fast_path_enabled": true
+          },
+          "health": {
+            "state": "degraded",
+            "reasons": [
+              {
+                "component": "notify_fast_path",
+                "issue": "fast_path_retry_pending",
+                "last_error": "simulated_fast_path_error"
+              }
+            ],
+            "observed_at": {
+              "$date": "2026-04-16T12:00:00Z"
+            },
+            "job_persistence": {
+              "state": "healthy",
+              "dirty": false,
+              "last_error": null,
+              "last_attempted_at": {
+                "$date": "2026-04-16T12:00:01Z"
+              },
+              "last_persisted_at": {
+                "$date": "2026-04-16T12:00:02Z"
+              },
+              "retry_scheduled": false
+            },
+            "notify_persistence": {
+              "state": "healthy",
+              "dirty": false,
+              "last_error": null,
+              "last_attempted_at": {
+                "$date": "2026-04-16T12:00:01Z"
+              },
+              "last_persisted_at": {
+                "$date": "2026-04-16T12:00:02Z"
+              },
+              "retry_scheduled": false
+            },
+            "notify_fast_path": {
+              "state": "degraded",
+              "dirty": true,
+              "last_error": "simulated_fast_path_error",
+              "last_attempted_at": {
+                "$date": "2026-04-16T12:00:01Z"
+              },
+              "last_persisted_at": null,
+              "retry_scheduled": true
+            }
+          },
+          "capabilities": {
+            "feature_flags": [
+              "userspace_notify",
+              "notify_registry_v1"
+            ],
+            "supports_native_macos_passthrough": false,
+            "supports_userspace_jobs": true,
+            "supports_userspace_notify": true,
+            "supports_cluster_overlay": false,
+            "supports_notify_fast_path": true,
+            "supports_launchctl_wrapper": false
+          },
+          "jobs": [],
+          "notify_names": [
+            {
+              "scope": "local",
+              "name": "com.launchx.fixture.check",
+              "generation": 4,
+              "state": 7,
+              "updated_at": {
+                "$date": "2026-04-16T12:00:03Z"
+              },
+              "last_posted_at": {
+                "$date": "2026-04-16T12:00:01Z"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "response.control.health.notify_persistence.recovered",
+      "kind": "response",
+      "description": "control health recovered notify persistence",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "state": "healthy",
+          "reasons": [],
+          "observed_at": {
+            "$date": "2026-04-16T12:00:06Z"
+          },
+          "job_persistence": {
+            "state": "healthy",
+            "dirty": false,
+            "last_error": null,
+            "last_attempted_at": {
+              "$date": "2026-04-16T12:00:05Z"
+            },
+            "last_persisted_at": {
+              "$date": "2026-04-16T12:00:06Z"
+            },
+            "retry_scheduled": false
+          },
+          "notify_persistence": {
+            "state": "healthy",
+            "dirty": false,
+            "last_error": null,
+            "last_attempted_at": {
+              "$date": "2026-04-16T12:00:05Z"
+            },
+            "last_persisted_at": {
+              "$date": "2026-04-16T12:00:06Z"
+            },
+            "retry_scheduled": false
+          },
+          "notify_fast_path": {
+            "state": "healthy",
+            "dirty": false,
+            "last_error": null,
+            "last_attempted_at": {
+              "$date": "2026-04-16T12:00:05Z"
+            },
+            "last_persisted_at": {
+              "$date": "2026-04-16T12:00:06Z"
+            },
+            "retry_scheduled": false
+          }
+        }
+      }
+    },
+    {
+      "id": "response.diagnostics.snapshot.notify_enabled.healthy",
+      "kind": "response",
+      "description": "diagnostics snapshot healthy with notify enabled and omitted optional output-status fields",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "daemon": {
+            "daemon_id": "daemon-fixture",
+            "node_id": "launchx-swift@fixture-host",
+            "hostname": "fixture-host",
+            "runtime_mode": "standalone",
+            "version": "dev-fixture",
+            "control_socket_path": "/tmp/launchx-fixture.sock",
+            "started_at": {
+              "$date": "2026-04-16T12:00:06Z"
+            },
+            "cluster_enabled": false,
+            "notify_fast_path_enabled": true
+          },
+          "health": {
+            "state": "healthy",
+            "reasons": [],
+            "observed_at": {
+              "$date": "2026-04-16T12:00:06Z"
+            },
+            "job_persistence": {
+              "state": "healthy",
+              "dirty": false,
+              "last_error": null,
+              "last_attempted_at": null,
+              "last_persisted_at": null,
+              "retry_scheduled": false
+            },
+            "notify_persistence": {
+              "state": "healthy",
+              "dirty": false,
+              "last_error": null,
+              "last_attempted_at": null,
+              "last_persisted_at": null,
+              "retry_scheduled": false
+            },
+            "notify_fast_path": {
+              "state": "healthy",
+              "dirty": false,
+              "last_error": null,
+              "last_attempted_at": null,
+              "last_persisted_at": null,
+              "retry_scheduled": false
+            }
+          },
+          "capabilities": {
+            "feature_flags": [
+              "userspace_notify",
+              "notify_registry_v1"
+            ],
+            "supports_native_macos_passthrough": false,
+            "supports_userspace_jobs": true,
+            "supports_userspace_notify": true,
+            "supports_cluster_overlay": false,
+            "supports_notify_fast_path": true,
+            "supports_launchctl_wrapper": false
+          },
+          "jobs": [],
+          "notify_names": [
+            {
+              "scope": "local",
+              "name": "com.launchx.fixture.check",
+              "generation": 4,
+              "state": 7,
+              "updated_at": {
+                "$date": "2026-04-16T12:00:06Z"
+              },
+              "last_posted_at": {
+                "$date": "2026-04-16T12:00:01Z"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "response.diagnostics.snapshot.notify_fast_path.recovered",
+      "kind": "response",
+      "description": "diagnostics snapshot recovered notify fast path",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "daemon": {
+            "daemon_id": "daemon-fixture",
+            "node_id": "launchx-swift@fixture-host",
+            "hostname": "fixture-host",
+            "runtime_mode": "standalone",
+            "version": "dev-fixture",
+            "control_socket_path": "/tmp/launchx-fixture.sock",
+            "started_at": {
+              "$date": "2026-04-16T12:00:00Z"
+            },
+            "cluster_enabled": false,
+            "notify_fast_path_enabled": true
+          },
+          "health": {
+            "state": "healthy",
+            "reasons": [],
+            "observed_at": {
+              "$date": "2026-04-16T12:00:06Z"
+            },
+            "job_persistence": {
+              "state": "healthy",
+              "dirty": false,
+              "last_error": null,
+              "last_attempted_at": {
+                "$date": "2026-04-16T12:00:05Z"
+              },
+              "last_persisted_at": {
+                "$date": "2026-04-16T12:00:06Z"
+              },
+              "retry_scheduled": false
+            },
+            "notify_persistence": {
+              "state": "healthy",
+              "dirty": false,
+              "last_error": null,
+              "last_attempted_at": {
+                "$date": "2026-04-16T12:00:05Z"
+              },
+              "last_persisted_at": {
+                "$date": "2026-04-16T12:00:06Z"
+              },
+              "retry_scheduled": false
+            },
+            "notify_fast_path": {
+              "state": "healthy",
+              "dirty": false,
+              "last_error": null,
+              "last_attempted_at": {
+                "$date": "2026-04-16T12:00:05Z"
+              },
+              "last_persisted_at": {
+                "$date": "2026-04-16T12:00:06Z"
+              },
+              "retry_scheduled": false
+            }
+          },
+          "capabilities": {
+            "feature_flags": [
+              "userspace_notify",
+              "notify_registry_v1"
+            ],
+            "supports_native_macos_passthrough": false,
+            "supports_userspace_jobs": true,
+            "supports_userspace_notify": true,
+            "supports_cluster_overlay": false,
+            "supports_notify_fast_path": true,
+            "supports_launchctl_wrapper": false
+          },
+          "jobs": [],
+          "notify_names": [
+            {
+              "scope": "local",
+              "name": "com.launchx.fixture.check",
+              "generation": 4,
+              "state": 7,
+              "updated_at": {
+                "$date": "2026-04-16T12:00:06Z"
+              },
+              "last_posted_at": {
+                "$date": "2026-04-16T12:00:01Z"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "response.notify.invalid_token.failure",
+      "kind": "response",
+      "description": "notify stale token failure",
+      "packet": {
+        "protocol_version": 1,
+        "status": "error",
+        "error": {
+          "code": "notify_failed",
+          "message": "notify_failed(invalid_token(42))"
+        }
+      }
+    },
+    {
+      "id": "response.notify.missing_name.failure",
+      "kind": "response",
+      "description": "notify missing name invalid request failure",
+      "packet": {
+        "protocol_version": 1,
+        "status": "error",
+        "error": {
+          "code": "invalid_request",
+          "message": "invalid_request(missing name)"
+        }
+      }
+    },
+    {
+      "id": "response.notify.invalid_scope.failure",
+      "kind": "response",
+      "description": "notify invalid scope failure",
+      "packet": {
+        "protocol_version": 1,
+        "status": "error",
+        "error": {
+          "code": "invalid_request",
+          "message": "invalid_request(invalid scope remote)"
+        }
+      }
+    },
+    {
+      "id": "response.notify.invalid_signal.failure",
+      "kind": "response",
+      "description": "notify invalid signal failure",
+      "packet": {
+        "protocol_version": 1,
+        "status": "error",
+        "error": {
+          "code": "notify_failed",
+          "message": "notify_failed(invalid_signal(0))"
+        }
+      }
+    },
+    {
+      "id": "response.notify.invalid_reuse.failure",
+      "kind": "response",
+      "description": "notify invalid file descriptor reuse failure",
+      "packet": {
+        "protocol_version": 1,
+        "status": "error",
+        "error": {
+          "code": "notify_failed",
+          "message": "notify_failed(invalid_client_registration_id(nil))"
+        }
+      }
+    },
+    {
+      "id": "response.notify.missing_dispatch_queue.failure",
+      "kind": "response",
+      "description": "notify missing dispatch queue invalid request failure",
+      "packet": {
+        "protocol_version": 1,
+        "status": "error",
+        "error": {
+          "code": "invalid_request",
+          "message": "invalid_request(missing queue_name)"
+        }
+      }
+    },
+    {
+      "id": "response.scalar_coverage.success",
+      "kind": "response",
+      "description": "control value scalar coverage",
+      "packet": {
+        "protocol_version": 1,
+        "status": "ok",
+        "result": {
+          "string": "hello",
+          "integer": -42,
+          "double": 3.5,
+          "bool_true": true,
+          "bool_false": false,
+          "date": {
+            "$date": "2026-04-16T12:00:00Z"
+          },
+          "data": {
+            "$data_utf8": "launchx"
+          },
+          "array": [
+            1,
+            "two",
+            true
+          ],
+          "object": {
+            "nested": "value"
+          }
+        }
+      }
+    }
+  ]
+}

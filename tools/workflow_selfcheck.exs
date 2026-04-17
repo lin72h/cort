@@ -56,6 +56,8 @@ defmodule WorkflowSelfcheck do
       {"subset1b compare tool", fn -> subset1b_compare_check!(repo_root) end},
       {"subset2a compare tool", fn -> subset2a_compare_check!(repo_root) end},
       {"subset3a compare tool", fn -> subset3a_compare_check!(repo_root) end},
+      {"subset7a expected builder", fn -> subset7a_expected_builder_check!(repo_root, artifacts_root) end},
+      {"subset7a compare tool", fn -> subset7a_compare_check!(repo_root) end},
       {"subset1 MX compare artifact wrapper", fn -> subset1_mx_compare_artifact_check!(repo_root, artifacts_root) end},
       {"subset1b MX compare artifact wrapper", fn -> subset1b_mx_compare_artifact_check!(repo_root, artifacts_root) end},
       {"subset2a MX compare artifact wrapper", fn -> subset2a_mx_compare_artifact_check!(repo_root, artifacts_root) end},
@@ -107,6 +109,7 @@ defmodule WorkflowSelfcheck do
       "cort-mx/scripts/run_subset3a_bplist_core.sh",
       "cort-mx/scripts/run_subset3a_bplist_compare.sh",
       "cort-mx/scripts/run_subset3a_suite.sh",
+      "tools/sync_subset7a_control_corpora.sh",
       "cort-fx/scripts/run_subset0_fx_artifacts.sh",
       "cort-fx/scripts/run_subset1a_compare_artifact.sh",
       "cort-fx/scripts/run_subset2a_compare_artifact.sh"
@@ -346,6 +349,50 @@ defmodule WorkflowSelfcheck do
     ensure_contains!(output, "- blockers: 0")
     ensure_contains!(output, "- warnings: 0")
     ensure_contains!(output, "`bplist_truncated_trailer_rejected` | match")
+  end
+
+  defp subset7a_expected_builder_check!(repo_root, artifacts_root) do
+    output_path = Path.join([artifacts_root, "subset7a_control_packet_expected_v1.json"])
+    expected_path = Path.join(repo_root, "fixtures/control/subset7a_control_packet_expected_v1.json")
+
+    run_cmd!(
+      Path.join(repo_root, "tools/run_elixir.sh"),
+      [
+        Path.join(repo_root, "tools/build_subset7a_control_packet_expected.exs"),
+        "--accept-source",
+        Path.join(repo_root, "fixtures/control/bplist_packet_corpus_v1.source.json"),
+        "--reject-source",
+        Path.join(repo_root, "fixtures/control/bplist_packet_rejection_corpus_v1.source.json"),
+        "--output",
+        output_path
+      ],
+      cd: repo_root,
+      expect_exit: 0
+    )
+
+    run_cmd!("diff", ["-u", expected_path, output_path], cd: repo_root, expect_exit: 0)
+  end
+
+  defp subset7a_compare_check!(repo_root) do
+    expected_path = Path.join(repo_root, "fixtures/control/subset7a_control_packet_expected_v1.json")
+
+    output =
+      run_cmd!(
+        Path.join(repo_root, "tools/run_elixir.sh"),
+        [
+          Path.join(repo_root, "tools/compare_subset7a_control_packet_json.exs"),
+          "--fx-json",
+          expected_path,
+          "--expected-json",
+          expected_path
+        ],
+        cd: repo_root,
+        expect_exit: 0
+      )
+
+    ensure_contains!(output, "- blockers: 0")
+    ensure_contains!(output, "- warnings: 0")
+    ensure_contains!(output, "`request.control.health` | match")
   end
 
   defp subset1_mx_compare_artifact_check!(repo_root, artifacts_root) do

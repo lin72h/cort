@@ -1,0 +1,362 @@
+{
+  "version": 1,
+  "validation_mode": "accept",
+  "format": "LaunchX ControlProtocol binary plist corpus",
+  "generated_from": "tests/fixtures/control/bplist_packet_corpus_v1.source.json",
+  "cases": [
+    {
+      "id": "request.control.health",
+      "kind": "request",
+      "description": "control health request",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGBwhWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZVZoZWFsdGjQEAFXY29udHJvbAgRGB8yOkFCRAAAAAAAAAEBAAAAAAAAAAkAAAAAAAAAAAAAAAAAAABM"
+    },
+    {
+      "id": "request.control.capabilities",
+      "kind": "request",
+      "description": "control capabilities request",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGBwhWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZVxjYXBhYmlsaXRpZXPQEAFXY29udHJvbAgRGB8yOkdISgAAAAAAAAEBAAAAAAAAAAkAAAAAAAAAAAAAAAAAAABS"
+    },
+    {
+      "id": "request.diagnostics.snapshot",
+      "kind": "request",
+      "description": "diagnostics snapshot request",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGBwhWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZVhzbmFwc2hvdNAQAVtkaWFnbm9zdGljcwgRGB8yOkNERgAAAAAAAAEBAAAAAAAAAAkAAAAAAAAAAAAAAAAAAABS"
+    },
+    {
+      "id": "request.notify.register_check.local",
+      "kind": "request",
+      "description": "notify register_check local request",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGCwxWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZV5yZWdpc3Rlcl9jaGVja9IHCAkKVG5hbWVVc2NvcGVfEBljb20ubGF1bmNoeC5maXh0dXJlLmNoZWNrVWxvY2FsEAFWbm90aWZ5CBEYHzI6SU5TWXV7fQAAAAAAAAEBAAAAAAAAAA0AAAAAAAAAAAAAAAAAAACE"
+    },
+    {
+      "id": "request.notify.register_check.default_scope",
+      "kind": "request",
+      "description": "notify register_check request using default local scope",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGCQpWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZV5yZWdpc3Rlcl9jaGVja9EHCFRuYW1lXxAZY29tLmxhdW5jaHguZml4dHVyZS5jaGVjaxABVm5vdGlmeQgRGB8yOklMUW1vAAAAAAAAAQEAAAAAAAAACwAAAAAAAAAAAAAAAAAAAHY="
+    },
+    {
+      "id": "request.notify.register_check.cluster",
+      "kind": "request",
+      "description": "notify register_check cluster request",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGCwxWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZV5yZWdpc3Rlcl9jaGVja9IHCAkKVG5hbWVVc2NvcGVfEBljb20ubGF1bmNoeC5maXh0dXJlLmNoZWNrV2NsdXN0ZXIQAVZub3RpZnkIERgfMjpJTlNZdX1/AAAAAAAAAQEAAAAAAAAADQAAAAAAAAAAAAAAAAAAAIY="
+    },
+    {
+      "id": "request.notify.post.local",
+      "kind": "request",
+      "description": "notify post local request",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGCwxWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZVRwb3N00gcICQpUbmFtZVVzY29wZV8QGWNvbS5sYXVuY2h4LmZpeHR1cmUuY2hlY2tVbG9jYWwQAVZub3RpZnkIERgfMjo/RElPa3FzAAAAAAAAAQEAAAAAAAAADQAAAAAAAAAAAAAAAAAAAHo="
+    },
+    {
+      "id": "request.notify.post.default_scope",
+      "kind": "request",
+      "description": "notify post request using default local scope",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGCQpWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZVRwb3N00QcIVG5hbWVfEBljb20ubGF1bmNoeC5maXh0dXJlLmNoZWNrEAFWbm90aWZ5CBEYHzI6P0JHY2UAAAAAAAABAQAAAAAAAAALAAAAAAAAAAAAAAAAAAAAbA=="
+    },
+    {
+      "id": "request.notify.post.cluster",
+      "kind": "request",
+      "description": "notify post cluster request",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGCwxWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZVRwb3N00gcICQpUbmFtZVVzY29wZV8QGWNvbS5sYXVuY2h4LmZpeHR1cmUuY2hlY2tXY2x1c3RlchABVm5vdGlmeQgRGB8yOj9ESU9rc3UAAAAAAAABAQAAAAAAAAANAAAAAAAAAAAAAAAAAAAAfA=="
+    },
+    {
+      "id": "request.notify.check.expected_session",
+      "kind": "request",
+      "description": "notify check with expected daemon session",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGCwxWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZVVjaGVja9IHCAkKXxATZXhwZWN0ZWRfc2Vzc2lvbl9pZFV0b2tlbl1zZXNzaW9uLWFscGhhECoQAVZub3RpZnkIERgfMjpARVthb3FzAAAAAAAAAQEAAAAAAAAADQAAAAAAAAAAAAAAAAAAAHo="
+    },
+    {
+      "id": "request.notify.cancel.expected_session",
+      "kind": "request",
+      "description": "notify cancel with expected daemon session",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGCwxWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZVZjYW5jZWzSBwgJCl8QE2V4cGVjdGVkX3Nlc3Npb25faWRVdG9rZW5dc2Vzc2lvbi1hbHBoYRAqEAFWbm90aWZ5CBEYHzI6QUZcYnBydAAAAAAAAAEBAAAAAAAAAA0AAAAAAAAAAAAAAAAAAAB7"
+    },
+    {
+      "id": "request.notify.suspend.expected_session",
+      "kind": "request",
+      "description": "notify suspend with expected daemon session",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGCwxWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZVdzdXNwZW5k0gcICQpfEBNleHBlY3RlZF9zZXNzaW9uX2lkVXRva2VuXXNlc3Npb24tYWxwaGEQKhABVm5vdGlmeQgRGB8yOkJHXWNxc3UAAAAAAAABAQAAAAAAAAANAAAAAAAAAAAAAAAAAAAAfA=="
+    },
+    {
+      "id": "request.notify.resume.expected_session",
+      "kind": "request",
+      "description": "notify resume with expected daemon session",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGCwxWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZVZyZXN1bWXSBwgJCl8QE2V4cGVjdGVkX3Nlc3Npb25faWRVdG9rZW5ac2Vzc2lvbi1mZBBNEAFWbm90aWZ5CBEYHzI6QUZcYm1vcQAAAAAAAAEBAAAAAAAAAA0AAAAAAAAAAAAAAAAAAAB4"
+    },
+    {
+      "id": "request.notify.set_state.expected_session",
+      "kind": "request",
+      "description": "notify set_state with expected daemon session and signed state payload",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGDQ5WbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZVlzZXRfc3RhdGXTBwgJCgsMXxATZXhwZWN0ZWRfc2Vzc2lvbl9pZFVzdGF0ZVV0b2tlbl1zZXNzaW9uLWFscGhhE///////////ECoQAVZub3RpZnkIERgfMjpES2FnbXuEhogAAAAAAAABAQAAAAAAAAAPAAAAAAAAAAAAAAAAAAAAjw=="
+    },
+    {
+      "id": "request.notify.get_state.expected_session",
+      "kind": "request",
+      "description": "notify get_state with expected daemon session",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGCwxWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZVlnZXRfc3RhdGXSBwgJCl8QE2V4cGVjdGVkX3Nlc3Npb25faWRVdG9rZW5dc2Vzc2lvbi1hbHBoYRAqEAFWbm90aWZ5CBEYHzI6RElfZXN1dwAAAAAAAAEBAAAAAAAAAA0AAAAAAAAAAAAAAAAAAAB+"
+    },
+    {
+      "id": "request.notify.is_valid_token.expected_session",
+      "kind": "request",
+      "description": "notify is_valid_token with expected daemon session",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGCwxWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZV5pc192YWxpZF90b2tlbtIHCAkKXxATZXhwZWN0ZWRfc2Vzc2lvbl9pZFV0b2tlbl1zZXNzaW9uLWFscGhhECoQAVZub3RpZnkIERgfMjpJTmRqeHp8AAAAAAAAAQEAAAAAAAAADQAAAAAAAAAAAAAAAAAAAIM="
+    },
+    {
+      "id": "request.notify.list_names",
+      "kind": "request",
+      "description": "notify list_names request",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGBwhWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZVpsaXN0X25hbWVz0BABVm5vdGlmeQgRGB8yOkVGSAAAAAAAAAEBAAAAAAAAAAkAAAAAAAAAAAAAAAAAAABP"
+    },
+    {
+      "id": "request.notify.register_dispatch.default_scope",
+      "kind": "request",
+      "description": "notify dispatch registration request using default local scope",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGCwxWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZV8QEXJlZ2lzdGVyX2Rpc3BhdGNo0gcICQpUbmFtZVpxdWV1ZV9uYW1lXxAcY29tLmxhdW5jaHguZml4dHVyZS5kaXNwYXRjaFRtYWluEAFWbm90aWZ5CBEYHzI6TlNYY4KHiQAAAAAAAAEBAAAAAAAAAA0AAAAAAAAAAAAAAAAAAACQ"
+    },
+    {
+      "id": "request.notify.register_signal.targeted",
+      "kind": "request",
+      "description": "notify signal registration request with explicit target pid",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGDxBWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZV8QD3JlZ2lzdGVyX3NpZ25hbNQHCAkKCwwNDlRuYW1lVXNjb3BlVnNpZ25hbFp0YXJnZXRfcGlkXxAaY29tLmxhdW5jaHguZml4dHVyZS5zaWduYWxVbG9jYWwQHhEQ4RABVm5vdGlmeQgRGB8yOkxVWmBnco+Vl5qcAAAAAAAAAQEAAAAAAAAAEQAAAAAAAAAAAAAAAAAAAKM="
+    },
+    {
+      "id": "request.notify.register_signal.default_scope",
+      "kind": "request",
+      "description": "notify signal registration request using default local scope",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGCwxWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZV8QD3JlZ2lzdGVyX3NpZ25hbNIHCAkKVG5hbWVWc2lnbmFsXxAaY29tLmxhdW5jaHguZml4dHVyZS5zaWduYWwQHhABVm5vdGlmeQgRGB8yOkxRVl16fH4AAAAAAAABAQAAAAAAAAANAAAAAAAAAAAAAAAAAAAAhQ=="
+    },
+    {
+      "id": "request.notify.register_file_descriptor.new_binding",
+      "kind": "request",
+      "description": "notify fd registration request creating a new binding",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGDQ5WbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZV8QGHJlZ2lzdGVyX2ZpbGVfZGVzY3JpcHRvctMHCAkKCwxfEBZjbGllbnRfcmVnaXN0cmF0aW9uX2lkVG5hbWVVc2NvcGVdYmluZGluZy1hbHBoYV8QGmNvbS5sYXVuY2h4LmZpeHR1cmUuZmQubmV3VWxvY2FsEAFWbm90aWZ5CBEYHzI6VVx1eoCOq7GzAAAAAAAAAQEAAAAAAAAADwAAAAAAAAAAAAAAAAAAALo="
+    },
+    {
+      "id": "request.notify.register_file_descriptor.new_binding.default_scope",
+      "kind": "request",
+      "description": "notify fd registration request creating a new binding using default local scope",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGCwxWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZV8QGHJlZ2lzdGVyX2ZpbGVfZGVzY3JpcHRvctIHCAkKXxAWY2xpZW50X3JlZ2lzdHJhdGlvbl9pZFRuYW1lXWJpbmRpbmctYWxwaGFfEBpjb20ubGF1bmNoeC5maXh0dXJlLmZkLm5ldxABVm5vdGlmeQgRGB8yOlVac3iGo6UAAAAAAAABAQAAAAAAAAANAAAAAAAAAAAAAAAAAAAArA=="
+    },
+    {
+      "id": "request.notify.register_file_descriptor.reuse",
+      "kind": "request",
+      "description": "notify fd registration reuse request",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGDxBWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZV8QGHJlZ2lzdGVyX2ZpbGVfZGVzY3JpcHRvctQHCAkKCwwNDl8QFmNsaWVudF9yZWdpc3RyYXRpb25faWRUbmFtZV8QFnJldXNlX2V4aXN0aW5nX2JpbmRpbmdVc2NvcGVdYmluZGluZy1hbHBoYV8QFmNvbS5sYXVuY2h4LmZpeHR1cmUuZmQJVWxvY2FsEAFWbm90aWZ5CBEYHzI6VV53fJWbqcLDycsAAAAAAAABAQAAAAAAAAARAAAAAAAAAAAAAAAAAAAA0g=="
+    },
+    {
+      "id": "request.notify.prepare_file_descriptor_delivery.reuse",
+      "kind": "request",
+      "description": "notify fd delivery preparation reuse request",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGDxBWbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZV8QIHByZXBhcmVfZmlsZV9kZXNjcmlwdG9yX2RlbGl2ZXJ51AcICQoLDA0OXxAWY2xpZW50X3JlZ2lzdHJhdGlvbl9pZFRuYW1lXxAWcmV1c2VfZXhpc3RpbmdfYmluZGluZ1VzY29wZV1iaW5kaW5nLWFscGhhXxAWY29tLmxhdW5jaHguZml4dHVyZS5mZAlVbG9jYWwQAVZub3RpZnkIERgfMjpdZn+EnaOxysvR0wAAAAAAAAEBAAAAAAAAABEAAAAAAAAAAAAAAAAAAADa"
+    },
+    {
+      "id": "request.notify.prepare_file_descriptor_delivery.reuse.default_scope",
+      "kind": "request",
+      "description": "notify fd delivery preparation reuse request using default local scope",
+      "payload_base64": "YnBsaXN0MDDUAQIDBAUGDQ5WbWV0aG9kVnBhcmFtc18QEHByb3RvY29sX3ZlcnNpb25Xc2VydmljZV8QIHByZXBhcmVfZmlsZV9kZXNjcmlwdG9yX2RlbGl2ZXJ50wcICQoLDF8QFmNsaWVudF9yZWdpc3RyYXRpb25faWRUbmFtZV8QFnJldXNlX2V4aXN0aW5nX2JpbmRpbmddYmluZGluZy1hbHBoYV8QFmNvbS5sYXVuY2h4LmZpeHR1cmUuZmQJEAFWbm90aWZ5CBEYHzI6XWR9gpupwsPFAAAAAAAAAQEAAAAAAAAADwAAAAAAAAAAAAAAAAAAAMw="
+    },
+    {
+      "id": "response.notify.post.success",
+      "kind": "response",
+      "description": "notify post success with generation and delivered tokens",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUWXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHUBgcICQoMDRJfEBBkZWxpdmVyZWRfdG9rZW5zWmdlbmVyYXRpb25UbmFtZVlwb3N0ZWRfYXShCxAqEAXWBw4IDxARDBITFBUSXmxhc3RfcG9zdGVkX2F0VXNjb3BlVXN0YXRlWnVwZGF0ZWRfYXQzQcfIg2MAAABfEBljb20ubGF1bmNoeC5maXh0dXJlLmNoZWNrVWxvY2FsEAdSb2sIDyIpMDI7TlleaGpsbnuKkJahqsbMzgAAAAAAAAEBAAAAAAAAABcAAAAAAAAAAAAAAAAAAADR"
+    },
+    {
+      "id": "response.notify.post.cluster.success",
+      "kind": "response",
+      "description": "notify cluster post success with generation and delivered tokens",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUUXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHUBgcICQoECxBfEBBkZWxpdmVyZWRfdG9rZW5zWmdlbmVyYXRpb25UbmFtZVlwb3N0ZWRfYXSg1gcMCA0ODwQQERITEF5sYXN0X3Bvc3RlZF9hdFVzY29wZVVzdGF0ZVp1cGRhdGVkX2F0M0HHyINlgAAAXxAZY29tLmxhdW5jaHguZml4dHVyZS5jaGVja1djbHVzdGVyEB1Sb2sIDyIpMDI7TlleaGl2hYuRnKXBycsAAAAAAAABAQAAAAAAAAAVAAAAAAAAAAAAAAAAAAAAzg=="
+    },
+    {
+      "id": "response.notify.registration.signal.success",
+      "kind": "response",
+      "description": "notify signal registration success",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUfXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHRBgdccmVnaXN0cmF0aW9u3QgJCgsMDQ4PEBESExQVEBYXGBkaGxwYHR4XWmNyZWF0ZWRfYXRfEA9kZWxpdmVyeV9tZXRob2ReZGVsaXZlcnlfc3RhdGVfEBNmaXJzdF9jaGVja19wZW5kaW5nXxAUbGFzdF9zZWVuX2dlbmVyYXRpb25UbmFtZVVzY29wZVpzZXNzaW9uX2lkVnNpZ25hbF1zdXNwZW5kX2RlcHRoWnRhcmdldF9waWRVdG9rZW5VdmFsaWQzQcfIg2OAAABWYWN0aXZlCRAAXxAaY29tLmxhdW5jaHguZml4dHVyZS5zaWduYWxVbG9jYWxec2Vzc2lvbi1zaWduYWwQHhEQ4RAzUm9rAAgADwAiACkAMAAyADUAQgBdAGgAegCJAJ8AtgC7AMEAzADTAOEA7ADyAPgBAQEIAQkBCwEoAS4BPQE/AUIBRAAAAAAAAAIBAAAAAAAAACAAAAAAAAAAAAAAAAAAAAFH"
+    },
+    {
+      "id": "response.notify.registration.file_descriptor.success",
+      "kind": "response",
+      "description": "notify file descriptor registration success",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUgXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHRBgdccmVnaXN0cmF0aW9u3QgJCgsMDQ4PEBESExQVFhcYGRobHB0eGR8YWmNyZWF0ZWRfYXRfEA9kZWxpdmVyeV9tZXRob2ReZGVsaXZlcnlfc3RhdGVfEBNmaXJzdF9jaGVja19wZW5kaW5nXxAUbGFzdF9zZWVuX2dlbmVyYXRpb25fEBpsb2NhbF90cmFuc3BvcnRfYmluZGluZ19pZF8QFmxvY2FsX3RyYW5zcG9ydF9oYW5kbGVUbmFtZVVzY29wZVpzZXNzaW9uX2lkXXN1c3BlbmRfZGVwdGhVdG9rZW5VdmFsaWQzQcfIg2OAAABfEA9maWxlX2Rlc2NyaXB0b3JWYWN0aXZlCRAAXWJpbmRpbmctYWxwaGFfECAvdG1wL2xhdW5jaHgtbm90aWZ5LWZpeHR1cmUuc29ja18QGmNvbS5sYXVuY2h4LmZpeHR1cmUuZmQubmV3VWxvY2FsWnNlc3Npb24tZmQQTVJvawAIAA8AIgApADAAMgA1AEIAXQBoAHoAiQCfALYA0wDsAPEA9wECARABFgEcASUBNwE+AT8BQQFPAXIBjwGVAaABogAAAAAAAAIBAAAAAAAAACEAAAAAAAAAAAAAAAAAAAGl"
+    },
+    {
+      "id": "response.notify.registration.file_descriptor.reuse.success",
+      "kind": "response",
+      "description": "notify file descriptor reuse registration success",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUgXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHRBgdccmVnaXN0cmF0aW9u3QgJCgsMDQ4PEBESExQVFhcYGRobHB0eGR8YWmNyZWF0ZWRfYXRfEA9kZWxpdmVyeV9tZXRob2ReZGVsaXZlcnlfc3RhdGVfEBNmaXJzdF9jaGVja19wZW5kaW5nXxAUbGFzdF9zZWVuX2dlbmVyYXRpb25fEBpsb2NhbF90cmFuc3BvcnRfYmluZGluZ19pZF8QFmxvY2FsX3RyYW5zcG9ydF9oYW5kbGVUbmFtZVVzY29wZVpzZXNzaW9uX2lkXXN1c3BlbmRfZGVwdGhVdG9rZW5VdmFsaWQzQcfIg2QAAABfEA9maWxlX2Rlc2NyaXB0b3JWYWN0aXZlCRAAXWJpbmRpbmctYWxwaGFfECAvdG1wL2xhdW5jaHgtbm90aWZ5LWZpeHR1cmUuc29ja18QFmNvbS5sYXVuY2h4LmZpeHR1cmUuZmRVbG9jYWxac2Vzc2lvbi1mZBBOUm9rAAgADwAiACkAMAAyADUAQgBdAGgAegCJAJ8AtgDTAOwA8QD3AQIBEAEWARwBJQE3AT4BPwFBAU8BcgGLAZEBnAGeAAAAAAAAAgEAAAAAAAAAIQAAAAAAAAAAAAAAAAAAAaE="
+    },
+    {
+      "id": "response.notify.cancel.success",
+      "kind": "response",
+      "description": "notify cancel success with invalidated registration",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUhXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHSBgcICVhjYW5jZWxlZFxyZWdpc3RyYXRpb24J3AoLDA0ODxAREhMUFRYXGBkaGxwdHh8gGVpjcmVhdGVkX2F0XxAPZGVsaXZlcnlfbWV0aG9kXmRlbGl2ZXJ5X3N0YXRlXxATZmlyc3RfY2hlY2tfcGVuZGluZ18QD2xhc3RfY2hlY2tlZF9hdF8QFGxhc3Rfc2Vlbl9nZW5lcmF0aW9uVG5hbWVVc2NvcGVac2Vzc2lvbl9pZF1zdXNwZW5kX2RlcHRoVXRva2VuVXZhbGlkM0HHyINiAAAAVWNoZWNrVmFjdGl2ZQgzQcfIg2KAAAAQBF8QGWNvbS5sYXVuY2h4LmZpeHR1cmUuY2hlY2tVbG9jYWxdc2Vzc2lvbi1hbHBoYRAAECpSb2sACAAPACIAKQAwADIANwBAAE0ATgBnAHIAhACTAKkAuwDSANcA3QDoAPYA/AECAQsBEQEYARkBIgEkAUABRgFUAVYBWAAAAAAAAAIBAAAAAAAAACIAAAAAAAAAAAAAAAAAAAFb"
+    },
+    {
+      "id": "response.notify.suspend.success",
+      "kind": "response",
+      "description": "notify suspend success increases suspend depth",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUdXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHcBgcICQoLDA0ODxAREhMUFRYXGBkaBBscWmNyZWF0ZWRfYXRfEA9kZWxpdmVyeV9tZXRob2ReZGVsaXZlcnlfc3RhdGVfEBNmaXJzdF9jaGVja19wZW5kaW5nXxAPbGFzdF9jaGVja2VkX2F0XxAUbGFzdF9zZWVuX2dlbmVyYXRpb25UbmFtZVVzY29wZVpzZXNzaW9uX2lkXXN1c3BlbmRfZGVwdGhVdG9rZW5VdmFsaWQzQcfIg2IAAABVY2hlY2tWYWN0aXZlCDNBx8iDYoAAABAEXxAZY29tLmxhdW5jaHguZml4dHVyZS5jaGVja1Vsb2NhbF1zZXNzaW9uLWFscGhhECoJUm9rAAgADwAiACkAMAAyAEsAVgBoAHcAjQCfALYAuwDBAMwA2gDgAOYA7wD1APwA/QEGAQgBJAEqATgBOgE7AAAAAAAAAgEAAAAAAAAAHgAAAAAAAAAAAAAAAAAAAT4="
+    },
+    {
+      "id": "response.notify.set_state.success",
+      "kind": "response",
+      "description": "notify set_state success preserving signed state payload",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUTXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHSBgcIEVRuYW1lVXN0YXRl1gkKBgsHDA0ODxARElpnZW5lcmF0aW9uXmxhc3RfcG9zdGVkX2F0VXNjb3BlWnVwZGF0ZWRfYXQQBDNBx8iDYwAAAF8QGWNvbS5sYXVuY2h4LmZpeHR1cmUuY2hlY2tVbG9jYWwT//////////8zQcfIg2KAAABSb2sIDyIpMDI3PEJPWmlvenyFoaewuQAAAAAAAAEBAAAAAAAAABQAAAAAAAAAAAAAAAAAAAC8"
+    },
+    {
+      "id": "response.notify.get_state.success",
+      "kind": "response",
+      "description": "notify get_state success preserving signed state payload",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUTXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHSBgcIEVRuYW1lVXN0YXRl1gkKBgsHDA0ODxARElpnZW5lcmF0aW9uXmxhc3RfcG9zdGVkX2F0VXNjb3BlWnVwZGF0ZWRfYXQQBDNBx8iDYwAAAF8QGWNvbS5sYXVuY2h4LmZpeHR1cmUuY2hlY2tVbG9jYWwT//////////8zQcfIg2KAAABSb2sIDyIpMDI3PEJPWmlvenyFoaewuQAAAAAAAAEBAAAAAAAAABQAAAAAAAAAAAAAAAAAAAC8"
+    },
+    {
+      "id": "response.notify.registration.dispatch.success",
+      "kind": "response",
+      "description": "notify dispatch registration success",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUeXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHRBgdccmVnaXN0cmF0aW9u3AgJCgsMDQ4PEBESExQVFhcYGRobHBgdF1pjcmVhdGVkX2F0XxAPZGVsaXZlcnlfbWV0aG9kXmRlbGl2ZXJ5X3N0YXRlXxATZmlyc3RfY2hlY2tfcGVuZGluZ18QFGxhc3Rfc2Vlbl9nZW5lcmF0aW9uVG5hbWVacXVldWVfbmFtZVVzY29wZVpzZXNzaW9uX2lkXXN1c3BlbmRfZGVwdGhVdG9rZW5VdmFsaWQzQcfIg2SAAABYZGlzcGF0Y2hWYWN0aXZlCRAAXxAcY29tLmxhdW5jaHguZml4dHVyZS5kaXNwYXRjaFRtYWluVWxvY2FsXxAQc2Vzc2lvbi1kaXNwYXRjaBBYUm9rAAgADwAiACkAMAAyADUAQgBbAGYAeACHAJ0AtAC5AMQAygDVAOMA6QDvAPgBAQEIAQkBCwEqAS8BNQFIAUoAAAAAAAACAQAAAAAAAAAfAAAAAAAAAAAAAAAAAAABTQ=="
+    },
+    {
+      "id": "response.notify.is_valid_token.false",
+      "kind": "response",
+      "description": "notify is_valid_token false response",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUIXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHRBgdVdmFsaWQIUm9rCA8iKTAyNTs8AAAAAAAAAQEAAAAAAAAACQAAAAAAAAAAAAAAAAAAAD8="
+    },
+    {
+      "id": "response.notify.post.dispatch.success",
+      "kind": "response",
+      "description": "notify post success for dispatch shape with no delivered tokens",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUUXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHUBgcICQoECxBfEBBkZWxpdmVyZWRfdG9rZW5zWmdlbmVyYXRpb25UbmFtZVlwb3N0ZWRfYXSg1gcMCA0ODwQQERITEF5sYXN0X3Bvc3RlZF9hdFVzY29wZVVzdGF0ZVp1cGRhdGVkX2F0M0HHyINlAAAAXxAcY29tLmxhdW5jaHguZml4dHVyZS5kaXNwYXRjaFVsb2NhbBAAUm9rCA8iKTAyO05ZXmhpdoWLkZylxMrMAAAAAAAAAQEAAAAAAAAAFQAAAAAAAAAAAAAAAAAAAM8="
+    },
+    {
+      "id": "response.notify.resume.success",
+      "kind": "response",
+      "description": "notify resume success for healthy signal delivery",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUdXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHdBgcICQoLDA0ODxAREhMOFBUWFxgZGhYbHBVaY3JlYXRlZF9hdF8QD2RlbGl2ZXJ5X21ldGhvZF5kZWxpdmVyeV9zdGF0ZV8QE2ZpcnN0X2NoZWNrX3BlbmRpbmdfEBRsYXN0X3NlZW5fZ2VuZXJhdGlvblRuYW1lVXNjb3BlWnNlc3Npb25faWRWc2lnbmFsXXN1c3BlbmRfZGVwdGhadGFyZ2V0X3BpZFV0b2tlblV2YWxpZDNBx8iDY4AAAFZhY3RpdmUJEABfEBpjb20ubGF1bmNoeC5maXh0dXJlLnNpZ25hbFVsb2NhbF5zZXNzaW9uLXNpZ25hbBAeERDhEDNSb2sACAAPACIAKQAwADIATQBYAGoAeQCPAKYAqwCxALwAwwDRANwA4gDoAPEA+AD5APsBGAEeAS0BLwEyATQAAAAAAAACAQAAAAAAAAAeAAAAAAAAAAAAAAAAAAABNw=="
+    },
+    {
+      "id": "response.notify.list_names.scoped",
+      "kind": "response",
+      "description": "notify list_names response with local and cluster scope entries",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUXXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAGiBhPWBwgJCgsMDQ4PEBESWmdlbmVyYXRpb25ebGFzdF9wb3N0ZWRfYXRUbmFtZVVzY29wZVVzdGF0ZVp1cGRhdGVkX2F0EAQzQcfIg2MAAABfEBljb20ubGF1bmNoeC5maXh0dXJlLmNoZWNrVWxvY2FsE///////////M0HHyINigAAA1gcICQoLDAQUDxUWFDNBx8iDZAAAAFdjbHVzdGVyEB1Sb2sIDyIpMDI1Qk1cYWdteHqDn6Wut8TN1dcAAAAAAAABAQAAAAAAAAAYAAAAAAAAAAAAAAAAAAAA2g=="
+    },
+    {
+      "id": "response.notify.resume.failed_after_pending_suspend",
+      "kind": "response",
+      "description": "notify resume exposes failed_after_pending_suspend and pending generation",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUgXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHeBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHhgfF1pjcmVhdGVkX2F0XxAPZGVsaXZlcnlfbWV0aG9kXmRlbGl2ZXJ5X3N0YXRlXxATZmlyc3RfY2hlY2tfcGVuZGluZ18QFGxhc3Rfc2Vlbl9nZW5lcmF0aW9uXxAabG9jYWxfdHJhbnNwb3J0X2JpbmRpbmdfaWRfEBZsb2NhbF90cmFuc3BvcnRfaGFuZGxlVG5hbWVfEBJwZW5kaW5nX2dlbmVyYXRpb25Vc2NvcGVac2Vzc2lvbl9pZF1zdXNwZW5kX2RlcHRoVXRva2VuVXZhbGlkM0HHyINjgAAAXxAPZmlsZV9kZXNjcmlwdG9yXxAcZmFpbGVkX2FmdGVyX3BlbmRpbmdfc3VzcGVuZAkQAF1iaW5kaW5nLWFscGhhXxAgL3RtcC9sYXVuY2h4LW5vdGlmeS1maXh0dXJlLnNvY2tfEBpjb20ubGF1bmNoeC5maXh0dXJlLmZkLm5ldxAFVWxvY2FsWnNlc3Npb24tZmQQTVJvawAIAA8AIgApADAAMgBPAFoAbAB7AJEAqADFAN4A4wD4AP4BCQEXAR0BIwEsAT4BXQFeAWABbgGRAa4BsAG2AcEBwwAAAAAAAAIBAAAAAAAAACEAAAAAAAAAAAAAAAAAAAHG"
+    },
+    {
+      "id": "response.notify.registration.check.success",
+      "kind": "response",
+      "description": "notify check registration success",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUcXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHRBgdccmVnaXN0cmF0aW9u2wgJCgsMDQ4PEBESExQVFhcYGRoXGxZaY3JlYXRlZF9hdF8QD2RlbGl2ZXJ5X21ldGhvZF5kZWxpdmVyeV9zdGF0ZV8QE2ZpcnN0X2NoZWNrX3BlbmRpbmdfEBRsYXN0X3NlZW5fZ2VuZXJhdGlvblRuYW1lVXNjb3BlWnNlc3Npb25faWRdc3VzcGVuZF9kZXB0aFV0b2tlblV2YWxpZDNBx8iDYgAAAFVjaGVja1ZhY3RpdmUJEABfEBljb20ubGF1bmNoeC5maXh0dXJlLmNoZWNrVWxvY2FsXXNlc3Npb24tYWxwaGEQKlJvawAIAA8AIgApADAAMgA1AEIAWQBkAHYAhQCbALIAtwC9AMgA1gDcAOIA6wDxAPgA+QD7ARcBHQErAS0AAAAAAAACAQAAAAAAAAAdAAAAAAAAAAAAAAAAAAABMA=="
+    },
+    {
+      "id": "response.notify.registration.check.cluster.success",
+      "kind": "response",
+      "description": "notify check registration success for cluster scope",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUcXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHRBgdccmVnaXN0cmF0aW9u2wgJCgsMDQ4PEBESExQVFhcYGRoXGxZaY3JlYXRlZF9hdF8QD2RlbGl2ZXJ5X21ldGhvZF5kZWxpdmVyeV9zdGF0ZV8QE2ZpcnN0X2NoZWNrX3BlbmRpbmdfEBRsYXN0X3NlZW5fZ2VuZXJhdGlvblRuYW1lVXNjb3BlWnNlc3Npb25faWRdc3VzcGVuZF9kZXB0aFV0b2tlblV2YWxpZDNBx8iDYgAAAFVjaGVja1ZhY3RpdmUJEABfEBljb20ubGF1bmNoeC5maXh0dXJlLmNoZWNrV2NsdXN0ZXJfEA9zZXNzaW9uLWNsdXN0ZXIQK1JvawAIAA8AIgApADAAMgA1AEIAWQBkAHYAhQCbALIAtwC9AMgA1gDcAOIA6wDxAPgA+QD7ARcBHwExATMAAAAAAAACAQAAAAAAAAAdAAAAAAAAAAAAAAAAAAABNg=="
+    },
+    {
+      "id": "response.notify.check.changed.success",
+      "kind": "response",
+      "description": "notify check changed success",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUkXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHUBgcICQoLDA1XY2hhbmdlZF1jdXJyZW50X3N0YXRlWmdlbmVyYXRpb25ccmVnaXN0cmF0aW9uCRAHEATcDg8QERITFBUWFxgZGhscHR4MHyAhIiMKWmNyZWF0ZWRfYXRfEA9kZWxpdmVyeV9tZXRob2ReZGVsaXZlcnlfc3RhdGVfEBNmaXJzdF9jaGVja19wZW5kaW5nXxAPbGFzdF9jaGVja2VkX2F0XxAUbGFzdF9zZWVuX2dlbmVyYXRpb25UbmFtZVVzY29wZVpzZXNzaW9uX2lkXXN1c3BlbmRfZGVwdGhVdG9rZW5VdmFsaWQzQcfIg2IAAABVY2hlY2tWYWN0aXZlCDNBx8iDYoAAAF8QGWNvbS5sYXVuY2h4LmZpeHR1cmUuY2hlY2tVbG9jYWxdc2Vzc2lvbi1hbHBoYRAAECpSb2sACAAPACIAKQAwADIAOwBDAFEAXABpAGoAbABuAIcAkgCkALMAyQDbAPIA9wD9AQgBFgEcASIBKwExATgBOQFCAV4BZAFyAXQBdgAAAAAAAAIBAAAAAAAAACUAAAAAAAAAAAAAAAAAAAF5"
+    },
+    {
+      "id": "response.notify.check.cluster.changed.success",
+      "kind": "response",
+      "description": "notify cluster check changed success after cluster post",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUjXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHUBgcICQoLBAxXY2hhbmdlZF1jdXJyZW50X3N0YXRlWmdlbmVyYXRpb25ccmVnaXN0cmF0aW9uCRAd3A0ODxAREhMUFRYXGBkaGxwdBB4fICEiClpjcmVhdGVkX2F0XxAPZGVsaXZlcnlfbWV0aG9kXmRlbGl2ZXJ5X3N0YXRlXxATZmlyc3RfY2hlY2tfcGVuZGluZ18QD2xhc3RfY2hlY2tlZF9hdF8QFGxhc3Rfc2Vlbl9nZW5lcmF0aW9uVG5hbWVVc2NvcGVac2Vzc2lvbl9pZF1zdXNwZW5kX2RlcHRoVXRva2VuVXZhbGlkM0HHyINiAAAAVWNoZWNrVmFjdGl2ZQgzQcfIg2WAAABfEBljb20ubGF1bmNoeC5maXh0dXJlLmNoZWNrV2NsdXN0ZXJfEA9zZXNzaW9uLWNsdXN0ZXIQABArUm9rAAgADwAiACkAMAAyADsAQwBRAFwAaQBqAGwAhQCQAKIAsQDHANkA8AD1APsBBgEUARoBIAEpAS8BNgE3AUABXAFkAXYBeAF6AAAAAAAAAgEAAAAAAAAAJAAAAAAAAAAAAAAAAAAAAX0="
+    },
+    {
+      "id": "response.notify.check.unchanged.success",
+      "kind": "response",
+      "description": "notify check unchanged success for cluster token after local-only post",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUjXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHUBgcICQoLDA1XY2hhbmdlZF1jdXJyZW50X3N0YXRlWmdlbmVyYXRpb25ccmVnaXN0cmF0aW9uCBAdEADcDg8QERITFBUWFxgZGhscCh0MHh8gDCEiWmNyZWF0ZWRfYXRfEA9kZWxpdmVyeV9tZXRob2ReZGVsaXZlcnlfc3RhdGVfEBNmaXJzdF9jaGVja19wZW5kaW5nXxAPbGFzdF9jaGVja2VkX2F0XxAUbGFzdF9zZWVuX2dlbmVyYXRpb25UbmFtZVVzY29wZVpzZXNzaW9uX2lkXXN1c3BlbmRfZGVwdGhVdG9rZW5VdmFsaWQzQcfIg2IAAABVY2hlY2tWYWN0aXZlM0HHyINjAAAAXxAZY29tLmxhdW5jaHguZml4dHVyZS5jaGVja1djbHVzdGVyXxAPc2Vzc2lvbi1jbHVzdGVyECsJUm9rAAgADwAiACkAMAAyADsAQwBRAFwAaQBqAGwAbgCHAJIApACzAMkA2wDyAPcA/QEIARYBHAEiASsBMQE4AUEBXQFlAXcBeQF6AAAAAAAAAgEAAAAAAAAAJAAAAAAAAAAAAAAAAAAAAX0="
+    },
+    {
+      "id": "response.control.capabilities.notify.enabled",
+      "kind": "response",
+      "description": "control capabilities response with notify support enabled",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUYXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHXBgcICQoLDA0WFxYWFxddZmVhdHVyZV9mbGFnc18QGHN1cHBvcnRzX2NsdXN0ZXJfb3ZlcmxheV8QGnN1cHBvcnRzX2xhdW5jaGN0bF93cmFwcGVyXxAhc3VwcG9ydHNfbmF0aXZlX21hY29zX3Bhc3N0aHJvdWdoXxAZc3VwcG9ydHNfbm90aWZ5X2Zhc3RfcGF0aF8QF3N1cHBvcnRzX3VzZXJzcGFjZV9qb2JzXxAZc3VwcG9ydHNfdXNlcnNwYWNlX25vdGlmeagODxAREhMUFV8QGGNvbnRyb2xfc29ja2V0X2Jvb3RzdHJhcF51c2Vyc3BhY2Vfam9ic18QEXNlcXBhY2tldF9jb250cm9sXxAbbmF0aXZlX3Byb2Nlc3NfbGlmZWN5Y2xlX3YxXxAVbmF0aXZlX3NwYXduX3NldHVwX3YxXxAUbGF1bmNoY3RsX3dyYXBwZXJfdjFfEBB1c2Vyc3BhY2Vfbm90aWZ5XxASbm90aWZ5X3JlZ2lzdHJ5X3YxCAlSb2sACAAPACIAKQAwADIAQQBPAGoAhwCrAMcA4QD9AQYBIQEwAUQBYgF6AZEBpAG5AboBuwAAAAAAAAIBAAAAAAAAABkAAAAAAAAAAAAAAAAAAAG+"
+    },
+    {
+      "id": "response.control.health.healthy",
+      "kind": "response",
+      "description": "control health healthy response with omitted optional output-status fields",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUVXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHWBgcICQoLDBESExQQXxAPam9iX3BlcnNpc3RlbmNlXxAQbm90aWZ5X2Zhc3RfcGF0aF8QEm5vdGlmeV9wZXJzaXN0ZW5jZVtvYnNlcnZlZF9hdFdyZWFzb25zVXN0YXRl0w0OCw8PEFVkaXJ0eV8QD3JldHJ5X3NjaGVkdWxlZAhXaGVhbHRoedMNDgsPDxDTDQ4LDw8QM0HHyINgAAAAoFJvawgPIikwMj9RZHmFjZOaoLKzu8LJ0tMAAAAAAAABAQAAAAAAAAAWAAAAAAAAAAAAAAAAAAAA1g=="
+    },
+    {
+      "id": "response.control.health.notify_persistence.degraded",
+      "kind": "response",
+      "description": "control health degraded notify persistence",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUhXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHWBgcICQoLDBUWGxwaXxAPam9iX3BlcnNpc3RlbmNlXxAQbm90aWZ5X2Zhc3RfcGF0aF8QEm5vdGlmeV9wZXJzaXN0ZW5jZVtvYnNlcnZlZF9hdFdyZWFzb25zVXN0YXRl1Q0ODxALERITERRVZGlydHlfEBFsYXN0X2F0dGVtcHRlZF9hdF8QEWxhc3RfcGVyc2lzdGVkX2F0XxAPcmV0cnlfc2NoZWR1bGVkCDNBx8iDYIAAADNBx8iDYQAAAFdoZWFsdGh51Q0ODxALERITERTVDQ4XEAsYEhkYGlpsYXN0X2Vycm9yCV8QGnNpbXVsYXRlZF9ub3RpZnlfZGlza19mdWxsWGRlZ3JhZGVkM0HHyINgAAAAoR3THh8XCCAZWWNvbXBvbmVudFVpc3N1ZV8QGXBlcnNpc3RlbmNlX3JldHJ5X3BlbmRpbmdSb2sACAAPACIAKQAwADIAPwBRAGQAeQCFAI0AkwCeAKQAuADMAN4A3wDoAPEA+QEEAQ8BGgEbATgBQQFKAUwBUwFdAWMBfwAAAAAAAAIBAAAAAAAAACIAAAAAAAAAAAAAAAAAAAGC"
+    },
+    {
+      "id": "response.diagnostics.snapshot.notify_fast_path.degraded",
+      "kind": "response",
+      "description": "diagnostics snapshot degraded notify fast path",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAVPXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHVBgcICQoLGClCQ1xjYXBhYmlsaXRpZXNWZGFlbW9uVmhlYWx0aFRqb2JzXG5vdGlmeV9uYW1lc9cMDQ4PEBESExYWFhcXF11mZWF0dXJlX2ZsYWdzXxAYc3VwcG9ydHNfY2x1c3Rlcl9vdmVybGF5XxAac3VwcG9ydHNfbGF1bmNoY3RsX3dyYXBwZXJfECFzdXBwb3J0c19uYXRpdmVfbWFjb3NfcGFzc3Rocm91Z2hfEBlzdXBwb3J0c19ub3RpZnlfZmFzdF9wYXRoXxAXc3VwcG9ydHNfdXNlcnNwYWNlX2pvYnNfEBlzdXBwb3J0c191c2Vyc3BhY2Vfbm90aWZ5ohQVXxAQdXNlcnNwYWNlX25vdGlmeV8QEm5vdGlmeV9yZWdpc3RyeV92MQgJ2RkaGxwdHh8gIRYiIyQlFyYnKF8QD2NsdXN0ZXJfZW5hYmxlZF8QE2NvbnRyb2xfc29ja2V0X3BhdGhZZGFlbW9uX2lkWGhvc3RuYW1lV25vZGVfaWRfEBhub3RpZnlfZmFzdF9wYXRoX2VuYWJsZWRccnVudGltZV9tb2RlWnN0YXJ0ZWRfYXRXdmVyc2lvbl8QGS90bXAvbGF1bmNoeC1maXh0dXJlLnNvY2teZGFlbW9uLWZpeHR1cmVcZml4dHVyZS1ob3N0XxAabGF1bmNoeC1zd2lmdEBmaXh0dXJlLWhvc3Rac3RhbmRhbG9uZTNBx8iDYAAAAFtkZXYtZml4dHVyZdYqKywtLi8wODwnPTtfEA9qb2JfcGVyc2lzdGVuY2VfEBBub3RpZnlfZmFzdF9wYXRoXxASbm90aWZ5X3BlcnNpc3RlbmNlW29ic2VydmVkX2F0V3JlYXNvbnNVc3RhdGXVMTIzNC8WNTYWN1VkaXJ0eV8QEWxhc3RfYXR0ZW1wdGVkX2F0XxARbGFzdF9wZXJzaXN0ZWRfYXRfEA9yZXRyeV9zY2hlZHVsZWQzQcfIg2CAAAAzQcfIg2EAAABXaGVhbHRoedUxMjk0Lxc1Ohc7Wmxhc3RfZXJyb3JfEBlzaW11bGF0ZWRfZmFzdF9wYXRoX2Vycm9yWGRlZ3JhZGVk1TEyMzQvFjU2FjehPtM/QDkrQTpZY29tcG9uZW50VWlzc3VlXxAXZmFzdF9wYXRoX3JldHJ5X3BlbmRpbmegoUTWRUZHSC9JSjVLTE1OWmdlbmVyYXRpb25ebGFzdF9wb3N0ZWRfYXRUbmFtZVVzY29wZVp1cGRhdGVkX2F0EARfEBljb20ubGF1bmNoeC5maXh0dXJlLmNoZWNrVWxvY2FsEAczQcfIg2GAAABSb2sACAAPACIAKQAwADIAPQBKAFEAWABdAGoAeQCHAKIAvwDjAP8BGQE1ATgBSwFgAWEBYgF1AYcBnQGnAbABuAHTAeAB6wHzAg8CHgIrAkgCUwJcAmgCdQKHApoCrwK7AsMCyQLUAtoC7gMCAxQDHQMmAy4DOQNEA2ADaQN0A3YDfQOHA40DpwOoA6oDtwPCA9ED1gPcA+cD6QQFBAsEDQQWAAAAAAAAAgEAAAAAAAAAUAAAAAAAAAAAAAAAAAAABBk="
+    },
+    {
+      "id": "response.control.health.notify_persistence.recovered",
+      "kind": "response",
+      "description": "control health recovered notify persistence",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUYXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHWBgcICQoLDBUWExcUXxAPam9iX3BlcnNpc3RlbmNlXxAQbm90aWZ5X2Zhc3RfcGF0aF8QEm5vdGlmeV9wZXJzaXN0ZW5jZVtvYnNlcnZlZF9hdFdyZWFzb25zVXN0YXRl1Q0ODxALERITERRVZGlydHlfEBFsYXN0X2F0dGVtcHRlZF9hdF8QEWxhc3RfcGVyc2lzdGVkX2F0XxAPcmV0cnlfc2NoZWR1bGVkCDNBx8iDYoAAADNBx8iDYwAAAFdoZWFsdGh51Q0ODxALERITERTVDQ4PEAsREhMRFKBSb2sACAAPACIAKQAwADIAPwBRAGQAeQCFAI0AkwCeAKQAuADMAN4A3wDoAPEA+QEEAQ8BEAAAAAAAAAIBAAAAAAAAABkAAAAAAAAAAAAAAAAAAAET"
+    },
+    {
+      "id": "response.diagnostics.snapshot.notify_enabled.healthy",
+      "kind": "response",
+      "description": "diagnostics snapshot healthy with notify enabled and omitted optional output-status fields",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAVEXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHVBgcICQoLGCk3OFxjYXBhYmlsaXRpZXNWZGFlbW9uVmhlYWx0aFRqb2JzXG5vdGlmeV9uYW1lc9cMDQ4PEBESExYWFhcXF11mZWF0dXJlX2ZsYWdzXxAYc3VwcG9ydHNfY2x1c3Rlcl9vdmVybGF5XxAac3VwcG9ydHNfbGF1bmNoY3RsX3dyYXBwZXJfECFzdXBwb3J0c19uYXRpdmVfbWFjb3NfcGFzc3Rocm91Z2hfEBlzdXBwb3J0c19ub3RpZnlfZmFzdF9wYXRoXxAXc3VwcG9ydHNfdXNlcnNwYWNlX2pvYnNfEBlzdXBwb3J0c191c2Vyc3BhY2Vfbm90aWZ5ohQVXxAQdXNlcnNwYWNlX25vdGlmeV8QEm5vdGlmeV9yZWdpc3RyeV92MQgJ2RkaGxwdHh8gIRYiIyQlFyYnKF8QD2NsdXN0ZXJfZW5hYmxlZF8QE2NvbnRyb2xfc29ja2V0X3BhdGhZZGFlbW9uX2lkWGhvc3RuYW1lV25vZGVfaWRfEBhub3RpZnlfZmFzdF9wYXRoX2VuYWJsZWRccnVudGltZV9tb2RlWnN0YXJ0ZWRfYXRXdmVyc2lvbl8QGS90bXAvbGF1bmNoeC1maXh0dXJlLnNvY2teZGFlbW9uLWZpeHR1cmVcZml4dHVyZS1ob3N0XxAabGF1bmNoeC1zd2lmdEBmaXh0dXJlLWhvc3Rac3RhbmRhbG9uZTNBx8iDYwAAAFtkZXYtZml4dHVyZdYqKywtLi8wNDUnNjNfEA9qb2JfcGVyc2lzdGVuY2VfEBBub3RpZnlfZmFzdF9wYXRoXxASbm90aWZ5X3BlcnNpc3RlbmNlW29ic2VydmVkX2F0V3JlYXNvbnNVc3RhdGXTMTIvFhYzVWRpcnR5XxAPcmV0cnlfc2NoZWR1bGVkV2hlYWx0aHnTMTIvFhYz0zEyLxYWM6CgoTnWOjs8PS8+P0BBQkMnWmdlbmVyYXRpb25ebGFzdF9wb3N0ZWRfYXRUbmFtZVVzY29wZVp1cGRhdGVkX2F0EAQzQcfIg2CAAABfEBljb20ubGF1bmNoeC5maXh0dXJlLmNoZWNrVWxvY2FsEAdSb2sACAAPACIAKQAwADIAPQBKAFEAWABdAGoAeQCHAKIAvwDjAP8BGQE1ATgBSwFgAWEBYgF1AYcBnQGnAbABuAHTAeAB6wHzAg8CHgIrAkgCUwJcAmgCdQKHApoCrwK7AsMCyQLQAtYC6ALwAvcC/gL/AwADAgMPAxoDKQMuAzQDPwNBA0oDZgNsA24AAAAAAAACAQAAAAAAAABFAAAAAAAAAAAAAAAAAAADcQ=="
+    },
+    {
+      "id": "response.diagnostics.snapshot.notify_fast_path.recovered",
+      "kind": "response",
+      "description": "diagnostics snapshot recovered notify fast path",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAVIXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHVBgcICQoLGCk7PFxjYXBhYmlsaXRpZXNWZGFlbW9uVmhlYWx0aFRqb2JzXG5vdGlmeV9uYW1lc9cMDQ4PEBESExYWFhcXF11mZWF0dXJlX2ZsYWdzXxAYc3VwcG9ydHNfY2x1c3Rlcl9vdmVybGF5XxAac3VwcG9ydHNfbGF1bmNoY3RsX3dyYXBwZXJfECFzdXBwb3J0c19uYXRpdmVfbWFjb3NfcGFzc3Rocm91Z2hfEBlzdXBwb3J0c19ub3RpZnlfZmFzdF9wYXRoXxAXc3VwcG9ydHNfdXNlcnNwYWNlX2pvYnNfEBlzdXBwb3J0c191c2Vyc3BhY2Vfbm90aWZ5ohQVXxAQdXNlcnNwYWNlX25vdGlmeV8QEm5vdGlmeV9yZWdpc3RyeV92MQgJ2RkaGxwdHh8gIRYiIyQlFyYnKF8QD2NsdXN0ZXJfZW5hYmxlZF8QE2NvbnRyb2xfc29ja2V0X3BhdGhZZGFlbW9uX2lkWGhvc3RuYW1lV25vZGVfaWRfEBhub3RpZnlfZmFzdF9wYXRoX2VuYWJsZWRccnVudGltZV9tb2RlWnN0YXJ0ZWRfYXRXdmVyc2lvbl8QGS90bXAvbGF1bmNoeC1maXh0dXJlLnNvY2teZGFlbW9uLWZpeHR1cmVcZml4dHVyZS1ob3N0XxAabGF1bmNoeC1zd2lmdEBmaXh0dXJlLWhvc3Rac3RhbmRhbG9uZTNBx8iDYAAAAFtkZXYtZml4dHVyZdYqKywtLi8wODk2OjdfEA9qb2JfcGVyc2lzdGVuY2VfEBBub3RpZnlfZmFzdF9wYXRoXxASbm90aWZ5X3BlcnNpc3RlbmNlW29ic2VydmVkX2F0V3JlYXNvbnNVc3RhdGXVMTIzNC8WNTYWN1VkaXJ0eV8QEWxhc3RfYXR0ZW1wdGVkX2F0XxARbGFzdF9wZXJzaXN0ZWRfYXRfEA9yZXRyeV9zY2hlZHVsZWQzQcfIg2KAAAAzQcfIg2MAAABXaGVhbHRoedUxMjM0LxY1NhY31TEyMzQvFjU2FjegoKE91j4/QEEvQkNERUZHNlpnZW5lcmF0aW9uXmxhc3RfcG9zdGVkX2F0VG5hbWVVc2NvcGVadXBkYXRlZF9hdBAEM0HHyINggAAAXxAZY29tLmxhdW5jaHguZml4dHVyZS5jaGVja1Vsb2NhbBAHUm9rAAgADwAiACkAMAAyAD0ASgBRAFgAXQBqAHkAhwCiAL8A4wD/ARkBNQE4AUsBYAFhAWIBdQGHAZ0BpwGwAbgB0wHgAesB8wIPAh4CKwJIAlMCXAJoAnUChwKaAq8CuwLDAskC1ALaAu4DAgMUAx0DJgMuAzkDRANFA0YDSANVA2ADbwN0A3oDhQOHA5ADrAOyA7QAAAAAAAACAQAAAAAAAABJAAAAAAAAAAAAAAAAAAADtw=="
+    },
+    {
+      "id": "response.notify.invalid_token.failure",
+      "kind": "response",
+      "description": "notify stale token failure",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAkBVWVycm9yXxAQcHJvdG9jb2xfdmVyc2lvblZzdGF0dXPSBQYHCFRjb2RlV21lc3NhZ2Vdbm90aWZ5X2ZhaWxlZF8QIG5vdGlmeV9mYWlsZWQoaW52YWxpZF90b2tlbig0MikpEAEIDxUoLzQ5QU9yAAAAAAAAAQEAAAAAAAAACgAAAAAAAAAAAAAAAAAAAHQ="
+    },
+    {
+      "id": "response.notify.missing_name.failure",
+      "kind": "response",
+      "description": "notify missing name invalid request failure",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAkBVWVycm9yXxAQcHJvdG9jb2xfdmVyc2lvblZzdGF0dXPSBQYHCFRjb2RlV21lc3NhZ2VfEA9pbnZhbGlkX3JlcXVlc3RfEB1pbnZhbGlkX3JlcXVlc3QobWlzc2luZyBuYW1lKRABCA8VKC80OUFTcwAAAAAAAAEBAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAB1"
+    },
+    {
+      "id": "response.notify.invalid_scope.failure",
+      "kind": "response",
+      "description": "notify invalid scope failure",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAkBVWVycm9yXxAQcHJvdG9jb2xfdmVyc2lvblZzdGF0dXPSBQYHCFRjb2RlV21lc3NhZ2VfEA9pbnZhbGlkX3JlcXVlc3RfECVpbnZhbGlkX3JlcXVlc3QoaW52YWxpZCBzY29wZSByZW1vdGUpEAEIDxUoLzQ5QVN7AAAAAAAAAQEAAAAAAAAACgAAAAAAAAAAAAAAAAAAAH0="
+    },
+    {
+      "id": "response.notify.invalid_signal.failure",
+      "kind": "response",
+      "description": "notify invalid signal failure",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAkBVWVycm9yXxAQcHJvdG9jb2xfdmVyc2lvblZzdGF0dXPSBQYHCFRjb2RlV21lc3NhZ2Vdbm90aWZ5X2ZhaWxlZF8QIG5vdGlmeV9mYWlsZWQoaW52YWxpZF9zaWduYWwoMCkpEAEIDxUoLzQ5QU9yAAAAAAAAAQEAAAAAAAAACgAAAAAAAAAAAAAAAAAAAHQ="
+    },
+    {
+      "id": "response.notify.invalid_reuse.failure",
+      "kind": "response",
+      "description": "notify invalid file descriptor reuse failure",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAkBVWVycm9yXxAQcHJvdG9jb2xfdmVyc2lvblZzdGF0dXPSBQYHCFRjb2RlV21lc3NhZ2Vdbm90aWZ5X2ZhaWxlZF8QMm5vdGlmeV9mYWlsZWQoaW52YWxpZF9jbGllbnRfcmVnaXN0cmF0aW9uX2lkKG5pbCkpEAEIDxUoLzQ5QU+EAAAAAAAAAQEAAAAAAAAACgAAAAAAAAAAAAAAAAAAAIY="
+    },
+    {
+      "id": "response.notify.missing_dispatch_queue.failure",
+      "kind": "response",
+      "description": "notify missing dispatch queue invalid request failure",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAkBVWVycm9yXxAQcHJvdG9jb2xfdmVyc2lvblZzdGF0dXPSBQYHCFRjb2RlV21lc3NhZ2VfEA9pbnZhbGlkX3JlcXVlc3RfECNpbnZhbGlkX3JlcXVlc3QobWlzc2luZyBxdWV1ZV9uYW1lKRABCA8VKC80OUFTeQAAAAAAAAEBAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAB7"
+    },
+    {
+      "id": "response.scalar_coverage.success",
+      "kind": "response",
+      "description": "control value scalar coverage",
+      "payload_base64": "YnBsaXN0MDDTAQIDBAUbXxAQcHJvdG9jb2xfdmVyc2lvblZyZXN1bHRWc3RhdHVzEAHZBgcICQoLDA0ODxIRExQVFhcaVWFycmF5WmJvb2xfZmFsc2VZYm9vbF90cnVlVGRhdGFUZGF0ZVZkb3VibGVXaW50ZWdlclZvYmplY3RWc3RyaW5nowQQEVN0d28JCEdsYXVuY2h4M0HHyINgAAAAI0AMAAAAAAAAE//////////W0RgZVm5lc3RlZFV2YWx1ZVVoZWxsb1JvawgPIikwMkVLVmBlanF5gIeLj5CRmaKrtLe+xMoAAAAAAAABAQAAAAAAAAAcAAAAAAAAAAAAAAAAAAAAzQ=="
+    }
+  ]
+}
