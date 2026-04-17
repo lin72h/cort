@@ -2846,6 +2846,481 @@ char *_FXCFControlResponseProfileCopySummary(const struct _FXCFControlResponsePr
     }
 }
 
+static const char *__FXCFControlNotifyOutcomeKindText(enum _FXCFControlNotifyOutcomeKind kind) {
+    switch (kind) {
+        case _FXCFControlNotifyOutcomeKindError:
+            return "error";
+        case _FXCFControlNotifyOutcomeKindPost:
+            return "notify.post";
+        case _FXCFControlNotifyOutcomeKindRegistration:
+            return "notify.registration";
+        case _FXCFControlNotifyOutcomeKindCheck:
+            return "notify.check";
+        case _FXCFControlNotifyOutcomeKindCancel:
+            return "notify.cancel";
+        case _FXCFControlNotifyOutcomeKindNameState:
+            return "notify.name_state";
+        case _FXCFControlNotifyOutcomeKindValidity:
+            return "notify.validity";
+        default:
+            return "invalid";
+    }
+}
+
+static const char *__FXCFControlNotifyStatusFamilyText(enum _FXCFControlNotifyStatusFamily family) {
+    switch (family) {
+        case _FXCFControlNotifyStatusFamilyOK:
+            return "ok";
+        case _FXCFControlNotifyStatusFamilyInvalidRequest:
+            return "invalid_request";
+        case _FXCFControlNotifyStatusFamilyInvalidName:
+            return "invalid_name";
+        case _FXCFControlNotifyStatusFamilyInvalidToken:
+            return "invalid_token";
+        case _FXCFControlNotifyStatusFamilyInvalidSignal:
+            return "invalid_signal";
+        case _FXCFControlNotifyStatusFamilyInvalidFile:
+            return "invalid_file";
+        case _FXCFControlNotifyStatusFamilyFailed:
+            return "failed";
+        default:
+            return "invalid";
+    }
+}
+
+static enum _FXCFControlNotifyStatusFamily __FXCFControlNotifyStatusFamilyForError(CFStringRef code, CFStringRef message) {
+    char *codeText = NULL;
+    char *messageText = NULL;
+    enum _FXCFControlNotifyStatusFamily family = _FXCFControlNotifyStatusFamilyFailed;
+
+    codeText = __FXCFControlPacketCopyCString(code);
+    messageText = __FXCFControlPacketCopyCString(message);
+    if (codeText == NULL || messageText == NULL) {
+        free(codeText);
+        free(messageText);
+        return family;
+    }
+
+    if (strcmp(codeText, "notify_failed") == 0) {
+        if (strstr(messageText, "invalid_name(") != NULL) {
+            family = _FXCFControlNotifyStatusFamilyInvalidName;
+        } else if (strstr(messageText, "invalid_token(") != NULL) {
+            family = _FXCFControlNotifyStatusFamilyInvalidToken;
+        } else if (strstr(messageText, "invalid_signal(") != NULL) {
+            family = _FXCFControlNotifyStatusFamilyInvalidSignal;
+        } else if (strstr(messageText, "invalid_client_registration_id(") != NULL) {
+            family = _FXCFControlNotifyStatusFamilyInvalidRequest;
+        } else if (strstr(messageText, "transport_binding_in_use(") != NULL ||
+                strstr(messageText, "unknown_transport_binding(") != NULL ||
+                strstr(messageText, "transport_failed(") != NULL) {
+            family = _FXCFControlNotifyStatusFamilyInvalidFile;
+        } else {
+            family = _FXCFControlNotifyStatusFamilyFailed;
+        }
+    } else if (strcmp(codeText, "invalid_request") == 0 || strcmp(codeText, "unsupported_method") == 0) {
+        family = _FXCFControlNotifyStatusFamilyInvalidRequest;
+    } else {
+        family = _FXCFControlNotifyStatusFamilyFailed;
+    }
+
+    free(codeText);
+    free(messageText);
+    return family;
+}
+
+static Boolean __FXCFControlNotifyRegistrationViewInit(
+    CFDictionaryRef dictionary,
+    struct _FXCFControlNotifyRegistrationView *viewOut,
+    struct _FXCFControlPacketError *errorOut
+) {
+    if (dictionary == NULL || viewOut == NULL) {
+        __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "registration view input is NULL");
+        return false;
+    }
+
+    memset(viewOut, 0, sizeof(*viewOut));
+    return
+        __FXCFControlPacketRequireInteger(dictionary, "token", &viewOut->token, errorOut) &&
+        __FXCFControlPacketRequireString(dictionary, "session_id", &viewOut->sessionID, errorOut) &&
+        __FXCFControlPacketRequireString(dictionary, "scope", &viewOut->scope, errorOut) &&
+        __FXCFControlPacketRequireString(dictionary, "name", &viewOut->name, errorOut) &&
+        __FXCFControlPacketLookupOptionalString(dictionary, "local_transport_binding_id", &viewOut->bindingID, NULL, errorOut) &&
+        __FXCFControlPacketLookupOptionalString(dictionary, "local_transport_handle", &viewOut->bindingHandle, NULL, errorOut) &&
+        __FXCFControlPacketRequireInteger(dictionary, "last_seen_generation", &viewOut->lastSeenGeneration, errorOut) &&
+        __FXCFControlPacketRequireBoolean(dictionary, "first_check_pending", &viewOut->firstCheckPending, errorOut);
+}
+
+void _FXCFControlNotifyOutcomeClear(struct _FXCFControlNotifyOutcome *outcome) {
+    if (outcome == NULL) {
+        return;
+    }
+    _FXCFControlResponseProfileClear(&outcome->profile);
+    memset(outcome, 0, sizeof(*outcome));
+}
+
+Boolean _FXCFControlNotifyOutcomeInit(
+    CFAllocatorRef allocator,
+    CFDataRef payload,
+    struct _FXCFControlNotifyOutcome *outcomeOut,
+    struct _FXCFControlPacketError *errorOut
+) {
+    if (outcomeOut == NULL) {
+        __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "outcomeOut is NULL");
+        return false;
+    }
+
+    memset(outcomeOut, 0, sizeof(*outcomeOut));
+    if (!_FXCFControlResponseProfileInit(allocator, payload, &outcomeOut->profile, errorOut)) {
+        return false;
+    }
+
+    if (outcomeOut->profile.kind == _FXCFControlResponseProfileKindError) {
+        outcomeOut->kind = _FXCFControlNotifyOutcomeKindError;
+        outcomeOut->statusFamily = __FXCFControlNotifyStatusFamilyForError(
+            outcomeOut->profile.response.errorCode,
+            outcomeOut->profile.response.errorMessage
+        );
+        return true;
+    }
+
+    outcomeOut->statusFamily = _FXCFControlNotifyStatusFamilyOK;
+
+    switch (outcomeOut->profile.kind) {
+        case _FXCFControlResponseProfileKindNotifyPost:
+            outcomeOut->kind = _FXCFControlNotifyOutcomeKindPost;
+            if (!outcomeOut->profile.hasGeneration || !outcomeOut->profile.hasState ||
+                outcomeOut->profile.deliveredTokens == NULL || outcomeOut->profile.nameObject == NULL ||
+                !__FXCFControlPacketRequireString(outcomeOut->profile.nameObject, "name", &outcomeOut->name, errorOut) ||
+                !__FXCFControlPacketRequireString(outcomeOut->profile.nameObject, "scope", &outcomeOut->scope, errorOut)) {
+                __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "invalid notify post outcome");
+                _FXCFControlNotifyOutcomeClear(outcomeOut);
+                return false;
+            }
+            outcomeOut->hasGeneration = true;
+            outcomeOut->generation = outcomeOut->profile.generation;
+            outcomeOut->hasState = true;
+            outcomeOut->state = outcomeOut->profile.state;
+            outcomeOut->hasDeliveredTokensCount = true;
+            outcomeOut->deliveredTokensCount = CFArrayGetCount(outcomeOut->profile.deliveredTokens);
+            return true;
+
+        case _FXCFControlResponseProfileKindNotifyRegistrationWrapper:
+        case _FXCFControlResponseProfileKindNotifyRegistration:
+            outcomeOut->kind = _FXCFControlNotifyOutcomeKindRegistration;
+            outcomeOut->hasRegistration = true;
+            if (!__FXCFControlNotifyRegistrationViewInit(outcomeOut->profile.registration, &outcomeOut->registration, errorOut)) {
+                _FXCFControlNotifyOutcomeClear(outcomeOut);
+                return false;
+            }
+            return true;
+
+        case _FXCFControlResponseProfileKindNotifyCheck:
+            outcomeOut->kind = _FXCFControlNotifyOutcomeKindCheck;
+            if (!outcomeOut->profile.hasChanged || !outcomeOut->profile.hasGeneration || !outcomeOut->profile.hasCurrentState) {
+                __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "invalid notify check outcome");
+                _FXCFControlNotifyOutcomeClear(outcomeOut);
+                return false;
+            }
+            outcomeOut->hasRegistration = true;
+            if (!__FXCFControlNotifyRegistrationViewInit(outcomeOut->profile.registration, &outcomeOut->registration, errorOut)) {
+                _FXCFControlNotifyOutcomeClear(outcomeOut);
+                return false;
+            }
+            outcomeOut->hasChanged = true;
+            outcomeOut->changed = outcomeOut->profile.changed;
+            outcomeOut->hasGeneration = true;
+            outcomeOut->generation = outcomeOut->profile.generation;
+            outcomeOut->hasCurrentState = true;
+            outcomeOut->currentState = outcomeOut->profile.currentState;
+            return true;
+
+        case _FXCFControlResponseProfileKindNotifyCancel:
+            if (!outcomeOut->profile.hasCanceled) {
+                __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "invalid notify cancel outcome");
+                _FXCFControlNotifyOutcomeClear(outcomeOut);
+                return false;
+            }
+            outcomeOut->kind = _FXCFControlNotifyOutcomeKindCancel;
+            outcomeOut->hasCanceled = true;
+            outcomeOut->canceled = outcomeOut->profile.canceled;
+            return true;
+
+        case _FXCFControlResponseProfileKindNotifyNameState:
+            outcomeOut->kind = _FXCFControlNotifyOutcomeKindNameState;
+            if (!outcomeOut->profile.hasGeneration || !outcomeOut->profile.hasState || outcomeOut->profile.nameObject == NULL ||
+                !__FXCFControlPacketRequireString(outcomeOut->profile.nameObject, "name", &outcomeOut->name, errorOut) ||
+                !__FXCFControlPacketRequireString(outcomeOut->profile.nameObject, "scope", &outcomeOut->scope, errorOut)) {
+                __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "invalid notify name_state outcome");
+                _FXCFControlNotifyOutcomeClear(outcomeOut);
+                return false;
+            }
+            outcomeOut->hasGeneration = true;
+            outcomeOut->generation = outcomeOut->profile.generation;
+            outcomeOut->hasState = true;
+            outcomeOut->state = outcomeOut->profile.state;
+            return true;
+
+        case _FXCFControlResponseProfileKindNotifyValidity:
+            if (!outcomeOut->profile.hasValid) {
+                __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "invalid notify validity outcome");
+                _FXCFControlNotifyOutcomeClear(outcomeOut);
+                return false;
+            }
+            outcomeOut->kind = _FXCFControlNotifyOutcomeKindValidity;
+            outcomeOut->hasValid = true;
+            outcomeOut->valid = outcomeOut->profile.valid;
+            return true;
+
+        default:
+            __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "unsupported notify outcome profile");
+            _FXCFControlNotifyOutcomeClear(outcomeOut);
+            return false;
+    }
+}
+
+static Boolean __FXCFControlNotifyOutcomeAppendRequiredStringJSON(
+    struct __FXCFTextBuffer *buffer,
+    const char *key,
+    CFStringRef value,
+    Boolean *needsComma
+) {
+    char *text = NULL;
+    Boolean ok = false;
+
+    if (value == NULL) {
+        return false;
+    }
+
+    text = __FXCFControlPacketCopyCString(value);
+    if (text == NULL) {
+        return false;
+    }
+
+    ok =
+        __FXCFTextBufferAppendJSONFieldPrefix(buffer, key, needsComma) &&
+        __FXCFTextBufferAppendJSONString(buffer, text);
+    free(text);
+    return ok;
+}
+
+static Boolean __FXCFControlNotifyOutcomeAppendRegistrationJSON(
+    struct __FXCFTextBuffer *buffer,
+    const struct _FXCFControlNotifyRegistrationView *registration
+) {
+    Boolean needsComma = false;
+
+    if (buffer == NULL || registration == NULL) {
+        return false;
+    }
+
+    return
+        __FXCFTextBufferAppendCString(buffer, "{") &&
+        __FXCFControlRequestRouteAppendOptionalStringJSON(buffer, "binding_handle", registration->bindingHandle, &needsComma) &&
+        __FXCFControlRequestRouteAppendOptionalStringJSON(buffer, "binding_id", registration->bindingID, &needsComma) &&
+        __FXCFTextBufferAppendJSONFieldPrefix(buffer, "first_check_pending", &needsComma) &&
+        __FXCFTextBufferAppendCString(buffer, registration->firstCheckPending ? "true" : "false") &&
+        __FXCFTextBufferAppendJSONFieldPrefix(buffer, "last_seen_generation", &needsComma) &&
+        __FXCFTextBufferAppendFormat(buffer, "%ld", (long)registration->lastSeenGeneration) &&
+        __FXCFControlNotifyOutcomeAppendRequiredStringJSON(buffer, "name", registration->name, &needsComma) &&
+        __FXCFControlNotifyOutcomeAppendRequiredStringJSON(buffer, "scope", registration->scope, &needsComma) &&
+        __FXCFControlNotifyOutcomeAppendRequiredStringJSON(buffer, "session_id", registration->sessionID, &needsComma) &&
+        __FXCFTextBufferAppendJSONFieldPrefix(buffer, "token", &needsComma) &&
+        __FXCFTextBufferAppendFormat(buffer, "%ld", (long)registration->token) &&
+        __FXCFTextBufferAppendCString(buffer, "}");
+}
+
+char *_FXCFControlNotifyOutcomeCopyCanonicalJSON(const struct _FXCFControlNotifyOutcome *outcome) {
+    struct __FXCFTextBuffer buffer = {0};
+    const char *kindText = NULL;
+    const char *statusFamilyText = NULL;
+    char *result = NULL;
+    Boolean needsComma = false;
+    Boolean ok = false;
+
+    if (outcome == NULL || outcome->profile.response.packet == NULL) {
+        return NULL;
+    }
+
+    kindText = __FXCFControlNotifyOutcomeKindText(outcome->kind);
+    statusFamilyText = __FXCFControlNotifyStatusFamilyText(outcome->statusFamily);
+    if (!__FXCFTextBufferAppendCString(&buffer, "{") ||
+        !__FXCFTextBufferAppendJSONFieldPrefix(&buffer, "kind", &needsComma) ||
+        !__FXCFTextBufferAppendJSONString(&buffer, kindText) ||
+        !__FXCFTextBufferAppendJSONFieldPrefix(&buffer, "status_family", &needsComma) ||
+        !__FXCFTextBufferAppendJSONString(&buffer, statusFamilyText)) {
+        __FXCFTextBufferFree(&buffer);
+        return NULL;
+    }
+
+    switch (outcome->kind) {
+        case _FXCFControlNotifyOutcomeKindError: {
+            ok =
+                __FXCFControlNotifyOutcomeAppendRequiredStringJSON(&buffer, "code", outcome->profile.response.errorCode, &needsComma) &&
+                __FXCFControlNotifyOutcomeAppendRequiredStringJSON(&buffer, "message", outcome->profile.response.errorMessage, &needsComma);
+            break;
+        }
+        case _FXCFControlNotifyOutcomeKindPost:
+            ok =
+                __FXCFTextBufferAppendJSONFieldPrefix(&buffer, "delivered_tokens_count", &needsComma) &&
+                __FXCFTextBufferAppendFormat(&buffer, "%ld", (long)outcome->deliveredTokensCount) &&
+                __FXCFTextBufferAppendJSONFieldPrefix(&buffer, "generation", &needsComma) &&
+                __FXCFTextBufferAppendFormat(&buffer, "%ld", (long)outcome->generation) &&
+                __FXCFControlNotifyOutcomeAppendRequiredStringJSON(&buffer, "name", outcome->name, &needsComma) &&
+                __FXCFControlNotifyOutcomeAppendRequiredStringJSON(&buffer, "scope", outcome->scope, &needsComma) &&
+                __FXCFTextBufferAppendJSONFieldPrefix(&buffer, "state", &needsComma) &&
+                __FXCFTextBufferAppendFormat(&buffer, "%ld", (long)outcome->state);
+            break;
+        case _FXCFControlNotifyOutcomeKindRegistration:
+            ok =
+                __FXCFTextBufferAppendJSONFieldPrefix(&buffer, "registration", &needsComma) &&
+                __FXCFControlNotifyOutcomeAppendRegistrationJSON(&buffer, &outcome->registration);
+            break;
+        case _FXCFControlNotifyOutcomeKindCheck:
+            ok =
+                __FXCFTextBufferAppendJSONFieldPrefix(&buffer, "changed", &needsComma) &&
+                __FXCFTextBufferAppendCString(&buffer, outcome->changed ? "true" : "false") &&
+                __FXCFTextBufferAppendJSONFieldPrefix(&buffer, "current_state", &needsComma) &&
+                __FXCFTextBufferAppendFormat(&buffer, "%ld", (long)outcome->currentState) &&
+                __FXCFTextBufferAppendJSONFieldPrefix(&buffer, "generation", &needsComma) &&
+                __FXCFTextBufferAppendFormat(&buffer, "%ld", (long)outcome->generation) &&
+                __FXCFTextBufferAppendJSONFieldPrefix(&buffer, "registration", &needsComma) &&
+                __FXCFControlNotifyOutcomeAppendRegistrationJSON(&buffer, &outcome->registration);
+            break;
+        case _FXCFControlNotifyOutcomeKindCancel:
+            ok =
+                __FXCFTextBufferAppendJSONFieldPrefix(&buffer, "canceled", &needsComma) &&
+                __FXCFTextBufferAppendCString(&buffer, outcome->canceled ? "true" : "false");
+            break;
+        case _FXCFControlNotifyOutcomeKindNameState:
+            ok =
+                __FXCFTextBufferAppendJSONFieldPrefix(&buffer, "generation", &needsComma) &&
+                __FXCFTextBufferAppendFormat(&buffer, "%ld", (long)outcome->generation) &&
+                __FXCFControlNotifyOutcomeAppendRequiredStringJSON(&buffer, "name", outcome->name, &needsComma) &&
+                __FXCFControlNotifyOutcomeAppendRequiredStringJSON(&buffer, "scope", outcome->scope, &needsComma) &&
+                __FXCFTextBufferAppendJSONFieldPrefix(&buffer, "state", &needsComma) &&
+                __FXCFTextBufferAppendFormat(&buffer, "%ld", (long)outcome->state);
+            break;
+        case _FXCFControlNotifyOutcomeKindValidity:
+            ok =
+                __FXCFTextBufferAppendJSONFieldPrefix(&buffer, "valid", &needsComma) &&
+                __FXCFTextBufferAppendCString(&buffer, outcome->valid ? "true" : "false");
+            break;
+        default:
+            ok = false;
+            break;
+    }
+
+    if (!ok || !__FXCFTextBufferAppendCString(&buffer, "}")) {
+        __FXCFTextBufferFree(&buffer);
+        return NULL;
+    }
+
+    result = __FXCFTextBufferDetach(&buffer);
+    __FXCFTextBufferFree(&buffer);
+    return result;
+}
+
+char *_FXCFControlNotifyOutcomeCopySummary(const struct _FXCFControlNotifyOutcome *outcome) {
+    char *result = NULL;
+    char *sessionText = NULL;
+    char *codeText = NULL;
+    size_t size = 0u;
+    const char *statusFamilyText = NULL;
+
+    if (outcome == NULL || outcome->profile.response.packet == NULL) {
+        return NULL;
+    }
+
+    statusFamilyText = __FXCFControlNotifyStatusFamilyText(outcome->statusFamily);
+    switch (outcome->kind) {
+        case _FXCFControlNotifyOutcomeKindError:
+            codeText = __FXCFControlPacketCopyCString(outcome->profile.response.errorCode);
+            if (codeText == NULL) {
+                return NULL;
+            }
+            size = strlen(statusFamilyText) + strlen(codeText) + 24u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "notify error %s code=%s", statusFamilyText, codeText);
+            }
+            free(codeText);
+            return result;
+
+        case _FXCFControlNotifyOutcomeKindPost:
+            size = 72u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "notify %s post generation=%ld delivered=%ld",
+                    statusFamilyText,
+                    (long)outcome->generation,
+                    (long)outcome->deliveredTokensCount);
+            }
+            return result;
+
+        case _FXCFControlNotifyOutcomeKindRegistration:
+            sessionText = __FXCFControlPacketCopyCString(outcome->registration.sessionID);
+            if (sessionText == NULL) {
+                return NULL;
+            }
+            size = strlen(sessionText) + 56u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "notify %s registration token=%ld session=%s",
+                    statusFamilyText,
+                    (long)outcome->registration.token,
+                    sessionText);
+            }
+            free(sessionText);
+            return result;
+
+        case _FXCFControlNotifyOutcomeKindCheck:
+            size = 80u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "notify %s check token=%ld changed=%s generation=%ld",
+                    statusFamilyText,
+                    (long)outcome->registration.token,
+                    outcome->changed ? "true" : "false",
+                    (long)outcome->generation);
+            }
+            return result;
+
+        case _FXCFControlNotifyOutcomeKindCancel:
+            size = 48u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "notify %s cancel canceled=%s",
+                    statusFamilyText,
+                    outcome->canceled ? "true" : "false");
+            }
+            return result;
+
+        case _FXCFControlNotifyOutcomeKindNameState:
+            size = 72u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "notify %s name_state state=%ld generation=%ld",
+                    statusFamilyText,
+                    (long)outcome->state,
+                    (long)outcome->generation);
+            }
+            return result;
+
+        case _FXCFControlNotifyOutcomeKindValidity:
+            size = 48u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "notify %s validity valid=%s",
+                    statusFamilyText,
+                    outcome->valid ? "true" : "false");
+            }
+            return result;
+
+        default:
+            return NULL;
+    }
+}
+
 static Boolean __FXCFControlResponseAppendSuccessEnvelopeJSON(struct __FXCFTextBuffer *buffer, const struct _FXCFControlResponse *response) {
     enum _FXCFControlValueKind kind = _FXCFControlPacketValueKind(response->result);
     const char *kindText = __FXCFControlValueKindText(kind);

@@ -66,6 +66,28 @@ enum _FXCFControlResponseProfileKind {
     _FXCFControlResponseProfileKindGenericObject = 13
 };
 
+enum _FXCFControlNotifyStatusFamily {
+    _FXCFControlNotifyStatusFamilyInvalid = 0,
+    _FXCFControlNotifyStatusFamilyOK = 1,
+    _FXCFControlNotifyStatusFamilyInvalidRequest = 2,
+    _FXCFControlNotifyStatusFamilyInvalidName = 3,
+    _FXCFControlNotifyStatusFamilyInvalidToken = 4,
+    _FXCFControlNotifyStatusFamilyInvalidSignal = 5,
+    _FXCFControlNotifyStatusFamilyInvalidFile = 6,
+    _FXCFControlNotifyStatusFamilyFailed = 7
+};
+
+enum _FXCFControlNotifyOutcomeKind {
+    _FXCFControlNotifyOutcomeKindInvalid = 0,
+    _FXCFControlNotifyOutcomeKindError = 1,
+    _FXCFControlNotifyOutcomeKindPost = 2,
+    _FXCFControlNotifyOutcomeKindRegistration = 3,
+    _FXCFControlNotifyOutcomeKindCheck = 4,
+    _FXCFControlNotifyOutcomeKindCancel = 5,
+    _FXCFControlNotifyOutcomeKindNameState = 6,
+    _FXCFControlNotifyOutcomeKindValidity = 7
+};
+
 enum _FXCFControlPacketErrorKind {
     _FXCFControlPacketErrorNone = 0,
     _FXCFControlPacketErrorMissingKey = 1,
@@ -149,6 +171,41 @@ struct _FXCFControlResponseProfile {
     CFIndex pendingGeneration;
 };
 
+struct _FXCFControlNotifyRegistrationView {
+    CFStringRef sessionID;
+    CFStringRef scope;
+    CFStringRef name;
+    CFStringRef bindingID;
+    CFStringRef bindingHandle;
+    CFIndex token;
+    CFIndex lastSeenGeneration;
+    Boolean firstCheckPending;
+};
+
+struct _FXCFControlNotifyOutcome {
+    struct _FXCFControlResponseProfile profile;
+    enum _FXCFControlNotifyOutcomeKind kind;
+    enum _FXCFControlNotifyStatusFamily statusFamily;
+    Boolean hasRegistration;
+    struct _FXCFControlNotifyRegistrationView registration;
+    Boolean hasDeliveredTokensCount;
+    CFIndex deliveredTokensCount;
+    CFStringRef name;
+    CFStringRef scope;
+    Boolean hasGeneration;
+    CFIndex generation;
+    Boolean hasState;
+    CFIndex state;
+    Boolean hasCurrentState;
+    CFIndex currentState;
+    Boolean hasChanged;
+    Boolean changed;
+    Boolean hasCanceled;
+    Boolean canceled;
+    Boolean hasValid;
+    Boolean valid;
+};
+
 Boolean _FXCFControlPacketIsBinaryPlist(CFDataRef payload);
 
 Boolean _FXCFControlPacketDecodeEnvelope(
@@ -196,6 +253,15 @@ Boolean _FXCFControlResponseProfileInit(
 void _FXCFControlResponseProfileClear(struct _FXCFControlResponseProfile *profile);
 char *_FXCFControlResponseProfileCopyCanonicalJSON(const struct _FXCFControlResponseProfile *profile);
 char *_FXCFControlResponseProfileCopySummary(const struct _FXCFControlResponseProfile *profile);
+Boolean _FXCFControlNotifyOutcomeInit(
+    CFAllocatorRef allocator,
+    CFDataRef payload,
+    struct _FXCFControlNotifyOutcome *outcomeOut,
+    struct _FXCFControlPacketError *errorOut
+);
+void _FXCFControlNotifyOutcomeClear(struct _FXCFControlNotifyOutcome *outcome);
+char *_FXCFControlNotifyOutcomeCopyCanonicalJSON(const struct _FXCFControlNotifyOutcome *outcome);
+char *_FXCFControlNotifyOutcomeCopySummary(const struct _FXCFControlNotifyOutcome *outcome);
 char *_FXCFControlPacketCopyCanonicalJSON(CFTypeRef value);
 char *_FXCFControlPacketCopyAcceptedSummary(CFDictionaryRef packet, enum _FXCFControlPacketKind kind);
 char *_FXCFControlRequestCopyEnvelopeJSON(const struct _FXCFControlRequest *request);

@@ -12,6 +12,8 @@ Files:
 - `subset7a_control_packet_expected_v1.json`
 - `subset7b_control_envelope_expected_v1.json`
 - `subset7c_control_request_route_expected_v1.json`
+- `subset7d_control_response_profile_expected_v1.json`
+- `subset7e_notify_client_outcome_expected_v1.json`
 
 Provenance:
 
@@ -61,4 +63,22 @@ request and rejection source corpora by:
 
 That file carries the internal request-route expected surface for the first
 consumer-facing packet cut. It is generated from the source corpora and should
+not be hand-edited.
+
+`subset7d_control_response_profile_expected_v1.json` is derived from the shared
+response corpus by:
+
+- `tools/build_subset7d_control_response_profile_expected.exs`
+
+That file carries the internal response-profile expected surface for the first
+response-side consumer cut. It is generated from the source corpora and should
+not be hand-edited.
+
+`subset7e_notify_client_outcome_expected_v1.json` is derived from the shared
+response corpus and the current notify-client consumer contract by:
+
+- `tools/build_subset7e_notify_client_expected.exs`
+
+That file carries the notify-client outcome expected surface for the next
+bounded packet consumer cut. It is generated from the source corpora and should
 not be hand-edited.

@@ -1,0 +1,231 @@
+{
+  "probe": "subset7e_notify_client_outcome",
+  "format": "CORT FX Subset 7E notify client outcome probe",
+  "results": [
+    {
+      "name": "response.notify.cancel.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"notify.cancel\",\"status_family\":\"ok\",\"canceled\":true}",
+      "alternate_value_text": "notify ok cancel canceled=true"
+    },
+    {
+      "name": "response.notify.check.changed.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"notify.check\",\"status_family\":\"ok\",\"changed\":true,\"current_state\":7,\"generation\":4,\"registration\":{\"first_check_pending\":false,\"last_seen_generation\":4,\"name\":\"com.launchx.fixture.check\",\"scope\":\"local\",\"session_id\":\"session-alpha\",\"token\":42}}",
+      "alternate_value_text": "notify ok check token=42 changed=true generation=4"
+    },
+    {
+      "name": "response.notify.check.cluster.changed.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"notify.check\",\"status_family\":\"ok\",\"changed\":true,\"current_state\":29,\"generation\":1,\"registration\":{\"first_check_pending\":false,\"last_seen_generation\":1,\"name\":\"com.launchx.fixture.check\",\"scope\":\"cluster\",\"session_id\":\"session-cluster\",\"token\":43}}",
+      "alternate_value_text": "notify ok check token=43 changed=true generation=1"
+    },
+    {
+      "name": "response.notify.check.unchanged.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"notify.check\",\"status_family\":\"ok\",\"changed\":false,\"current_state\":29,\"generation\":0,\"registration\":{\"first_check_pending\":false,\"last_seen_generation\":0,\"name\":\"com.launchx.fixture.check\",\"scope\":\"cluster\",\"session_id\":\"session-cluster\",\"token\":43}}",
+      "alternate_value_text": "notify ok check token=43 changed=false generation=0"
+    },
+    {
+      "name": "response.notify.get_state.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"notify.name_state\",\"status_family\":\"ok\",\"generation\":4,\"name\":\"com.launchx.fixture.check\",\"scope\":\"local\",\"state\":-1}",
+      "alternate_value_text": "notify ok name_state state=-1 generation=4"
+    },
+    {
+      "name": "response.notify.invalid_reuse.failure",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"error\",\"status_family\":\"invalid_request\",\"code\":\"notify_failed\",\"message\":\"notify_failed(invalid_client_registration_id(nil))\"}",
+      "alternate_value_text": "notify error invalid_request code=notify_failed"
+    },
+    {
+      "name": "response.notify.invalid_scope.failure",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"error\",\"status_family\":\"invalid_request\",\"code\":\"invalid_request\",\"message\":\"invalid_request(invalid scope remote)\"}",
+      "alternate_value_text": "notify error invalid_request code=invalid_request"
+    },
+    {
+      "name": "response.notify.invalid_signal.failure",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"error\",\"status_family\":\"invalid_signal\",\"code\":\"notify_failed\",\"message\":\"notify_failed(invalid_signal(0))\"}",
+      "alternate_value_text": "notify error invalid_signal code=notify_failed"
+    },
+    {
+      "name": "response.notify.invalid_token.failure",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"error\",\"status_family\":\"invalid_token\",\"code\":\"notify_failed\",\"message\":\"notify_failed(invalid_token(42))\"}",
+      "alternate_value_text": "notify error invalid_token code=notify_failed"
+    },
+    {
+      "name": "response.notify.is_valid_token.false",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"notify.validity\",\"status_family\":\"ok\",\"valid\":false}",
+      "alternate_value_text": "notify ok validity valid=false"
+    },
+    {
+      "name": "response.notify.missing_dispatch_queue.failure",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"error\",\"status_family\":\"invalid_request\",\"code\":\"invalid_request\",\"message\":\"invalid_request(missing queue_name)\"}",
+      "alternate_value_text": "notify error invalid_request code=invalid_request"
+    },
+    {
+      "name": "response.notify.missing_name.failure",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"error\",\"status_family\":\"invalid_request\",\"code\":\"invalid_request\",\"message\":\"invalid_request(missing name)\"}",
+      "alternate_value_text": "notify error invalid_request code=invalid_request"
+    },
+    {
+      "name": "response.notify.post.cluster.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"notify.post\",\"status_family\":\"ok\",\"delivered_tokens_count\":0,\"generation\":1,\"name\":\"com.launchx.fixture.check\",\"scope\":\"cluster\",\"state\":29}",
+      "alternate_value_text": "notify ok post generation=1 delivered=0"
+    },
+    {
+      "name": "response.notify.post.dispatch.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"notify.post\",\"status_family\":\"ok\",\"delivered_tokens_count\":0,\"generation\":1,\"name\":\"com.launchx.fixture.dispatch\",\"scope\":\"local\",\"state\":0}",
+      "alternate_value_text": "notify ok post generation=1 delivered=0"
+    },
+    {
+      "name": "response.notify.post.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"notify.post\",\"status_family\":\"ok\",\"delivered_tokens_count\":1,\"generation\":5,\"name\":\"com.launchx.fixture.check\",\"scope\":\"local\",\"state\":7}",
+      "alternate_value_text": "notify ok post generation=5 delivered=1"
+    },
+    {
+      "name": "response.notify.registration.check.cluster.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"notify.registration\",\"status_family\":\"ok\",\"registration\":{\"first_check_pending\":true,\"last_seen_generation\":0,\"name\":\"com.launchx.fixture.check\",\"scope\":\"cluster\",\"session_id\":\"session-cluster\",\"token\":43}}",
+      "alternate_value_text": "notify ok registration token=43 session=session-cluster"
+    },
+    {
+      "name": "response.notify.registration.check.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"notify.registration\",\"status_family\":\"ok\",\"registration\":{\"first_check_pending\":true,\"last_seen_generation\":0,\"name\":\"com.launchx.fixture.check\",\"scope\":\"local\",\"session_id\":\"session-alpha\",\"token\":42}}",
+      "alternate_value_text": "notify ok registration token=42 session=session-alpha"
+    },
+    {
+      "name": "response.notify.registration.dispatch.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"notify.registration\",\"status_family\":\"ok\",\"registration\":{\"first_check_pending\":true,\"last_seen_generation\":0,\"name\":\"com.launchx.fixture.dispatch\",\"scope\":\"local\",\"session_id\":\"session-dispatch\",\"token\":88}}",
+      "alternate_value_text": "notify ok registration token=88 session=session-dispatch"
+    },
+    {
+      "name": "response.notify.registration.file_descriptor.reuse.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"notify.registration\",\"status_family\":\"ok\",\"registration\":{\"binding_handle\":\"/tmp/launchx-notify-fixture.sock\",\"binding_id\":\"binding-alpha\",\"first_check_pending\":true,\"last_seen_generation\":0,\"name\":\"com.launchx.fixture.fd\",\"scope\":\"local\",\"session_id\":\"session-fd\",\"token\":78}}",
+      "alternate_value_text": "notify ok registration token=78 session=session-fd"
+    },
+    {
+      "name": "response.notify.registration.file_descriptor.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"notify.registration\",\"status_family\":\"ok\",\"registration\":{\"binding_handle\":\"/tmp/launchx-notify-fixture.sock\",\"binding_id\":\"binding-alpha\",\"first_check_pending\":true,\"last_seen_generation\":0,\"name\":\"com.launchx.fixture.fd.new\",\"scope\":\"local\",\"session_id\":\"session-fd\",\"token\":77}}",
+      "alternate_value_text": "notify ok registration token=77 session=session-fd"
+    },
+    {
+      "name": "response.notify.registration.signal.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"notify.registration\",\"status_family\":\"ok\",\"registration\":{\"first_check_pending\":true,\"last_seen_generation\":0,\"name\":\"com.launchx.fixture.signal\",\"scope\":\"local\",\"session_id\":\"session-signal\",\"token\":51}}",
+      "alternate_value_text": "notify ok registration token=51 session=session-signal"
+    },
+    {
+      "name": "response.notify.resume.failed_after_pending_suspend",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"notify.registration\",\"status_family\":\"ok\",\"registration\":{\"binding_handle\":\"/tmp/launchx-notify-fixture.sock\",\"binding_id\":\"binding-alpha\",\"first_check_pending\":true,\"last_seen_generation\":0,\"name\":\"com.launchx.fixture.fd.new\",\"scope\":\"local\",\"session_id\":\"session-fd\",\"token\":77}}",
+      "alternate_value_text": "notify ok registration token=77 session=session-fd"
+    },
+    {
+      "name": "response.notify.resume.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"notify.registration\",\"status_family\":\"ok\",\"registration\":{\"first_check_pending\":true,\"last_seen_generation\":0,\"name\":\"com.launchx.fixture.signal\",\"scope\":\"local\",\"session_id\":\"session-signal\",\"token\":51}}",
+      "alternate_value_text": "notify ok registration token=51 session=session-signal"
+    },
+    {
+      "name": "response.notify.set_state.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"notify.name_state\",\"status_family\":\"ok\",\"generation\":4,\"name\":\"com.launchx.fixture.check\",\"scope\":\"local\",\"state\":-1}",
+      "alternate_value_text": "notify ok name_state state=-1 generation=4"
+    },
+    {
+      "name": "response.notify.suspend.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"kind\":\"notify.registration\",\"status_family\":\"ok\",\"registration\":{\"first_check_pending\":false,\"last_seen_generation\":4,\"name\":\"com.launchx.fixture.check\",\"scope\":\"local\",\"session_id\":\"session-alpha\",\"token\":42}}",
+      "alternate_value_text": "notify ok registration token=42 session=session-alpha"
+    }
+  ]
+}

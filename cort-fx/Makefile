@@ -29,6 +29,7 @@ PACKET_COMPARE_TOOL := $(REPO_ROOT)/tools/compare_subset7a_control_packet_json.e
 ENVELOPE_COMPARE_TOOL := $(REPO_ROOT)/tools/compare_subset7b_control_envelope_json.exs
 REQUEST_ROUTE_COMPARE_TOOL := $(REPO_ROOT)/tools/compare_subset7c_control_request_json.exs
 RESPONSE_PROFILE_COMPARE_TOOL := $(REPO_ROOT)/tools/compare_subset7d_control_response_json.exs
+NOTIFY_OUTCOME_COMPARE_TOOL := $(REPO_ROOT)/tools/compare_subset7e_control_notify_json.exs
 RUN_ARTIFACT_SCRIPT := scripts/run_subset0_fx_artifacts.sh
 SUBSET1A_COMPARE_ARTIFACT_SCRIPT := scripts/run_subset1a_compare_artifact.sh
 SUBSET2A_COMPARE_ARTIFACT_SCRIPT := scripts/run_subset2a_compare_artifact.sh
@@ -61,6 +62,7 @@ PACKET_TEST_BINARY := $(BIN_DIR)/control_packet_tests
 ENVELOPE_TEST_BINARY := $(BIN_DIR)/control_envelope_tests
 REQUEST_ROUTE_TEST_BINARY := $(BIN_DIR)/control_request_route_tests
 RESPONSE_PROFILE_TEST_BINARY := $(BIN_DIR)/control_response_profile_tests
+NOTIFY_OUTCOME_TEST_BINARY := $(BIN_DIR)/control_notify_outcome_tests
 SMOKE_BINARY := $(BIN_DIR)/c_consumer_smoke
 COMPARE_BINARY := $(BIN_DIR)/subset0_public_compare_fx
 SCALAR_COMPARE_BINARY := $(BIN_DIR)/subset1_scalar_core_fx
@@ -71,6 +73,7 @@ PACKET_COMPARE_BINARY := $(BIN_DIR)/subset7a_control_packet_fx
 ENVELOPE_COMPARE_BINARY := $(BIN_DIR)/subset7b_control_envelope_fx
 REQUEST_ROUTE_COMPARE_BINARY := $(BIN_DIR)/subset7c_control_request_route_fx
 RESPONSE_PROFILE_COMPARE_BINARY := $(BIN_DIR)/subset7d_control_response_profile_fx
+NOTIFY_OUTCOME_COMPARE_BINARY := $(BIN_DIR)/subset7e_control_notify_outcome_fx
 COMPARE_OUTPUT := $(BUILD_DIR)/out/subset0_public_compare_fx.json
 SCALAR_COMPARE_OUTPUT := $(BUILD_DIR)/out/subset1_scalar_core_fx.json
 STRING_COMPARE_OUTPUT := $(BUILD_DIR)/out/subset1b_cfstring_fx.json
@@ -85,10 +88,12 @@ PACKET_COMPARE_OUTPUT := $(BUILD_DIR)/out/subset7a_control_packet_fx.json
 ENVELOPE_COMPARE_OUTPUT := $(BUILD_DIR)/out/subset7b_control_envelope_fx.json
 REQUEST_ROUTE_COMPARE_OUTPUT := $(BUILD_DIR)/out/subset7c_control_request_route_fx.json
 RESPONSE_PROFILE_COMPARE_OUTPUT := $(BUILD_DIR)/out/subset7d_control_response_profile_fx.json
+NOTIFY_OUTCOME_COMPARE_OUTPUT := $(BUILD_DIR)/out/subset7e_notify_client_outcome_fx.json
 SHARED_SUBSET7A_JSON := $(REPO_ROOT)/subset7a_control_packet_fx.json
 SHARED_SUBSET7B_JSON := $(REPO_ROOT)/subset7b_control_envelope_fx.json
 SHARED_SUBSET7C_JSON := $(REPO_ROOT)/subset7c_control_request_route_fx.json
 SHARED_SUBSET7D_JSON := $(REPO_ROOT)/subset7d_control_response_profile_fx.json
+SHARED_SUBSET7E_JSON := $(REPO_ROOT)/subset7e_notify_client_outcome_fx.json
 FX_JSON ?= $(COMPARE_OUTPUT)
 FX_SCALAR_JSON ?= $(SCALAR_COMPARE_OUTPUT)
 FX_STRING_JSON ?= $(STRING_COMPARE_OUTPUT)
@@ -98,6 +103,7 @@ FX_PACKET_JSON ?= $(PACKET_COMPARE_OUTPUT)
 FX_ENVELOPE_JSON ?= $(ENVELOPE_COMPARE_OUTPUT)
 FX_REQUEST_ROUTE_JSON ?= $(REQUEST_ROUTE_COMPARE_OUTPUT)
 FX_RESPONSE_PROFILE_JSON ?= $(RESPONSE_PROFILE_COMPARE_OUTPUT)
+FX_NOTIFY_OUTCOME_JSON ?= $(NOTIFY_OUTCOME_COMPARE_OUTPUT)
 COMPARE_REPORT ?= $(BUILD_DIR)/out/subset0_fx_vs_mx_report.md
 SCALAR_COMPARE_REPORT ?= $(BUILD_DIR)/out/subset1_scalar_core_fx_vs_mx_report.md
 STRING_COMPARE_REPORT ?= $(BUILD_DIR)/out/subset1b_cfstring_fx_vs_mx_report.md
@@ -107,10 +113,12 @@ PACKET_COMPARE_REPORT ?= $(BUILD_DIR)/out/subset7a_control_packet_fx_vs_expected
 ENVELOPE_COMPARE_REPORT ?= $(BUILD_DIR)/out/subset7b_control_envelope_fx_vs_expected_report.md
 REQUEST_ROUTE_COMPARE_REPORT ?= $(BUILD_DIR)/out/subset7c_control_request_route_fx_vs_expected_report.md
 RESPONSE_PROFILE_COMPARE_REPORT ?= $(BUILD_DIR)/out/subset7d_control_response_profile_fx_vs_expected_report.md
+NOTIFY_OUTCOME_COMPARE_REPORT ?= $(BUILD_DIR)/out/subset7e_notify_client_outcome_fx_vs_expected_report.md
 EXPECTED_JSON ?= $(REPO_ROOT)/fixtures/control/subset7a_control_packet_expected_v1.json
 ENVELOPE_EXPECTED_JSON ?= $(REPO_ROOT)/fixtures/control/subset7b_control_envelope_expected_v1.json
 REQUEST_ROUTE_EXPECTED_JSON ?= $(REPO_ROOT)/fixtures/control/subset7c_control_request_route_expected_v1.json
 RESPONSE_PROFILE_EXPECTED_JSON ?= $(REPO_ROOT)/fixtures/control/subset7d_control_response_profile_expected_v1.json
+NOTIFY_OUTCOME_EXPECTED_JSON ?= $(REPO_ROOT)/fixtures/control/subset7e_notify_client_outcome_expected_v1.json
 EXPORTS_EXPECTED := $(EXPORTS_DIR)/subset3a-exported-symbols.txt
 EXPORTS_ACTUAL := $(BUILD_DIR)/subset3a-exported-symbols.txt
 SCALAR_COMPARE_RUN_DIR ?= $(ARTIFACTS_ROOT)/cort-fx/runs/subset1a-fx-vs-mx
@@ -120,14 +128,14 @@ INSTALL_INCLUDE_DIR := $(DESTDIR)$(PREFIX)/include/CoreFoundation
 INSTALL_LIB_DIR := $(DESTDIR)$(PREFIX)/lib
 INSTALL_DOC_DIR := $(DESTDIR)$(PREFIX)/share/doc/cort-fx
 
-.PHONY: all clean check-deps check-exports compare-fx compare-subset1a-fx compare-subset1b-fx compare-subset2a-fx compare-subset3a-fx compare-subset7a-fx compare-subset7b-fx compare-subset7c-fx compare-subset7d-fx compare-with-mx compare-subset1a-with-mx compare-subset1b-with-mx compare-subset2a-with-mx compare-subset3a-with-mx compare-subset7a-with-expected compare-subset7b-with-expected compare-subset7c-with-expected compare-subset7d-with-expected publish-subset0-artifact publish-subset1a-artifact publish-subset1b-artifact publish-subset2a-artifact publish-subset3a-artifact publish-subset7a-artifact publish-subset7b-artifact publish-subset7c-artifact publish-subset7d-artifact publish-shared-artifacts artifact-run artifact-subset1a-compare artifact-subset2a-compare artifact-subset3a-compare install install-stage test test-installed
+.PHONY: all clean check-deps check-exports compare-fx compare-subset1a-fx compare-subset1b-fx compare-subset2a-fx compare-subset3a-fx compare-subset7a-fx compare-subset7b-fx compare-subset7c-fx compare-subset7d-fx compare-subset7e-fx compare-with-mx compare-subset1a-with-mx compare-subset1b-with-mx compare-subset2a-with-mx compare-subset3a-with-mx compare-subset7a-with-expected compare-subset7b-with-expected compare-subset7c-with-expected compare-subset7d-with-expected compare-subset7e-with-expected publish-subset0-artifact publish-subset1a-artifact publish-subset1b-artifact publish-subset2a-artifact publish-subset3a-artifact publish-subset7a-artifact publish-subset7b-artifact publish-subset7c-artifact publish-subset7d-artifact publish-subset7e-artifact publish-shared-artifacts artifact-run artifact-subset1a-compare artifact-subset2a-compare artifact-subset3a-compare install install-stage test test-installed
 
-all: $(LIB) $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(BPLIST_TEST_BINARY) $(PACKET_TEST_BINARY) $(ENVELOPE_TEST_BINARY) $(REQUEST_ROUTE_TEST_BINARY) $(RESPONSE_PROFILE_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY) $(STRING_COMPARE_BINARY) $(CONTAINER_COMPARE_BINARY) $(BPLIST_COMPARE_BINARY) $(PACKET_COMPARE_BINARY) $(ENVELOPE_COMPARE_BINARY) $(REQUEST_ROUTE_COMPARE_BINARY) $(RESPONSE_PROFILE_COMPARE_BINARY)
+all: $(LIB) $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(BPLIST_TEST_BINARY) $(PACKET_TEST_BINARY) $(ENVELOPE_TEST_BINARY) $(REQUEST_ROUTE_TEST_BINARY) $(RESPONSE_PROFILE_TEST_BINARY) $(NOTIFY_OUTCOME_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY) $(STRING_COMPARE_BINARY) $(CONTAINER_COMPARE_BINARY) $(BPLIST_COMPARE_BINARY) $(PACKET_COMPARE_BINARY) $(ENVELOPE_COMPARE_BINARY) $(REQUEST_ROUTE_COMPARE_BINARY) $(RESPONSE_PROFILE_COMPARE_BINARY) $(NOTIFY_OUTCOME_COMPARE_BINARY)
 
-check-deps: $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(BPLIST_TEST_BINARY) $(PACKET_TEST_BINARY) $(ENVELOPE_TEST_BINARY) $(REQUEST_ROUTE_TEST_BINARY) $(RESPONSE_PROFILE_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY) $(STRING_COMPARE_BINARY) $(CONTAINER_COMPARE_BINARY) $(BPLIST_COMPARE_BINARY) $(PACKET_COMPARE_BINARY) $(ENVELOPE_COMPARE_BINARY) $(REQUEST_ROUTE_COMPARE_BINARY) $(RESPONSE_PROFILE_COMPARE_BINARY) $(LIB)
+check-deps: $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(BPLIST_TEST_BINARY) $(PACKET_TEST_BINARY) $(ENVELOPE_TEST_BINARY) $(REQUEST_ROUTE_TEST_BINARY) $(RESPONSE_PROFILE_TEST_BINARY) $(NOTIFY_OUTCOME_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY) $(STRING_COMPARE_BINARY) $(CONTAINER_COMPARE_BINARY) $(BPLIST_COMPARE_BINARY) $(PACKET_COMPARE_BINARY) $(ENVELOPE_COMPARE_BINARY) $(REQUEST_ROUTE_COMPARE_BINARY) $(RESPONSE_PROFILE_COMPARE_BINARY) $(NOTIFY_OUTCOME_COMPARE_BINARY) $(LIB)
 	@set -eu; \
 	host_uname_s=$$(uname -s 2>/dev/null || printf Unknown); \
-	for file in $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(BPLIST_TEST_BINARY) $(PACKET_TEST_BINARY) $(ENVELOPE_TEST_BINARY) $(REQUEST_ROUTE_TEST_BINARY) $(RESPONSE_PROFILE_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY) $(STRING_COMPARE_BINARY) $(CONTAINER_COMPARE_BINARY) $(BPLIST_COMPARE_BINARY) $(PACKET_COMPARE_BINARY) $(ENVELOPE_COMPARE_BINARY) $(REQUEST_ROUTE_COMPARE_BINARY) $(RESPONSE_PROFILE_COMPARE_BINARY); do \
+	for file in $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(BPLIST_TEST_BINARY) $(PACKET_TEST_BINARY) $(ENVELOPE_TEST_BINARY) $(REQUEST_ROUTE_TEST_BINARY) $(RESPONSE_PROFILE_TEST_BINARY) $(NOTIFY_OUTCOME_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY) $(STRING_COMPARE_BINARY) $(CONTAINER_COMPARE_BINARY) $(BPLIST_COMPARE_BINARY) $(PACKET_COMPARE_BINARY) $(ENVELOPE_COMPARE_BINARY) $(REQUEST_ROUTE_COMPARE_BINARY) $(RESPONSE_PROFILE_COMPARE_BINARY) $(NOTIFY_OUTCOME_COMPARE_BINARY); do \
 		if [ "$$host_uname_s" = "Darwin" ]; then \
 			if otool -L "$$file" | sed '1d' | rg -q 'dispatch|swift|objc|icu|CoreFoundation'; then \
 				echo "forbidden dynamic dependency detected in $$file"; \
@@ -143,7 +151,7 @@ check-deps: $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_T
 			exit 1; \
 		fi; \
 	done
-	@if nm -a $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(BPLIST_TEST_BINARY) $(PACKET_TEST_BINARY) $(ENVELOPE_TEST_BINARY) $(REQUEST_ROUTE_TEST_BINARY) $(RESPONSE_PROFILE_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY) $(STRING_COMPARE_BINARY) $(CONTAINER_COMPARE_BINARY) $(BPLIST_COMPARE_BINARY) $(PACKET_COMPARE_BINARY) $(ENVELOPE_COMPARE_BINARY) $(REQUEST_ROUTE_COMPARE_BINARY) $(RESPONSE_PROFILE_COMPARE_BINARY) $(LIB) | rg -q 'swift|dispatch|objc|icu|CoreFoundation'; then \
+	@if nm -a $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(BPLIST_TEST_BINARY) $(PACKET_TEST_BINARY) $(ENVELOPE_TEST_BINARY) $(REQUEST_ROUTE_TEST_BINARY) $(RESPONSE_PROFILE_TEST_BINARY) $(NOTIFY_OUTCOME_TEST_BINARY) $(SMOKE_BINARY) $(COMPARE_BINARY) $(SCALAR_COMPARE_BINARY) $(STRING_COMPARE_BINARY) $(CONTAINER_COMPARE_BINARY) $(BPLIST_COMPARE_BINARY) $(PACKET_COMPARE_BINARY) $(ENVELOPE_COMPARE_BINARY) $(REQUEST_ROUTE_COMPARE_BINARY) $(RESPONSE_PROFILE_COMPARE_BINARY) $(NOTIFY_OUTCOME_COMPARE_BINARY) $(LIB) | rg -q 'swift|dispatch|objc|icu|CoreFoundation'; then \
 		echo "forbidden symbol detected"; \
 		exit 1; \
 	fi
@@ -196,6 +204,10 @@ compare-subset7c-fx: $(REQUEST_ROUTE_COMPARE_BINARY)
 compare-subset7d-fx: $(RESPONSE_PROFILE_COMPARE_BINARY)
 	mkdir -p $(BUILD_DIR)/out
 	$(RESPONSE_PROFILE_COMPARE_BINARY) > $(RESPONSE_PROFILE_COMPARE_OUTPUT)
+
+compare-subset7e-fx: $(NOTIFY_OUTCOME_COMPARE_BINARY)
+	mkdir -p $(BUILD_DIR)/out
+	$(NOTIFY_OUTCOME_COMPARE_BINARY) > $(NOTIFY_OUTCOME_COMPARE_OUTPUT)
 
 compare-with-mx: compare-fx $(COMPARE_TOOL)
 	@if [ -z "$(MX_JSON)" ]; then \
@@ -308,6 +320,18 @@ compare-subset7d-with-expected: compare-subset7d-fx $(RESPONSE_PROFILE_COMPARE_T
 	$(ELIXIR_RUN) $(RESPONSE_PROFILE_COMPARE_TOOL) --fx-json $(FX_RESPONSE_PROFILE_JSON) --expected-json $(RESPONSE_PROFILE_EXPECTED_JSON) --output $(RESPONSE_PROFILE_COMPARE_REPORT)
 	cat $(RESPONSE_PROFILE_COMPARE_REPORT)
 
+compare-subset7e-with-expected: compare-subset7e-fx $(NOTIFY_OUTCOME_COMPARE_TOOL)
+	@if [ ! -f "$(FX_NOTIFY_OUTCOME_JSON)" ]; then \
+		echo "set FX_NOTIFY_OUTCOME_JSON=/path/to/subset7e_notify_client_outcome_fx.json"; \
+		exit 1; \
+	fi
+	@if [ ! -f "$(NOTIFY_OUTCOME_EXPECTED_JSON)" ]; then \
+		echo "expected notify outcome corpus not found at $(NOTIFY_OUTCOME_EXPECTED_JSON)"; \
+		exit 1; \
+	fi
+	$(ELIXIR_RUN) $(NOTIFY_OUTCOME_COMPARE_TOOL) --fx-json $(FX_NOTIFY_OUTCOME_JSON) --expected-json $(NOTIFY_OUTCOME_EXPECTED_JSON) --output $(NOTIFY_OUTCOME_COMPARE_REPORT)
+	cat $(NOTIFY_OUTCOME_COMPARE_REPORT)
+
 publish-subset7a-artifact: compare-subset7a-fx $(PUBLISH_SHARED_JSON_SCRIPT)
 	$(PUBLISH_SHARED_JSON_SCRIPT) $(PACKET_COMPARE_OUTPUT) $(SHARED_SUBSET7A_JSON)
 
@@ -320,7 +344,10 @@ publish-subset7c-artifact: compare-subset7c-fx $(PUBLISH_SHARED_JSON_SCRIPT)
 publish-subset7d-artifact: compare-subset7d-fx $(PUBLISH_SHARED_JSON_SCRIPT)
 	$(PUBLISH_SHARED_JSON_SCRIPT) $(RESPONSE_PROFILE_COMPARE_OUTPUT) $(SHARED_SUBSET7D_JSON)
 
-publish-shared-artifacts: publish-subset0-artifact publish-subset1a-artifact publish-subset1b-artifact publish-subset2a-artifact publish-subset3a-artifact publish-subset7a-artifact publish-subset7b-artifact publish-subset7c-artifact publish-subset7d-artifact
+publish-subset7e-artifact: compare-subset7e-fx $(PUBLISH_SHARED_JSON_SCRIPT)
+	$(PUBLISH_SHARED_JSON_SCRIPT) $(NOTIFY_OUTCOME_COMPARE_OUTPUT) $(SHARED_SUBSET7E_JSON)
+
+publish-shared-artifacts: publish-subset0-artifact publish-subset1a-artifact publish-subset1b-artifact publish-subset2a-artifact publish-subset3a-artifact publish-subset7a-artifact publish-subset7b-artifact publish-subset7c-artifact publish-subset7d-artifact publish-subset7e-artifact
 
 artifact-run: $(RUN_ARTIFACT_SCRIPT)
 	CORT_ARTIFACTS_ROOT="$(ARTIFACTS_ROOT)" BUILD_DIR="$(BUILD_DIR)" STAGE_DIR="$(STAGE_DIR)" $(RUN_ARTIFACT_SCRIPT) $(RUN_DIR)
@@ -364,7 +391,7 @@ artifact-subset3a-compare: $(SUBSET3A_COMPARE_ARTIFACT_SCRIPT)
 		FX_BPLIST_JSON="$(FX_BPLIST_JSON)" MX_JSON="$(MX_JSON)" \
 		$(SUBSET3A_COMPARE_ARTIFACT_SCRIPT) $(BPLIST_COMPARE_RUN_DIR)
 
-test: $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(BPLIST_TEST_BINARY) $(PACKET_TEST_BINARY) $(ENVELOPE_TEST_BINARY) $(REQUEST_ROUTE_TEST_BINARY) $(RESPONSE_PROFILE_TEST_BINARY) $(SMOKE_BINARY) check-deps check-exports compare-fx compare-subset1a-fx compare-subset1b-fx compare-subset2a-fx compare-subset3a-fx compare-subset7a-with-expected compare-subset7b-with-expected compare-subset7c-with-expected compare-subset7d-with-expected
+test: $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BINARY) $(CONTAINER_TEST_BINARY) $(BPLIST_TEST_BINARY) $(PACKET_TEST_BINARY) $(ENVELOPE_TEST_BINARY) $(REQUEST_ROUTE_TEST_BINARY) $(RESPONSE_PROFILE_TEST_BINARY) $(NOTIFY_OUTCOME_TEST_BINARY) $(SMOKE_BINARY) check-deps check-exports compare-fx compare-subset1a-fx compare-subset1b-fx compare-subset2a-fx compare-subset3a-fx compare-subset7a-with-expected compare-subset7b-with-expected compare-subset7c-with-expected compare-subset7d-with-expected compare-subset7e-with-expected
 	$(TEST_BINARY)
 	$(ABORT_TEST_BINARY)
 	$(SCALAR_TEST_BINARY)
@@ -375,6 +402,7 @@ test: $(TEST_BINARY) $(ABORT_TEST_BINARY) $(SCALAR_TEST_BINARY) $(STRING_TEST_BI
 	$(ENVELOPE_TEST_BINARY)
 	$(REQUEST_ROUTE_TEST_BINARY)
 	$(RESPONSE_PROFILE_TEST_BINARY)
+	$(NOTIFY_OUTCOME_TEST_BINARY)
 	$(SMOKE_BINARY)
 
 test-installed: install-stage
@@ -450,6 +478,10 @@ $(RESPONSE_PROFILE_TEST_BINARY): $(OBJ_DIR)/tests/control_response_profile_tests
 	mkdir -p $(BIN_DIR)
 	$(CC) $(CFLAGS) $(STRICT_CFLAGS) $(LDFLAGS) -o $(RESPONSE_PROFILE_TEST_BINARY) $(OBJ_DIR)/tests/control_response_profile_tests.o $(LIB) -pthread
 
+$(NOTIFY_OUTCOME_TEST_BINARY): $(OBJ_DIR)/tests/control_notify_outcome_tests.o $(LIB)
+	mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) $(STRICT_CFLAGS) $(LDFLAGS) -o $(NOTIFY_OUTCOME_TEST_BINARY) $(OBJ_DIR)/tests/control_notify_outcome_tests.o $(LIB) -pthread
+
 $(SMOKE_BINARY): $(OBJ_DIR)/tests/c_consumer_smoke.o $(LIB)
 	mkdir -p $(BIN_DIR)
 	$(CC) $(CFLAGS) $(STRICT_CFLAGS) $(LDFLAGS) -o $(SMOKE_BINARY) $(OBJ_DIR)/tests/c_consumer_smoke.o $(LIB) -pthread
@@ -489,6 +521,10 @@ $(REQUEST_ROUTE_COMPARE_BINARY): $(OBJ_DIR)/tests/cort_subset7c_control_request_
 $(RESPONSE_PROFILE_COMPARE_BINARY): $(OBJ_DIR)/tests/cort_subset7d_control_response_profile_fx.o $(LIB)
 	mkdir -p $(BIN_DIR)
 	$(CC) $(CFLAGS) $(STRICT_CFLAGS) $(LDFLAGS) -o $(RESPONSE_PROFILE_COMPARE_BINARY) $(OBJ_DIR)/tests/cort_subset7d_control_response_profile_fx.o $(LIB) -pthread
+
+$(NOTIFY_OUTCOME_COMPARE_BINARY): $(OBJ_DIR)/tests/cort_subset7e_control_notify_outcome_fx.o $(LIB)
+	mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) $(STRICT_CFLAGS) $(LDFLAGS) -o $(NOTIFY_OUTCOME_COMPARE_BINARY) $(OBJ_DIR)/tests/cort_subset7e_control_notify_outcome_fx.o $(LIB) -pthread
 
 $(OBJ_DIR)/src/CFBase.o: src/CFBase.c src/FXCFInternal.h include/CoreFoundation/CFBase.h include/CoreFoundation/CFRuntime.h
 	mkdir -p $(OBJ_DIR)/src
@@ -582,6 +618,10 @@ $(OBJ_DIR)/tests/control_response_profile_tests.o: tests/control_response_profil
 	mkdir -p $(OBJ_DIR)/tests
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(STRICT_CFLAGS) -c tests/control_response_profile_tests.c -o $(OBJ_DIR)/tests/control_response_profile_tests.o
 
+$(OBJ_DIR)/tests/control_notify_outcome_tests.o: tests/control_notify_outcome_tests.c tests/subset7e_control_notify_outcome_support.h $(SUBSET7A_CASES_HEADER) include/CoreFoundation/CoreFoundation.h src/FXCFControlPacket.h
+	mkdir -p $(OBJ_DIR)/tests
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(STRICT_CFLAGS) -c tests/control_notify_outcome_tests.c -o $(OBJ_DIR)/tests/control_notify_outcome_tests.o
+
 $(OBJ_DIR)/tests/c_consumer_smoke.o: tests/c_consumer_smoke.c include/CoreFoundation/CoreFoundation.h include/CoreFoundation/CFBase.h include/CoreFoundation/CFRuntime.h
 	mkdir -p $(OBJ_DIR)/tests
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(STRICT_CFLAGS) -c tests/c_consumer_smoke.c -o $(OBJ_DIR)/tests/c_consumer_smoke.o
@@ -621,6 +661,10 @@ $(OBJ_DIR)/tests/cort_subset7c_control_request_route_fx.o: tests/cort_subset7c_c
 $(OBJ_DIR)/tests/cort_subset7d_control_response_profile_fx.o: tests/cort_subset7d_control_response_profile_fx.c tests/subset7d_control_response_profile_support.h $(SUBSET7A_CASES_HEADER) include/CoreFoundation/CoreFoundation.h src/FXCFControlPacket.h
 	mkdir -p $(OBJ_DIR)/tests
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(STRICT_CFLAGS) -c tests/cort_subset7d_control_response_profile_fx.c -o $(OBJ_DIR)/tests/cort_subset7d_control_response_profile_fx.o
+
+$(OBJ_DIR)/tests/cort_subset7e_control_notify_outcome_fx.o: tests/cort_subset7e_control_notify_outcome_fx.c tests/subset7e_control_notify_outcome_support.h $(SUBSET7A_CASES_HEADER) include/CoreFoundation/CoreFoundation.h src/FXCFControlPacket.h
+	mkdir -p $(OBJ_DIR)/tests
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(STRICT_CFLAGS) -c tests/cort_subset7e_control_notify_outcome_fx.c -o $(OBJ_DIR)/tests/cort_subset7e_control_notify_outcome_fx.o
 
 clean:
 	rm -rf $(BUILD_DIR) $(STAGE_DIR)

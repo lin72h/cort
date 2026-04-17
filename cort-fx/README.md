@@ -1,4 +1,4 @@
-# cort-fx Subset 0, 1A, 1B, 2A, 3A, 7A, 7B, And 7C Proof
+# cort-fx Subset 0, 1A, 1B, 2A, 3A, 7A, 7B, 7C, 7D, And 7E Proof
 
 This directory holds the temporary standalone `cort-fx` proof for CORT
 Subset 0, Subset 1A, Subset 1B, Subset 2A, Subset 3A, and Subset 7A:
@@ -17,6 +17,10 @@ Subset 0, Subset 1A, Subset 1B, Subset 2A, Subset 3A, and Subset 7A:
   summaries on top of the proven packet decode surface
 - Subset 7C: internal request-route classification and typed known-parameter
   extraction on top of the proven request envelope surface
+- Subset 7D: internal response-profile classification and bounded response
+  summaries on top of the proven response envelope surface
+- Subset 7E: internal notify-client outcome extraction and notify status-family
+  mapping on top of the proven response-profile surface
 
 The active 3A coordination documents live in:
 
@@ -46,6 +50,18 @@ The Subset 7C docs live in:
 - `../docs/cort-subset7c-control-request-route-contract.md`
 - `../docs/cort-subset7c-source-audit-and-readiness.md`
 - `../docs/cort-subset7c-validation-workflow.md`
+
+The Subset 7D docs live in:
+
+- `../docs/cort-subset7d-control-response-profile-contract.md`
+- `../docs/cort-subset7d-source-audit-and-readiness.md`
+- `../docs/cort-subset7d-validation-workflow.md`
+
+The Subset 7E docs live in:
+
+- `../docs/cort-subset7e-control-notify-outcome-contract.md`
+- `../docs/cort-subset7e-source-audit-and-readiness.md`
+- `../docs/cort-subset7e-validation-workflow.md`
 
 The shared imported packet corpora live in:
 
@@ -137,6 +153,10 @@ Implemented:
   for the imported packet corpora
 - internal request-route classification and typed known-parameter extraction
   for the imported request packet corpus
+- internal response-profile classification and bounded response summaries for
+  the imported response packet corpus
+- internal notify-client outcome extraction and notify status-family mapping
+  for the imported notify response packet corpus
 
 Explicitly not implemented here:
 
@@ -153,7 +173,7 @@ Explicitly not implemented here:
 - packet encode parity
 - transport/session behavior beyond the bounded decode/rejection surface
 - public packet-specific APIs beyond the bounded internal envelope layer
-- response/result consumer logic beyond the bounded request-route layer
+- response/result consumer logic beyond the bounded notify-client outcome layer
 
 ## Provenance
 
@@ -205,6 +225,7 @@ This builds under `../wip-cort-gpt-artifacts/cort-fx/build/` by default:
 - `bin/subset7b_control_envelope_fx`
 - `bin/subset7c_control_request_route_fx`
 - `bin/subset7d_control_response_profile_fx`
+- `bin/subset7e_control_notify_outcome_fx`
 
 ## Verification Targets
 
@@ -275,6 +296,10 @@ What they enforce:
   `../wip-cort-gpt-artifacts/cort-fx/build/out/subset7d_control_response_profile_fx.json`
 - FX control response-profile compare emits
   `../wip-cort-gpt-artifacts/cort-fx/build/out/subset7d_control_response_profile_fx_vs_expected_report.md`
+- FX notify-client outcome probe emits
+  `../wip-cort-gpt-artifacts/cort-fx/build/out/subset7e_notify_client_outcome_fx.json`
+- FX notify-client outcome compare emits
+  `../wip-cort-gpt-artifacts/cort-fx/build/out/subset7e_notify_client_outcome_fx_vs_expected_report.md`
 
 The 7A packet slice is implemented with:
 
@@ -311,10 +336,20 @@ The 7D control response-profile slice is implemented with:
 - `tests/subset7d_control_response_profile_support.h`
 - `../tools/build_subset7d_control_response_profile_expected.exs`
 
+The 7E notify-client outcome slice is implemented with:
+
+- `src/FXCFControlPacket.c`
+- `src/FXCFControlPacket.h`
+- `tests/control_notify_outcome_tests.c`
+- `tests/cort_subset7e_control_notify_outcome_fx.c`
+- `tests/subset7e_control_notify_outcome_support.h`
+- `../tools/build_subset7e_notify_client_expected.exs`
+
 Shared handoff artifact:
 
 - `../subset7a_control_packet_fx.json`
 - `../subset7d_control_response_profile_fx.json`
+- `../subset7e_notify_client_outcome_fx.json`
 - Subset 1A compare wrapper can compare that FX JSON against MX and preserve a
   dedicated handoff artifact run
 - shared handoff artifacts may also be committed at repo root for MX
@@ -323,7 +358,8 @@ Shared handoff artifact:
   `subset2a_container_fx.json`, `subset3a_bplist_fx.json`, and
   `subset7a_control_packet_fx.json`, `subset7b_control_envelope_fx.json`,
   `subset7c_control_request_route_fx.json`, and
-  `subset7d_control_response_profile_fx.json`
+  `subset7d_control_response_profile_fx.json`, and
+  `subset7e_notify_client_outcome_fx.json`
 - Subset 2A compare wrapper can compare a real FX container JSON against MX and
   preserve a dedicated handoff artifact run once the FX artifact exists
 - Subset 3A compare wrapper can compare a real FX binary-plist JSON against MX
