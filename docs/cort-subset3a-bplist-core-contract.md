@@ -232,6 +232,8 @@ Future FX-vs-MX compare tool:
 FX readiness note:
 
 - `docs/cort-subset3a-source-audit-and-readiness.md`
+- `docs/cort-subset3a-fx-implementation-plan.md`
+- `docs/cort-subset3a-fixture-corpus.md`
 
 ## Expected MX Artifacts
 

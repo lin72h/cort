@@ -14,6 +14,12 @@ It does not replace the semantic contract in
 which upstream source can inform FX, which source must be excluded, and what
 must be true before FX starts a clean local binary-plist implementation.
 
+Related execution documents:
+
+- `docs/cort-subset3a-validation-workflow.md`
+- `docs/cort-subset3a-fx-implementation-plan.md`
+- `docs/cort-subset3a-fixture-corpus.md`
+
 ## Source Basis
 
 Working directory:
@@ -221,5 +227,9 @@ FX Subset 3A implementation should not start until:
 Current readiness note:
 
 - this package makes Subset 3A ready for bounded MX validation
-- the real FX implementation should still wait for the final Subset 2A MX
-  compare result before starting code changes
+- the concrete FX cut plan now lives in
+  `docs/cort-subset3a-fx-implementation-plan.md`
+- the planned MX/FX fixture contract now lives in
+  `docs/cort-subset3a-fixture-corpus.md`
+- the real FX implementation should still wait for the current MX Subset 3A
+  artifacts before starting code changes

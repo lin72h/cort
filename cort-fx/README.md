@@ -18,6 +18,9 @@ The next planned slice after this proof is Subset 3A:
   `../docs/cort-subset3a-bplist-core-contract.md`,
   `../docs/cort-subset3a-source-audit-and-readiness.md`, and
   `../docs/cort-subset3a-validation-workflow.md`
+- the FX cut plan and fixture contract for that slice now live in
+  `../docs/cort-subset3a-fx-implementation-plan.md` and
+  `../docs/cort-subset3a-fixture-corpus.md`
 - MX and FX contracts still live in `../docs/` and `../cort-mx/`
 
 It is not the final repository layout. The final target remains

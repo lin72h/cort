@@ -37,6 +37,9 @@ FX status:
   depends on
 - no FX binary-plist implementation exists yet
 - no shared `subset3a_bplist_fx.json` artifact exists yet
+- the planned FX file cut and fixture contract now live in:
+  - `docs/cort-subset3a-fx-implementation-plan.md`
+  - `docs/cort-subset3a-fixture-corpus.md`
 
 ## MX Run
 
