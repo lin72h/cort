@@ -10,6 +10,10 @@ enum {
     FX_CF_CONTROL_PACKET_UNIX_EPOCH_DELTA = 978307200
 };
 
+static const UInt8 kFXCFBinaryPlistHeader[] = {
+    'b', 'p', 'l', 'i', 's', 't', '0', '0'
+};
+
 struct __FXCFTextBuffer {
     char *bytes;
     size_t length;
@@ -222,6 +226,80 @@ static int __FXCFControlPacketCompareDictionaryEntries(const void *left, const v
     } *entryLeft = (const struct __FXCFDictionarySortEntry *)left;
     const struct __FXCFDictionarySortEntry *entryRight = (const struct __FXCFDictionarySortEntry *)right;
     return strcmp(entryLeft->keyText, entryRight->keyText);
+}
+
+static int __FXCFControlPacketCompareCStringPointers(const void *left, const void *right) {
+    const char *const *leftText = (const char *const *)left;
+    const char *const *rightText = (const char *const *)right;
+    return strcmp(*leftText, *rightText);
+}
+
+static void __FXCFControlPacketFreeSortedKeys(char **keys, CFIndex count) {
+    if (keys == NULL) {
+        return;
+    }
+    for (CFIndex index = 0; index < count; ++index) {
+        free(keys[index]);
+    }
+    free(keys);
+}
+
+static Boolean __FXCFControlPacketCopySortedKeys(CFDictionaryRef dictionary, char ***keysOut, CFIndex *countOut) {
+    CFIndex count = CFDictionaryGetCount(dictionary);
+    char **keys = NULL;
+
+    if (keysOut == NULL || countOut == NULL) {
+        return false;
+    }
+
+    *keysOut = NULL;
+    *countOut = 0;
+
+    if (count == 0) {
+        return true;
+    }
+
+    keys = (char **)calloc((size_t)count, sizeof(char *));
+    if (keys == NULL) {
+        return false;
+    }
+
+    for (CFIndex index = 0; index < count; ++index) {
+        const void *key = NULL;
+        const void *value = NULL;
+
+        if (!_FXCFDictionaryGetEntryAtIndex(dictionary, index, &key, &value)) {
+            __FXCFControlPacketFreeSortedKeys(keys, count);
+            return false;
+        }
+        (void)value;
+
+        keys[index] = __FXCFControlPacketCopyCString((CFStringRef)key);
+        if (keys[index] == NULL) {
+            __FXCFControlPacketFreeSortedKeys(keys, count);
+            return false;
+        }
+    }
+
+    qsort(keys, (size_t)count, sizeof(char *), __FXCFControlPacketCompareCStringPointers);
+    *keysOut = keys;
+    *countOut = count;
+    return true;
+}
+
+static Boolean __FXCFControlPacketAppendKeyArrayJSON(struct __FXCFTextBuffer *buffer, char *const *keys, CFIndex count) {
+    if (!__FXCFTextBufferAppendCString(buffer, "[")) {
+        return false;
+    }
+    for (CFIndex index = 0; index < count; ++index) {
+        if (index > 0 && !__FXCFTextBufferAppendCString(buffer, ",")) {
+            return false;
+        }
+        if (!__FXCFTextBufferAppendJSONString(buffer, keys[index])) {
+            return false;
+        }
+    }
+    return __FXCFTextBufferAppendCString(buffer, "]");
 }
 
 static Boolean __FXCFControlPacketDataIsUTF8(const UInt8 *bytes, CFIndex length) {
@@ -514,6 +592,57 @@ static Boolean __FXCFControlPacketAppendValueJSON(struct __FXCFTextBuffer *buffe
     return false;
 }
 
+Boolean _FXCFControlPacketIsBinaryPlist(CFDataRef payload) {
+    const UInt8 *bytes = NULL;
+
+    if (payload == NULL) {
+        return false;
+    }
+    if (CFDataGetLength(payload) < (CFIndex)sizeof(kFXCFBinaryPlistHeader)) {
+        return false;
+    }
+
+    bytes = CFDataGetBytePtr(payload);
+    if (bytes == NULL) {
+        return false;
+    }
+    return memcmp(bytes, kFXCFBinaryPlistHeader, sizeof(kFXCFBinaryPlistHeader)) == 0;
+}
+
+enum _FXCFControlValueKind _FXCFControlPacketValueKind(CFTypeRef value) {
+    CFTypeID typeID = 0;
+
+    if (value == NULL) {
+        return _FXCFControlValueKindInvalid;
+    }
+
+    typeID = CFGetTypeID(value);
+    if (typeID == CFDictionaryGetTypeID()) {
+        return _FXCFControlValueKindObject;
+    }
+    if (typeID == CFArrayGetTypeID()) {
+        return _FXCFControlValueKindArray;
+    }
+    if (typeID == CFStringGetTypeID()) {
+        return _FXCFControlValueKindString;
+    }
+    if (typeID == CFBooleanGetTypeID()) {
+        return _FXCFControlValueKindBool;
+    }
+    if (typeID == CFNumberGetTypeID()) {
+        return CFNumberGetType((CFNumberRef)value) == kCFNumberFloat64Type
+            ? _FXCFControlValueKindDouble
+            : _FXCFControlValueKindInteger;
+    }
+    if (typeID == CFDateGetTypeID()) {
+        return _FXCFControlValueKindDate;
+    }
+    if (typeID == CFDataGetTypeID()) {
+        return _FXCFControlValueKindData;
+    }
+    return _FXCFControlValueKindInvalid;
+}
+
 char *_FXCFControlPacketCopyCanonicalJSON(CFTypeRef value) {
     struct __FXCFTextBuffer buffer = {0};
     char *result = NULL;
@@ -773,6 +902,428 @@ Boolean _FXCFControlPacketDecodeEnvelope(
         CFRelease(root);
     }
     return true;
+}
+
+static const char *__FXCFControlValueKindText(enum _FXCFControlValueKind kind) {
+    switch (kind) {
+        case _FXCFControlValueKindObject:
+            return "object";
+        case _FXCFControlValueKindArray:
+            return "array";
+        case _FXCFControlValueKindString:
+            return "string";
+        case _FXCFControlValueKindInteger:
+            return "integer";
+        case _FXCFControlValueKindDouble:
+            return "double";
+        case _FXCFControlValueKindBool:
+            return "bool";
+        case _FXCFControlValueKindDate:
+            return "date";
+        case _FXCFControlValueKindData:
+            return "data";
+        default:
+            return "invalid";
+    }
+}
+
+void _FXCFControlRequestClear(struct _FXCFControlRequest *request) {
+    if (request == NULL) {
+        return;
+    }
+    if (request->packet != NULL) {
+        CFRelease((CFTypeRef)request->packet);
+    }
+    memset(request, 0, sizeof(*request));
+}
+
+Boolean _FXCFControlRequestInit(
+    CFAllocatorRef allocator,
+    CFDataRef payload,
+    struct _FXCFControlRequest *requestOut,
+    struct _FXCFControlPacketError *errorOut
+) {
+    CFDictionaryRef packet = NULL;
+    CFIndex protocolVersion = 0;
+    CFStringRef service = NULL;
+    CFStringRef method = NULL;
+    CFDictionaryRef params = NULL;
+
+    if (requestOut == NULL) {
+        __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "requestOut is NULL");
+        return false;
+    }
+
+    memset(requestOut, 0, sizeof(*requestOut));
+
+    if (!_FXCFControlPacketDecodeEnvelope(allocator, payload, _FXCFControlPacketKindRequest, &packet, errorOut)) {
+        return false;
+    }
+
+    if (!__FXCFControlPacketRequireInteger(packet, "protocol_version", &protocolVersion, errorOut) ||
+        !__FXCFControlPacketRequireString(packet, "service", &service, errorOut) ||
+        !__FXCFControlPacketRequireString(packet, "method", &method, errorOut) ||
+        !__FXCFControlPacketRequireDictionary(packet, "params", &params, errorOut)) {
+        CFRelease((CFTypeRef)packet);
+        return false;
+    }
+
+    requestOut->packet = packet;
+    requestOut->protocolVersion = protocolVersion;
+    requestOut->service = service;
+    requestOut->method = method;
+    requestOut->params = params;
+    return true;
+}
+
+void _FXCFControlResponseClear(struct _FXCFControlResponse *response) {
+    if (response == NULL) {
+        return;
+    }
+    if (response->packet != NULL) {
+        CFRelease((CFTypeRef)response->packet);
+    }
+    memset(response, 0, sizeof(*response));
+}
+
+Boolean _FXCFControlResponseInit(
+    CFAllocatorRef allocator,
+    CFDataRef payload,
+    struct _FXCFControlResponse *responseOut,
+    struct _FXCFControlPacketError *errorOut
+) {
+    CFDictionaryRef packet = NULL;
+    CFIndex protocolVersion = 0;
+    CFStringRef status = NULL;
+    char *statusText = NULL;
+
+    if (responseOut == NULL) {
+        __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "responseOut is NULL");
+        return false;
+    }
+
+    memset(responseOut, 0, sizeof(*responseOut));
+
+    if (!_FXCFControlPacketDecodeEnvelope(allocator, payload, _FXCFControlPacketKindResponse, &packet, errorOut)) {
+        return false;
+    }
+
+    if (!__FXCFControlPacketRequireInteger(packet, "protocol_version", &protocolVersion, errorOut) ||
+        !__FXCFControlPacketRequireString(packet, "status", &status, errorOut)) {
+        CFRelease((CFTypeRef)packet);
+        return false;
+    }
+
+    statusText = __FXCFControlPacketCopyCString(status);
+    if (statusText == NULL) {
+        __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "failed to decode response status");
+        CFRelease((CFTypeRef)packet);
+        return false;
+    }
+
+    responseOut->packet = packet;
+    responseOut->protocolVersion = protocolVersion;
+
+    if (strcmp(statusText, "ok") == 0) {
+        responseOut->status = _FXCFControlResponseStatusOK;
+        if (!__FXCFControlPacketRequireValue(packet, "result", &responseOut->result, errorOut)) {
+            free(statusText);
+            _FXCFControlResponseClear(responseOut);
+            return false;
+        }
+    } else if (strcmp(statusText, "error") == 0) {
+        responseOut->status = _FXCFControlResponseStatusError;
+        if (!__FXCFControlPacketRequireDictionary(packet, "error", &responseOut->errorPayload, errorOut) ||
+            !__FXCFControlPacketRequireString(responseOut->errorPayload, "code", &responseOut->errorCode, errorOut) ||
+            !__FXCFControlPacketRequireString(responseOut->errorPayload, "message", &responseOut->errorMessage, errorOut)) {
+            if (errorOut != NULL && errorOut->kind == _FXCFControlPacketErrorMissingKey) {
+                if (strcmp(errorOut->text, "code") == 0) {
+                    snprintf(errorOut->text, sizeof(errorOut->text), "%s", "error.code");
+                } else if (strcmp(errorOut->text, "message") == 0) {
+                    snprintf(errorOut->text, sizeof(errorOut->text), "%s", "error.message");
+                }
+            }
+            free(statusText);
+            _FXCFControlResponseClear(responseOut);
+            return false;
+        }
+    } else {
+        __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "unsupported response status");
+        free(statusText);
+        _FXCFControlResponseClear(responseOut);
+        return false;
+    }
+
+    free(statusText);
+    return true;
+}
+
+static char *__FXCFControlPacketCopyRequestServiceText(const struct _FXCFControlRequest *request) {
+    return request != NULL ? __FXCFControlPacketCopyCString(request->service) : NULL;
+}
+
+static char *__FXCFControlPacketCopyRequestMethodText(const struct _FXCFControlRequest *request) {
+    return request != NULL ? __FXCFControlPacketCopyCString(request->method) : NULL;
+}
+
+char *_FXCFControlRequestCopyEnvelopeJSON(const struct _FXCFControlRequest *request) {
+    struct __FXCFTextBuffer buffer = {0};
+    char **keys = NULL;
+    CFIndex count = 0;
+    char *serviceText = NULL;
+    char *methodText = NULL;
+    char *result = NULL;
+
+    if (request == NULL || request->packet == NULL || request->service == NULL || request->method == NULL || request->params == NULL) {
+        return NULL;
+    }
+
+    if (!__FXCFControlPacketCopySortedKeys(request->params, &keys, &count)) {
+        return NULL;
+    }
+
+    serviceText = __FXCFControlPacketCopyRequestServiceText(request);
+    methodText = __FXCFControlPacketCopyRequestMethodText(request);
+    if (serviceText == NULL || methodText == NULL) {
+        __FXCFControlPacketFreeSortedKeys(keys, count);
+        free(serviceText);
+        free(methodText);
+        return NULL;
+    }
+
+    if (!__FXCFTextBufferAppendCString(&buffer, "{\"method\":") ||
+        !__FXCFTextBufferAppendJSONString(&buffer, methodText) ||
+        !__FXCFTextBufferAppendCString(&buffer, ",\"param_keys\":") ||
+        !__FXCFControlPacketAppendKeyArrayJSON(&buffer, keys, count) ||
+        !__FXCFTextBufferAppendFormat(&buffer, ",\"params_count\":%ld,\"protocol_version\":%ld,\"service\":", (long)count, (long)request->protocolVersion) ||
+        !__FXCFTextBufferAppendJSONString(&buffer, serviceText) ||
+        !__FXCFTextBufferAppendCString(&buffer, "}")) {
+        __FXCFTextBufferFree(&buffer);
+        __FXCFControlPacketFreeSortedKeys(keys, count);
+        free(serviceText);
+        free(methodText);
+        return NULL;
+    }
+
+    result = __FXCFTextBufferDetach(&buffer);
+    __FXCFTextBufferFree(&buffer);
+    __FXCFControlPacketFreeSortedKeys(keys, count);
+    free(serviceText);
+    free(methodText);
+    return result;
+}
+
+char *_FXCFControlRequestCopyEnvelopeSummary(const struct _FXCFControlRequest *request) {
+    char *serviceText = NULL;
+    char *methodText = NULL;
+    char *result = NULL;
+    size_t size = 0u;
+    CFIndex paramsCount = 0;
+
+    if (request == NULL || request->packet == NULL || request->service == NULL || request->method == NULL || request->params == NULL) {
+        return NULL;
+    }
+
+    serviceText = __FXCFControlPacketCopyRequestServiceText(request);
+    methodText = __FXCFControlPacketCopyRequestMethodText(request);
+    if (serviceText == NULL || methodText == NULL) {
+        free(serviceText);
+        free(methodText);
+        return NULL;
+    }
+
+    paramsCount = CFDictionaryGetCount(request->params);
+    size = strlen(serviceText) + strlen(methodText) + 48u;
+    result = (char *)calloc(size, sizeof(char));
+    if (result != NULL) {
+        snprintf(result, size, "request %s %s params=%ld", serviceText, methodText, (long)paramsCount);
+    }
+
+    free(serviceText);
+    free(methodText);
+    return result;
+}
+
+static Boolean __FXCFControlResponseAppendSuccessEnvelopeJSON(struct __FXCFTextBuffer *buffer, const struct _FXCFControlResponse *response) {
+    enum _FXCFControlValueKind kind = _FXCFControlPacketValueKind(response->result);
+    const char *kindText = __FXCFControlValueKindText(kind);
+
+    if (!__FXCFTextBufferAppendFormat(buffer, "{\"protocol_version\":%ld", (long)response->protocolVersion)) {
+        return false;
+    }
+
+    switch (kind) {
+        case _FXCFControlValueKindObject: {
+            char **keys = NULL;
+            CFIndex count = 0;
+            if (!__FXCFControlPacketCopySortedKeys((CFDictionaryRef)response->result, &keys, &count)) {
+                return false;
+            }
+            Boolean ok =
+                __FXCFTextBufferAppendFormat(buffer, ",\"result_count\":%ld,\"result_keys\":", (long)count) &&
+                __FXCFControlPacketAppendKeyArrayJSON(buffer, keys, count) &&
+                __FXCFTextBufferAppendFormat(buffer, ",\"result_kind\":\"%s\",\"status\":\"ok\"}", kindText);
+            __FXCFControlPacketFreeSortedKeys(keys, count);
+            return ok;
+        }
+        case _FXCFControlValueKindArray:
+            return __FXCFTextBufferAppendFormat(
+                buffer,
+                ",\"result_count\":%ld,\"result_kind\":\"%s\",\"status\":\"ok\"}",
+                (long)CFArrayGetCount((CFArrayRef)response->result),
+                kindText
+            );
+        case _FXCFControlValueKindString:
+            return __FXCFTextBufferAppendFormat(
+                buffer,
+                ",\"result_kind\":\"%s\",\"result_length\":%ld,\"status\":\"ok\"}",
+                kindText,
+                (long)CFStringGetLength((CFStringRef)response->result)
+            );
+        case _FXCFControlValueKindData:
+            return __FXCFTextBufferAppendFormat(
+                buffer,
+                ",\"result_kind\":\"%s\",\"result_size\":%ld,\"status\":\"ok\"}",
+                kindText,
+                (long)CFDataGetLength((CFDataRef)response->result)
+            );
+        case _FXCFControlValueKindInteger:
+        case _FXCFControlValueKindDouble:
+        case _FXCFControlValueKindBool:
+        case _FXCFControlValueKindDate:
+            return __FXCFTextBufferAppendFormat(buffer, ",\"result_kind\":\"%s\",\"status\":\"ok\"}", kindText);
+        default:
+            return false;
+    }
+}
+
+char *_FXCFControlResponseCopyEnvelopeJSON(const struct _FXCFControlResponse *response) {
+    struct __FXCFTextBuffer buffer = {0};
+    char *codeText = NULL;
+    char *messageText = NULL;
+    char *result = NULL;
+
+    if (response == NULL || response->packet == NULL) {
+        return NULL;
+    }
+
+    if (response->status == _FXCFControlResponseStatusOK) {
+        if (response->result == NULL || !__FXCFControlResponseAppendSuccessEnvelopeJSON(&buffer, response)) {
+            __FXCFTextBufferFree(&buffer);
+            return NULL;
+        }
+    } else if (response->status == _FXCFControlResponseStatusError) {
+        if (response->errorCode == NULL || response->errorMessage == NULL) {
+            return NULL;
+        }
+        codeText = __FXCFControlPacketCopyCString(response->errorCode);
+        messageText = __FXCFControlPacketCopyCString(response->errorMessage);
+        if (codeText == NULL || messageText == NULL) {
+            __FXCFTextBufferFree(&buffer);
+            free(codeText);
+            free(messageText);
+            return NULL;
+        }
+        if (!__FXCFTextBufferAppendCString(&buffer, "{\"code\":") ||
+            !__FXCFTextBufferAppendJSONString(&buffer, codeText) ||
+            !__FXCFTextBufferAppendCString(&buffer, ",\"message\":") ||
+            !__FXCFTextBufferAppendJSONString(&buffer, messageText) ||
+            !__FXCFTextBufferAppendFormat(&buffer, ",\"protocol_version\":%ld,\"status\":\"error\"}", (long)response->protocolVersion)) {
+            __FXCFTextBufferFree(&buffer);
+            free(codeText);
+            free(messageText);
+            return NULL;
+        }
+        free(codeText);
+        free(messageText);
+    } else {
+        return NULL;
+    }
+
+    result = __FXCFTextBufferDetach(&buffer);
+    __FXCFTextBufferFree(&buffer);
+    return result;
+}
+
+char *_FXCFControlResponseCopyEnvelopeSummary(const struct _FXCFControlResponse *response) {
+    enum _FXCFControlValueKind kind = _FXCFControlValueKindInvalid;
+    char *codeText = NULL;
+    char *result = NULL;
+    size_t size = 0u;
+
+    if (response == NULL || response->packet == NULL) {
+        return NULL;
+    }
+
+    if (response->status == _FXCFControlResponseStatusError) {
+        if (response->errorCode == NULL) {
+            return NULL;
+        }
+        codeText = __FXCFControlPacketCopyCString(response->errorCode);
+        if (codeText == NULL) {
+            return NULL;
+        }
+        size = strlen(codeText) + 24u;
+        result = (char *)calloc(size, sizeof(char));
+        if (result != NULL) {
+            snprintf(result, size, "response error code=%s", codeText);
+        }
+        free(codeText);
+        return result;
+    }
+
+    if (response->status != _FXCFControlResponseStatusOK || response->result == NULL) {
+        return NULL;
+    }
+
+    kind = _FXCFControlPacketValueKind(response->result);
+    switch (kind) {
+        case _FXCFControlValueKindObject: {
+            CFIndex count = CFDictionaryGetCount((CFDictionaryRef)response->result);
+            size = 64u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "response ok result=object count=%ld", (long)count);
+            }
+            return result;
+        }
+        case _FXCFControlValueKindArray: {
+            CFIndex count = CFArrayGetCount((CFArrayRef)response->result);
+            size = 64u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "response ok result=array count=%ld", (long)count);
+            }
+            return result;
+        }
+        case _FXCFControlValueKindString: {
+            CFIndex length = CFStringGetLength((CFStringRef)response->result);
+            size = 64u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "response ok result=string length=%ld", (long)length);
+            }
+            return result;
+        }
+        case _FXCFControlValueKindData: {
+            CFIndex sizeValue = CFDataGetLength((CFDataRef)response->result);
+            size = 64u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "response ok result=data size=%ld", (long)sizeValue);
+            }
+            return result;
+        }
+        default: {
+            const char *kindText = __FXCFControlValueKindText(kind);
+            size = strlen(kindText) + 24u;
+            result = (char *)calloc(size, sizeof(char));
+            if (result != NULL) {
+                snprintf(result, size, "response ok result=%s", kindText);
+            }
+            return result;
+        }
+    }
 }
 
 char *_FXCFControlPacketCopyAcceptedSummary(CFDictionaryRef packet, enum _FXCFControlPacketKind kind) {

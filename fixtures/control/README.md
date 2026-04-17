@@ -10,6 +10,7 @@ Files:
 - `bplist_packet_rejection_corpus_v1.source.json`
 - `bplist_packet_rejection_corpus_v1.json`
 - `subset7a_control_packet_expected_v1.json`
+- `subset7b_control_envelope_expected_v1.json`
 
 Provenance:
 
@@ -42,3 +43,12 @@ corpora by:
 That file is the semantic expected-corpus used by the future FX packet probe
 compare workflow. It is generated from the source corpora and should not be
 hand-edited.
+
+`subset7b_control_envelope_expected_v1.json` is derived from the same imported
+source corpora by:
+
+- `tools/build_subset7b_control_envelope_expected.exs`
+
+That file carries the internal typed-envelope expected surface for the next
+packet-facing FX slice. It is generated from the source corpora and should not
+be hand-edited.

@@ -1,0 +1,663 @@
+{
+  "probe": "subset7b_control_envelope",
+  "format": "CORT FX Subset 7B control envelope probe",
+  "results": [
+    {
+      "name": "request.control.capabilities",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"capabilities\",\"param_keys\":[],\"params_count\":0,\"protocol_version\":1,\"service\":\"control\"}",
+      "alternate_value_text": "request control capabilities params=0"
+    },
+    {
+      "name": "request.control.health",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"health\",\"param_keys\":[],\"params_count\":0,\"protocol_version\":1,\"service\":\"control\"}",
+      "alternate_value_text": "request control health params=0"
+    },
+    {
+      "name": "request.diagnostics.snapshot",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"snapshot\",\"param_keys\":[],\"params_count\":0,\"protocol_version\":1,\"service\":\"diagnostics\"}",
+      "alternate_value_text": "request diagnostics snapshot params=0"
+    },
+    {
+      "name": "request.missing_method",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"key\":\"method\",\"type\":\"missing_key\"}",
+      "alternate_value_text": "reject request missing_key method"
+    },
+    {
+      "name": "request.missing_protocol_version",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"key\":\"protocol_version\",\"type\":\"missing_key\"}",
+      "alternate_value_text": "reject request missing_key protocol_version"
+    },
+    {
+      "name": "request.missing_service",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"key\":\"service\",\"type\":\"missing_key\"}",
+      "alternate_value_text": "reject request missing_key service"
+    },
+    {
+      "name": "request.notify.cancel.expected_session",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"cancel\",\"param_keys\":[\"expected_session_id\",\"token\"],\"params_count\":2,\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "request notify cancel params=2"
+    },
+    {
+      "name": "request.notify.check.expected_session",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"check\",\"param_keys\":[\"expected_session_id\",\"token\"],\"params_count\":2,\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "request notify check params=2"
+    },
+    {
+      "name": "request.notify.get_state.expected_session",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"get_state\",\"param_keys\":[\"expected_session_id\",\"token\"],\"params_count\":2,\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "request notify get_state params=2"
+    },
+    {
+      "name": "request.notify.is_valid_token.expected_session",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"is_valid_token\",\"param_keys\":[\"expected_session_id\",\"token\"],\"params_count\":2,\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "request notify is_valid_token params=2"
+    },
+    {
+      "name": "request.notify.list_names",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"list_names\",\"param_keys\":[],\"params_count\":0,\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "request notify list_names params=0"
+    },
+    {
+      "name": "request.notify.post.cluster",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"post\",\"param_keys\":[\"name\",\"scope\"],\"params_count\":2,\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "request notify post params=2"
+    },
+    {
+      "name": "request.notify.post.default_scope",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"post\",\"param_keys\":[\"name\"],\"params_count\":1,\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "request notify post params=1"
+    },
+    {
+      "name": "request.notify.post.local",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"post\",\"param_keys\":[\"name\",\"scope\"],\"params_count\":2,\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "request notify post params=2"
+    },
+    {
+      "name": "request.notify.prepare_file_descriptor_delivery.reuse",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"prepare_file_descriptor_delivery\",\"param_keys\":[\"client_registration_id\",\"name\",\"reuse_existing_binding\",\"scope\"],\"params_count\":4,\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "request notify prepare_file_descriptor_delivery params=4"
+    },
+    {
+      "name": "request.notify.prepare_file_descriptor_delivery.reuse.default_scope",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"prepare_file_descriptor_delivery\",\"param_keys\":[\"client_registration_id\",\"name\",\"reuse_existing_binding\"],\"params_count\":3,\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "request notify prepare_file_descriptor_delivery params=3"
+    },
+    {
+      "name": "request.notify.register_check.cluster",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"register_check\",\"param_keys\":[\"name\",\"scope\"],\"params_count\":2,\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "request notify register_check params=2"
+    },
+    {
+      "name": "request.notify.register_check.default_scope",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"register_check\",\"param_keys\":[\"name\"],\"params_count\":1,\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "request notify register_check params=1"
+    },
+    {
+      "name": "request.notify.register_check.local",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"register_check\",\"param_keys\":[\"name\",\"scope\"],\"params_count\":2,\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "request notify register_check params=2"
+    },
+    {
+      "name": "request.notify.register_dispatch.default_scope",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"register_dispatch\",\"param_keys\":[\"name\",\"queue_name\"],\"params_count\":2,\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "request notify register_dispatch params=2"
+    },
+    {
+      "name": "request.notify.register_file_descriptor.new_binding",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"register_file_descriptor\",\"param_keys\":[\"client_registration_id\",\"name\",\"scope\"],\"params_count\":3,\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "request notify register_file_descriptor params=3"
+    },
+    {
+      "name": "request.notify.register_file_descriptor.new_binding.default_scope",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"register_file_descriptor\",\"param_keys\":[\"client_registration_id\",\"name\"],\"params_count\":2,\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "request notify register_file_descriptor params=2"
+    },
+    {
+      "name": "request.notify.register_file_descriptor.reuse",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"register_file_descriptor\",\"param_keys\":[\"client_registration_id\",\"name\",\"reuse_existing_binding\",\"scope\"],\"params_count\":4,\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "request notify register_file_descriptor params=4"
+    },
+    {
+      "name": "request.notify.register_signal.default_scope",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"register_signal\",\"param_keys\":[\"name\",\"signal\"],\"params_count\":2,\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "request notify register_signal params=2"
+    },
+    {
+      "name": "request.notify.register_signal.targeted",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"register_signal\",\"param_keys\":[\"name\",\"scope\",\"signal\",\"target_pid\"],\"params_count\":4,\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "request notify register_signal params=4"
+    },
+    {
+      "name": "request.notify.resume.expected_session",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"resume\",\"param_keys\":[\"expected_session_id\",\"token\"],\"params_count\":2,\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "request notify resume params=2"
+    },
+    {
+      "name": "request.notify.set_state.expected_session",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"set_state\",\"param_keys\":[\"expected_session_id\",\"state\",\"token\"],\"params_count\":3,\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "request notify set_state params=3"
+    },
+    {
+      "name": "request.notify.suspend.expected_session",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"suspend\",\"param_keys\":[\"expected_session_id\",\"token\"],\"params_count\":2,\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "request notify suspend params=2"
+    },
+    {
+      "name": "request.params_not_object",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"key\":\"params\",\"type\":\"missing_key\"}",
+      "alternate_value_text": "reject request missing_key params"
+    },
+    {
+      "name": "request.root_not_dictionary",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"detail\":\"root property list must be a dictionary\",\"type\":\"invalid_packet\"}",
+      "alternate_value_text": "reject request invalid_packet root property list must be a dictionary"
+    },
+    {
+      "name": "request.unsupported_version",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"type\":\"unsupported_version\",\"version\":99}",
+      "alternate_value_text": "reject request unsupported_version 99"
+    },
+    {
+      "name": "response.control.capabilities.notify.enabled",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":7,\"result_keys\":[\"feature_flags\",\"supports_cluster_overlay\",\"supports_launchctl_wrapper\",\"supports_native_macos_passthrough\",\"supports_notify_fast_path\",\"supports_userspace_jobs\",\"supports_userspace_notify\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=7"
+    },
+    {
+      "name": "response.control.health.healthy",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":6,\"result_keys\":[\"job_persistence\",\"notify_fast_path\",\"notify_persistence\",\"observed_at\",\"reasons\",\"state\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=6"
+    },
+    {
+      "name": "response.control.health.notify_persistence.degraded",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":6,\"result_keys\":[\"job_persistence\",\"notify_fast_path\",\"notify_persistence\",\"observed_at\",\"reasons\",\"state\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=6"
+    },
+    {
+      "name": "response.control.health.notify_persistence.recovered",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":6,\"result_keys\":[\"job_persistence\",\"notify_fast_path\",\"notify_persistence\",\"observed_at\",\"reasons\",\"state\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=6"
+    },
+    {
+      "name": "response.diagnostics.snapshot.notify_enabled.healthy",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":5,\"result_keys\":[\"capabilities\",\"daemon\",\"health\",\"jobs\",\"notify_names\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=5"
+    },
+    {
+      "name": "response.diagnostics.snapshot.notify_fast_path.degraded",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":5,\"result_keys\":[\"capabilities\",\"daemon\",\"health\",\"jobs\",\"notify_names\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=5"
+    },
+    {
+      "name": "response.diagnostics.snapshot.notify_fast_path.recovered",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":5,\"result_keys\":[\"capabilities\",\"daemon\",\"health\",\"jobs\",\"notify_names\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=5"
+    },
+    {
+      "name": "response.error_missing_code",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"key\":\"error.code\",\"type\":\"missing_key\"}",
+      "alternate_value_text": "reject response missing_key error.code"
+    },
+    {
+      "name": "response.error_missing_error",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"key\":\"error\",\"type\":\"missing_key\"}",
+      "alternate_value_text": "reject response missing_key error"
+    },
+    {
+      "name": "response.error_missing_message",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"key\":\"error.message\",\"type\":\"missing_key\"}",
+      "alternate_value_text": "reject response missing_key error.message"
+    },
+    {
+      "name": "response.missing_protocol_version",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"key\":\"protocol_version\",\"type\":\"missing_key\"}",
+      "alternate_value_text": "reject response missing_key protocol_version"
+    },
+    {
+      "name": "response.missing_status",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"key\":\"status\",\"type\":\"missing_key\"}",
+      "alternate_value_text": "reject response missing_key status"
+    },
+    {
+      "name": "response.notify.cancel.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":2,\"result_keys\":[\"canceled\",\"registration\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=2"
+    },
+    {
+      "name": "response.notify.check.changed.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":4,\"result_keys\":[\"changed\",\"current_state\",\"generation\",\"registration\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=4"
+    },
+    {
+      "name": "response.notify.check.cluster.changed.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":4,\"result_keys\":[\"changed\",\"current_state\",\"generation\",\"registration\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=4"
+    },
+    {
+      "name": "response.notify.check.unchanged.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":4,\"result_keys\":[\"changed\",\"current_state\",\"generation\",\"registration\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=4"
+    },
+    {
+      "name": "response.notify.get_state.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":2,\"result_keys\":[\"name\",\"state\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=2"
+    },
+    {
+      "name": "response.notify.invalid_reuse.failure",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"code\":\"notify_failed\",\"message\":\"notify_failed(invalid_client_registration_id(nil))\",\"protocol_version\":1,\"status\":\"error\"}",
+      "alternate_value_text": "response error code=notify_failed"
+    },
+    {
+      "name": "response.notify.invalid_scope.failure",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"code\":\"invalid_request\",\"message\":\"invalid_request(invalid scope remote)\",\"protocol_version\":1,\"status\":\"error\"}",
+      "alternate_value_text": "response error code=invalid_request"
+    },
+    {
+      "name": "response.notify.invalid_signal.failure",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"code\":\"notify_failed\",\"message\":\"notify_failed(invalid_signal(0))\",\"protocol_version\":1,\"status\":\"error\"}",
+      "alternate_value_text": "response error code=notify_failed"
+    },
+    {
+      "name": "response.notify.invalid_token.failure",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"code\":\"notify_failed\",\"message\":\"notify_failed(invalid_token(42))\",\"protocol_version\":1,\"status\":\"error\"}",
+      "alternate_value_text": "response error code=notify_failed"
+    },
+    {
+      "name": "response.notify.is_valid_token.false",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":1,\"result_keys\":[\"valid\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=1"
+    },
+    {
+      "name": "response.notify.list_names.scoped",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":2,\"result_kind\":\"array\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=array count=2"
+    },
+    {
+      "name": "response.notify.missing_dispatch_queue.failure",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"code\":\"invalid_request\",\"message\":\"invalid_request(missing queue_name)\",\"protocol_version\":1,\"status\":\"error\"}",
+      "alternate_value_text": "response error code=invalid_request"
+    },
+    {
+      "name": "response.notify.missing_name.failure",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"code\":\"invalid_request\",\"message\":\"invalid_request(missing name)\",\"protocol_version\":1,\"status\":\"error\"}",
+      "alternate_value_text": "response error code=invalid_request"
+    },
+    {
+      "name": "response.notify.post.cluster.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":4,\"result_keys\":[\"delivered_tokens\",\"generation\",\"name\",\"posted_at\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=4"
+    },
+    {
+      "name": "response.notify.post.dispatch.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":4,\"result_keys\":[\"delivered_tokens\",\"generation\",\"name\",\"posted_at\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=4"
+    },
+    {
+      "name": "response.notify.post.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":4,\"result_keys\":[\"delivered_tokens\",\"generation\",\"name\",\"posted_at\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=4"
+    },
+    {
+      "name": "response.notify.registration.check.cluster.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":1,\"result_keys\":[\"registration\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=1"
+    },
+    {
+      "name": "response.notify.registration.check.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":1,\"result_keys\":[\"registration\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=1"
+    },
+    {
+      "name": "response.notify.registration.dispatch.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":1,\"result_keys\":[\"registration\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=1"
+    },
+    {
+      "name": "response.notify.registration.file_descriptor.reuse.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":1,\"result_keys\":[\"registration\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=1"
+    },
+    {
+      "name": "response.notify.registration.file_descriptor.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":1,\"result_keys\":[\"registration\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=1"
+    },
+    {
+      "name": "response.notify.registration.signal.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":1,\"result_keys\":[\"registration\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=1"
+    },
+    {
+      "name": "response.notify.resume.failed_after_pending_suspend",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":14,\"result_keys\":[\"created_at\",\"delivery_method\",\"delivery_state\",\"first_check_pending\",\"last_seen_generation\",\"local_transport_binding_id\",\"local_transport_handle\",\"name\",\"pending_generation\",\"scope\",\"session_id\",\"suspend_depth\",\"token\",\"valid\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=14"
+    },
+    {
+      "name": "response.notify.resume.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":13,\"result_keys\":[\"created_at\",\"delivery_method\",\"delivery_state\",\"first_check_pending\",\"last_seen_generation\",\"name\",\"scope\",\"session_id\",\"signal\",\"suspend_depth\",\"target_pid\",\"token\",\"valid\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=13"
+    },
+    {
+      "name": "response.notify.set_state.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":2,\"result_keys\":[\"name\",\"state\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=2"
+    },
+    {
+      "name": "response.notify.suspend.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":12,\"result_keys\":[\"created_at\",\"delivery_method\",\"delivery_state\",\"first_check_pending\",\"last_checked_at\",\"last_seen_generation\",\"name\",\"scope\",\"session_id\",\"suspend_depth\",\"token\",\"valid\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=12"
+    },
+    {
+      "name": "response.ok_missing_result",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"key\":\"result\",\"type\":\"missing_key\"}",
+      "alternate_value_text": "reject response missing_key result"
+    },
+    {
+      "name": "response.scalar_coverage.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result_count\":9,\"result_keys\":[\"array\",\"bool_false\",\"bool_true\",\"data\",\"date\",\"double\",\"integer\",\"object\",\"string\"],\"result_kind\":\"object\",\"status\":\"ok\"}",
+      "alternate_value_text": "response ok result=object count=9"
+    },
+    {
+      "name": "response.unsupported_status",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"detail\":\"unsupported status partial\",\"type\":\"invalid_packet\"}",
+      "alternate_value_text": "reject response invalid_packet unsupported status partial"
+    },
+    {
+      "name": "response.unsupported_version",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"type\":\"unsupported_version\",\"version\":99}",
+      "alternate_value_text": "reject response unsupported_version 99"
+    }
+  ]
+}

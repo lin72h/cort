@@ -1,4 +1,4 @@
-# cort-fx Subset 0, 1A, 1B, 2A, 3A, And 7A Proof
+# cort-fx Subset 0, 1A, 1B, 2A, 3A, 7A, And 7B Proof
 
 This directory holds the temporary standalone `cort-fx` proof for CORT
 Subset 0, Subset 1A, Subset 1B, Subset 2A, Subset 3A, and Subset 7A:
@@ -13,6 +13,8 @@ Subset 0, Subset 1A, Subset 1B, Subset 2A, Subset 3A, and Subset 7A:
   runtime, scalar, string, and container surface
 - Subset 7A: control-packet decode and rejection compatibility against the
   imported Swift packet corpora
+- Subset 7B: internal request/response control-envelope accessors and semantic
+  summaries on top of the proven packet decode surface
 
 The active 3A coordination documents live in:
 
@@ -30,6 +32,12 @@ The Subset 7A docs live in:
 - `../docs/cort-subset7a-control-packet-contract.md`
 - `../docs/cort-subset7a-source-audit-and-readiness.md`
 - `../docs/cort-subset7a-validation-workflow.md`
+
+The Subset 7B docs live in:
+
+- `../docs/cort-subset7b-control-envelope-contract.md`
+- `../docs/cort-subset7b-source-audit-and-readiness.md`
+- `../docs/cort-subset7b-validation-workflow.md`
 
 The shared imported packet corpora live in:
 
@@ -117,6 +125,8 @@ Implemented:
   dictionary with string keys
 - internal control-packet decode and rejection compatibility for the imported
   request/response packet corpora
+- internal request/response control-envelope accessors and semantic summaries
+  for the imported packet corpora
 
 Explicitly not implemented here:
 
@@ -132,6 +142,7 @@ Explicitly not implemented here:
 - mutable parse/write modes beyond the bounded 3A surface
 - packet encode parity
 - transport/session behavior beyond the bounded decode/rejection surface
+- public packet-specific APIs beyond the bounded internal envelope layer
 
 ## Provenance
 
@@ -170,6 +181,7 @@ This builds under `../wip-cort-gpt-artifacts/cort-fx/build/` by default:
 - `bin/container_core_tests`
 - `bin/bplist_core_tests`
 - `bin/control_packet_tests`
+- `bin/control_envelope_tests`
 - `bin/c_consumer_smoke`
 - `bin/subset0_public_compare_fx`
 - `bin/subset1_scalar_core_fx`
@@ -177,6 +189,7 @@ This builds under `../wip-cort-gpt-artifacts/cort-fx/build/` by default:
 - `bin/subset2a_container_fx`
 - `bin/subset3a_bplist_fx`
 - `bin/subset7a_control_packet_fx`
+- `bin/subset7b_control_envelope_fx`
 
 ## Verification Targets
 
@@ -190,11 +203,13 @@ make compare-subset1b-fx
 make compare-subset2a-fx
 make compare-subset3a-fx
 make compare-subset7a-fx
+make compare-subset7b-fx
 make compare-subset1a-with-mx
 make compare-subset1b-with-mx
 make compare-subset2a-with-mx
 make compare-subset3a-with-mx
 make compare-subset7a-with-expected
+make compare-subset7b-with-expected
 make artifact-run
 make artifact-subset1a-compare
 make artifact-subset2a-compare
@@ -229,6 +244,10 @@ What they enforce:
   `../wip-cort-gpt-artifacts/cort-fx/build/out/subset7a_control_packet_fx.json`
 - FX control-packet compare emits
   `../wip-cort-gpt-artifacts/cort-fx/build/out/subset7a_control_packet_fx_vs_expected_report.md`
+- FX control-envelope probe emits
+  `../wip-cort-gpt-artifacts/cort-fx/build/out/subset7b_control_envelope_fx.json`
+- FX control-envelope compare emits
+  `../wip-cort-gpt-artifacts/cort-fx/build/out/subset7b_control_envelope_fx_vs_expected_report.md`
 
 The 7A packet slice is implemented with:
 
@@ -237,6 +256,15 @@ The 7A packet slice is implemented with:
 - `tests/subset7a_control_packet_support.h`
 - `tests/generated/subset7a_control_packet_cases.h`
 - `../tools/build_subset7a_control_packet_cases_header.exs`
+
+The 7B control-envelope slice is implemented with:
+
+- `src/FXCFControlPacket.c`
+- `src/FXCFControlPacket.h`
+- `tests/control_envelope_tests.c`
+- `tests/cort_subset7b_control_envelope_fx.c`
+- `tests/subset7b_control_envelope_support.h`
+- `../tools/build_subset7b_control_envelope_expected.exs`
 
 Shared handoff artifact:
 

@@ -10,6 +10,24 @@ enum _FXCFControlPacketKind {
     _FXCFControlPacketKindResponse = 2
 };
 
+enum _FXCFControlResponseStatus {
+    _FXCFControlResponseStatusNone = 0,
+    _FXCFControlResponseStatusOK = 1,
+    _FXCFControlResponseStatusError = 2
+};
+
+enum _FXCFControlValueKind {
+    _FXCFControlValueKindInvalid = 0,
+    _FXCFControlValueKindObject = 1,
+    _FXCFControlValueKindArray = 2,
+    _FXCFControlValueKindString = 3,
+    _FXCFControlValueKindInteger = 4,
+    _FXCFControlValueKindDouble = 5,
+    _FXCFControlValueKindBool = 6,
+    _FXCFControlValueKindDate = 7,
+    _FXCFControlValueKindData = 8
+};
+
 enum _FXCFControlPacketErrorKind {
     _FXCFControlPacketErrorNone = 0,
     _FXCFControlPacketErrorMissingKey = 1,
@@ -23,6 +41,26 @@ struct _FXCFControlPacketError {
     char text[192];
 };
 
+struct _FXCFControlRequest {
+    CFDictionaryRef packet;
+    CFIndex protocolVersion;
+    CFStringRef service;
+    CFStringRef method;
+    CFDictionaryRef params;
+};
+
+struct _FXCFControlResponse {
+    CFDictionaryRef packet;
+    CFIndex protocolVersion;
+    enum _FXCFControlResponseStatus status;
+    CFTypeRef result;
+    CFDictionaryRef errorPayload;
+    CFStringRef errorCode;
+    CFStringRef errorMessage;
+};
+
+Boolean _FXCFControlPacketIsBinaryPlist(CFDataRef payload);
+
 Boolean _FXCFControlPacketDecodeEnvelope(
     CFAllocatorRef allocator,
     CFDataRef payload,
@@ -31,8 +69,31 @@ Boolean _FXCFControlPacketDecodeEnvelope(
     struct _FXCFControlPacketError *errorOut
 );
 
+Boolean _FXCFControlRequestInit(
+    CFAllocatorRef allocator,
+    CFDataRef payload,
+    struct _FXCFControlRequest *requestOut,
+    struct _FXCFControlPacketError *errorOut
+);
+
+void _FXCFControlRequestClear(struct _FXCFControlRequest *request);
+
+Boolean _FXCFControlResponseInit(
+    CFAllocatorRef allocator,
+    CFDataRef payload,
+    struct _FXCFControlResponse *responseOut,
+    struct _FXCFControlPacketError *errorOut
+);
+
+void _FXCFControlResponseClear(struct _FXCFControlResponse *response);
+
+enum _FXCFControlValueKind _FXCFControlPacketValueKind(CFTypeRef value);
 char *_FXCFControlPacketCopyCanonicalJSON(CFTypeRef value);
 char *_FXCFControlPacketCopyAcceptedSummary(CFDictionaryRef packet, enum _FXCFControlPacketKind kind);
+char *_FXCFControlRequestCopyEnvelopeJSON(const struct _FXCFControlRequest *request);
+char *_FXCFControlRequestCopyEnvelopeSummary(const struct _FXCFControlRequest *request);
+char *_FXCFControlResponseCopyEnvelopeJSON(const struct _FXCFControlResponse *response);
+char *_FXCFControlResponseCopyEnvelopeSummary(const struct _FXCFControlResponse *response);
 char *_FXCFControlPacketCopyErrorJSON(const struct _FXCFControlPacketError *error);
 char *_FXCFControlPacketCopyErrorSummary(enum _FXCFControlPacketKind kind, const struct _FXCFControlPacketError *error);
 
