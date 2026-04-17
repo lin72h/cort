@@ -1,0 +1,146 @@
+{
+  "corpus_version": 1,
+  "format": "CORT notify state transition expected corpus",
+  "generated_from": [
+    "fixtures/control/subset7e_notify_client_outcome_expected_v1.json",
+    "fixtures/control/subset7f_notify_state_transition_cases_v1.json"
+  ],
+  "probe": "subset7f_notify_state_transition",
+  "results": [
+    {
+      "alternate_value_text": "notify transition cancel discard release=binding-alpha status=ok",
+      "classification": "required",
+      "kind": "notify_transition",
+      "name": "notify.transition.cancel.discard_binding",
+      "primary_value_text": "{\"action\":\"discard\",\"operation\":\"cancel\",\"released_binding_id\":\"binding-alpha\",\"status_family\":\"ok\"}",
+      "success": true,
+      "validation_mode": "accept"
+    },
+    {
+      "alternate_value_text": "notify transition check merge token=42 changed=true last_seen=4 status=ok",
+      "classification": "required",
+      "kind": "notify_transition",
+      "name": "notify.transition.check.merge.binding_preserved",
+      "primary_value_text": "{\"action\":\"merge\",\"changed_result\":true,\"operation\":\"check\",\"registration\":{\"binding_id\":\"binding-alpha\",\"first_check_pending\":false,\"last_seen_generation\":4,\"name\":\"com.launchx.fixture.check\",\"scope\":\"local\",\"session_id\":\"session-alpha\",\"token\":42},\"status_family\":\"ok\"}",
+      "success": true,
+      "validation_mode": "accept"
+    },
+    {
+      "alternate_value_text": "notify transition check merge token=42 changed=true last_seen=4 status=ok",
+      "classification": "required",
+      "kind": "notify_transition",
+      "name": "notify.transition.check.merge.initial_pending",
+      "primary_value_text": "{\"action\":\"merge\",\"changed_result\":true,\"operation\":\"check\",\"registration\":{\"first_check_pending\":false,\"last_seen_generation\":4,\"name\":\"com.launchx.fixture.check\",\"scope\":\"local\",\"session_id\":\"session-alpha\",\"token\":42},\"status_family\":\"ok\"}",
+      "success": true,
+      "validation_mode": "accept"
+    },
+    {
+      "alternate_value_text": "notify transition check merge token=43 changed=false last_seen=2 status=ok",
+      "classification": "required",
+      "kind": "notify_transition",
+      "name": "notify.transition.check.merge.stale_generation",
+      "primary_value_text": "{\"action\":\"merge\",\"changed_result\":false,\"operation\":\"check\",\"registration\":{\"first_check_pending\":false,\"last_seen_generation\":2,\"name\":\"com.launchx.fixture.check\",\"scope\":\"cluster\",\"session_id\":\"session-cluster\",\"token\":43},\"status_family\":\"ok\"}",
+      "success": true,
+      "validation_mode": "accept"
+    },
+    {
+      "alternate_value_text": "notify transition check merge token=43 changed=false last_seen=0 status=ok",
+      "classification": "required",
+      "kind": "notify_transition",
+      "name": "notify.transition.check.unchanged_keeps_generation",
+      "primary_value_text": "{\"action\":\"merge\",\"changed_result\":false,\"operation\":\"check\",\"registration\":{\"first_check_pending\":false,\"last_seen_generation\":0,\"name\":\"com.launchx.fixture.check\",\"scope\":\"cluster\",\"session_id\":\"session-cluster\",\"token\":43},\"status_family\":\"ok\"}",
+      "success": true,
+      "validation_mode": "accept"
+    },
+    {
+      "alternate_value_text": "notify transition get_state keep token=42 status=invalid_request",
+      "classification": "required",
+      "kind": "notify_transition",
+      "name": "notify.transition.error.invalid_request.keep_get_state",
+      "primary_value_text": "{\"action\":\"keep\",\"operation\":\"get_state\",\"registration\":{\"first_check_pending\":false,\"last_seen_generation\":4,\"name\":\"com.launchx.fixture.check\",\"scope\":\"local\",\"session_id\":\"session-alpha\",\"token\":42},\"status_family\":\"invalid_request\"}",
+      "success": true,
+      "validation_mode": "accept"
+    },
+    {
+      "alternate_value_text": "notify transition is_valid_token keep valid=true status=invalid_request",
+      "classification": "required",
+      "kind": "notify_transition",
+      "name": "notify.transition.error.invalid_request.keep_validity",
+      "primary_value_text": "{\"action\":\"keep\",\"operation\":\"is_valid_token\",\"registration\":{\"first_check_pending\":false,\"last_seen_generation\":4,\"name\":\"com.launchx.fixture.check\",\"scope\":\"local\",\"session_id\":\"session-alpha\",\"token\":42},\"status_family\":\"invalid_request\",\"valid_result\":true}",
+      "success": true,
+      "validation_mode": "accept"
+    },
+    {
+      "alternate_value_text": "notify transition check discard release=binding-alpha status=invalid_token",
+      "classification": "required",
+      "kind": "notify_transition",
+      "name": "notify.transition.error.invalid_token.discard_check",
+      "primary_value_text": "{\"action\":\"discard\",\"operation\":\"check\",\"released_binding_id\":\"binding-alpha\",\"status_family\":\"invalid_token\"}",
+      "success": true,
+      "validation_mode": "accept"
+    },
+    {
+      "alternate_value_text": "notify transition registration_update discard release=binding-alpha status=invalid_token",
+      "classification": "required",
+      "kind": "notify_transition",
+      "name": "notify.transition.error.invalid_token.discard_update",
+      "primary_value_text": "{\"action\":\"discard\",\"operation\":\"registration_update\",\"released_binding_id\":\"binding-alpha\",\"status_family\":\"invalid_token\"}",
+      "success": true,
+      "validation_mode": "accept"
+    },
+    {
+      "alternate_value_text": "notify transition is_valid_token discard valid=false status=invalid_token",
+      "classification": "required",
+      "kind": "notify_transition",
+      "name": "notify.transition.error.invalid_token.discard_validity",
+      "primary_value_text": "{\"action\":\"discard\",\"operation\":\"is_valid_token\",\"released_binding_id\":\"binding-alpha\",\"status_family\":\"invalid_token\",\"valid_result\":false}",
+      "success": true,
+      "validation_mode": "accept"
+    },
+    {
+      "alternate_value_text": "notify transition get_state keep token=42 status=ok",
+      "classification": "required",
+      "kind": "notify_transition",
+      "name": "notify.transition.get_state.keep_on_success",
+      "primary_value_text": "{\"action\":\"keep\",\"operation\":\"get_state\",\"registration\":{\"first_check_pending\":false,\"last_seen_generation\":4,\"name\":\"com.launchx.fixture.check\",\"scope\":\"local\",\"session_id\":\"session-alpha\",\"token\":42},\"status_family\":\"ok\"}",
+      "success": true,
+      "validation_mode": "accept"
+    },
+    {
+      "alternate_value_text": "notify transition registration_store store token=42 status=ok",
+      "classification": "required",
+      "kind": "notify_transition",
+      "name": "notify.transition.registration.store.check",
+      "primary_value_text": "{\"action\":\"store\",\"operation\":\"registration_store\",\"registration\":{\"first_check_pending\":true,\"last_seen_generation\":0,\"name\":\"com.launchx.fixture.check\",\"scope\":\"local\",\"session_id\":\"session-alpha\",\"token\":42},\"status_family\":\"ok\"}",
+      "success": true,
+      "validation_mode": "accept"
+    },
+    {
+      "alternate_value_text": "notify transition registration_store store token=77 status=ok",
+      "classification": "required",
+      "kind": "notify_transition",
+      "name": "notify.transition.registration.store.file_descriptor",
+      "primary_value_text": "{\"action\":\"store\",\"operation\":\"registration_store\",\"registration\":{\"binding_id\":\"binding-alpha\",\"first_check_pending\":true,\"last_seen_generation\":0,\"name\":\"com.launchx.fixture.fd.new\",\"scope\":\"local\",\"session_id\":\"session-fd\",\"token\":77},\"status_family\":\"ok\"}",
+      "success": true,
+      "validation_mode": "accept"
+    },
+    {
+      "alternate_value_text": "notify transition registration_update store token=51 status=ok",
+      "classification": "required",
+      "kind": "notify_transition",
+      "name": "notify.transition.registration.update.resume_replaces_cached",
+      "primary_value_text": "{\"action\":\"store\",\"operation\":\"registration_update\",\"registration\":{\"first_check_pending\":true,\"last_seen_generation\":0,\"name\":\"com.launchx.fixture.signal\",\"scope\":\"local\",\"session_id\":\"session-signal\",\"token\":51},\"status_family\":\"ok\"}",
+      "success": true,
+      "validation_mode": "accept"
+    },
+    {
+      "alternate_value_text": "notify transition is_valid_token discard valid=false status=ok",
+      "classification": "required",
+      "kind": "notify_transition",
+      "name": "notify.transition.validity.false.discard",
+      "primary_value_text": "{\"action\":\"discard\",\"operation\":\"is_valid_token\",\"released_binding_id\":\"binding-alpha\",\"status_family\":\"ok\",\"valid_result\":false}",
+      "success": true,
+      "validation_mode": "accept"
+    }
+  ]
+}

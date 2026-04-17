@@ -14,6 +14,8 @@ Files:
 - `subset7c_control_request_route_expected_v1.json`
 - `subset7d_control_response_profile_expected_v1.json`
 - `subset7e_notify_client_outcome_expected_v1.json`
+- `subset7f_notify_state_transition_cases_v1.json`
+- `subset7f_notify_state_transition_expected_v1.json`
 
 Provenance:
 
@@ -82,3 +84,15 @@ response corpus and the current notify-client consumer contract by:
 That file carries the notify-client outcome expected surface for the next
 bounded packet consumer cut. It is generated from the source corpora and should
 not be hand-edited.
+
+`subset7f_notify_state_transition_cases_v1.json` is the shared scenario file
+for the first local notify cache-policy consumer cut. It is hand-maintained and
+should stay narrow.
+
+`subset7f_notify_state_transition_expected_v1.json` is derived from the 7E
+notify outcome corpus and the shared 7F scenario file by:
+
+- `tools/build_subset7f_notify_transition_expected.exs`
+
+That file carries the notify state-transition expected surface for the next
+notify-client consumer cut. It is generated and should not be hand-edited.

@@ -3321,6 +3321,540 @@ char *_FXCFControlNotifyOutcomeCopySummary(const struct _FXCFControlNotifyOutcom
     }
 }
 
+static const char *__FXCFControlNotifyTransitionOperationText(enum _FXCFControlNotifyTransitionOperation operation) {
+    switch (operation) {
+        case _FXCFControlNotifyTransitionOperationRegistrationStore:
+            return "registration_store";
+        case _FXCFControlNotifyTransitionOperationRegistrationUpdate:
+            return "registration_update";
+        case _FXCFControlNotifyTransitionOperationCheck:
+            return "check";
+        case _FXCFControlNotifyTransitionOperationCancel:
+            return "cancel";
+        case _FXCFControlNotifyTransitionOperationGetState:
+            return "get_state";
+        case _FXCFControlNotifyTransitionOperationIsValidToken:
+            return "is_valid_token";
+        default:
+            return "invalid";
+    }
+}
+
+static const char *__FXCFControlNotifyTransitionActionText(enum _FXCFControlNotifyTransitionAction action) {
+    switch (action) {
+        case _FXCFControlNotifyTransitionActionStore:
+            return "store";
+        case _FXCFControlNotifyTransitionActionMerge:
+            return "merge";
+        case _FXCFControlNotifyTransitionActionDiscard:
+            return "discard";
+        case _FXCFControlNotifyTransitionActionKeep:
+            return "keep";
+        default:
+            return "invalid";
+    }
+}
+
+static CFStringRef __FXCFControlRetainedString(CFStringRef string) {
+    if (string == NULL) {
+        return NULL;
+    }
+    return (CFStringRef)CFRetain((CFTypeRef)string);
+}
+
+void _FXCFControlNotifyCachedRegistrationClear(struct _FXCFControlNotifyCachedRegistration *registration) {
+    if (registration == NULL) {
+        return;
+    }
+    if (registration->sessionID != NULL) {
+        CFRelease((CFTypeRef)registration->sessionID);
+    }
+    if (registration->scope != NULL) {
+        CFRelease((CFTypeRef)registration->scope);
+    }
+    if (registration->name != NULL) {
+        CFRelease((CFTypeRef)registration->name);
+    }
+    if (registration->bindingID != NULL) {
+        CFRelease((CFTypeRef)registration->bindingID);
+    }
+    memset(registration, 0, sizeof(*registration));
+}
+
+static Boolean __FXCFControlNotifyCachedRegistrationAssign(
+    CFAllocatorRef allocator,
+    CFStringRef sessionID,
+    CFStringRef scope,
+    CFStringRef name,
+    CFStringRef bindingID,
+    CFIndex token,
+    CFIndex lastSeenGeneration,
+    Boolean firstCheckPending,
+    struct _FXCFControlNotifyCachedRegistration *registrationOut,
+    struct _FXCFControlPacketError *errorOut
+) {
+    (void)allocator;
+
+    if (registrationOut == NULL) {
+        __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "registrationOut is NULL");
+        return false;
+    }
+    if (sessionID == NULL || scope == NULL || name == NULL) {
+        __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "cached registration requires session/scope/name");
+        return false;
+    }
+
+    memset(registrationOut, 0, sizeof(*registrationOut));
+    registrationOut->sessionID = __FXCFControlRetainedString(sessionID);
+    registrationOut->scope = __FXCFControlRetainedString(scope);
+    registrationOut->name = __FXCFControlRetainedString(name);
+    registrationOut->bindingID = __FXCFControlRetainedString(bindingID);
+    registrationOut->token = token;
+    registrationOut->lastSeenGeneration = lastSeenGeneration;
+    registrationOut->firstCheckPending = firstCheckPending;
+    return true;
+}
+
+static Boolean __FXCFControlNotifyCachedRegistrationInitFromView(
+    CFAllocatorRef allocator,
+    const struct _FXCFControlNotifyRegistrationView *view,
+    struct _FXCFControlNotifyCachedRegistration *registrationOut,
+    struct _FXCFControlPacketError *errorOut
+) {
+    if (view == NULL) {
+        __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "registration view is NULL");
+        return false;
+    }
+    return __FXCFControlNotifyCachedRegistrationAssign(
+        allocator,
+        view->sessionID,
+        view->scope,
+        view->name,
+        view->bindingID,
+        view->token,
+        view->lastSeenGeneration,
+        view->firstCheckPending,
+        registrationOut,
+        errorOut
+    );
+}
+
+Boolean _FXCFControlNotifyCachedRegistrationInitCopy(
+    CFAllocatorRef allocator,
+    const struct _FXCFControlNotifyCachedRegistration *source,
+    struct _FXCFControlNotifyCachedRegistration *registrationOut,
+    struct _FXCFControlPacketError *errorOut
+) {
+    if (source == NULL) {
+        __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "source cached registration is NULL");
+        return false;
+    }
+    return __FXCFControlNotifyCachedRegistrationAssign(
+        allocator,
+        source->sessionID,
+        source->scope,
+        source->name,
+        source->bindingID,
+        source->token,
+        source->lastSeenGeneration,
+        source->firstCheckPending,
+        registrationOut,
+        errorOut
+    );
+}
+
+static CFIndex __FXCFControlMax3(CFIndex left, CFIndex middle, CFIndex right) {
+    CFIndex result = left;
+
+    if (middle > result) {
+        result = middle;
+    }
+    if (right > result) {
+        result = right;
+    }
+    return result;
+}
+
+void _FXCFControlNotifyTransitionClear(struct _FXCFControlNotifyTransition *transition) {
+    if (transition == NULL) {
+        return;
+    }
+    _FXCFControlNotifyCachedRegistrationClear(&transition->registration);
+    if (transition->releasedBindingID != NULL) {
+        CFRelease((CFTypeRef)transition->releasedBindingID);
+    }
+    memset(transition, 0, sizeof(*transition));
+}
+
+static Boolean __FXCFControlNotifyTransitionCopyCached(
+    CFAllocatorRef allocator,
+    const struct _FXCFControlNotifyCachedRegistration *cached,
+    struct _FXCFControlNotifyTransition *transitionOut,
+    struct _FXCFControlPacketError *errorOut
+) {
+    if (cached == NULL) {
+        return true;
+    }
+
+    transitionOut->hasRegistration = true;
+    if (!_FXCFControlNotifyCachedRegistrationInitCopy(allocator, cached, &transitionOut->registration, errorOut)) {
+        transitionOut->hasRegistration = false;
+        return false;
+    }
+    return true;
+}
+
+static Boolean __FXCFControlNotifyTransitionCopyReleasedBindingID(
+    const struct _FXCFControlNotifyCachedRegistration *cached,
+    struct _FXCFControlNotifyTransition *transitionOut
+) {
+    if (cached == NULL || cached->bindingID == NULL) {
+        return true;
+    }
+    transitionOut->releasedBindingID = __FXCFControlRetainedString(cached->bindingID);
+    return transitionOut->releasedBindingID != NULL;
+}
+
+static Boolean __FXCFControlNotifyTransitionHandleError(
+    CFAllocatorRef allocator,
+    enum _FXCFControlNotifyTransitionOperation operation,
+    const struct _FXCFControlNotifyOutcome *outcome,
+    const struct _FXCFControlNotifyCachedRegistration *cached,
+    Boolean hasCachedRegistration,
+    struct _FXCFControlNotifyTransition *transitionOut,
+    struct _FXCFControlPacketError *errorOut
+) {
+    if (outcome->statusFamily == _FXCFControlNotifyStatusFamilyInvalidToken) {
+        transitionOut->action = _FXCFControlNotifyTransitionActionDiscard;
+        if (!__FXCFControlNotifyTransitionCopyReleasedBindingID(hasCachedRegistration ? cached : NULL, transitionOut)) {
+            __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "failed to retain released binding ID");
+            return false;
+        }
+        if (operation == _FXCFControlNotifyTransitionOperationIsValidToken) {
+            transitionOut->hasValidResult = true;
+            transitionOut->validResult = false;
+        }
+        return true;
+    }
+
+    transitionOut->action = _FXCFControlNotifyTransitionActionKeep;
+    if (operation == _FXCFControlNotifyTransitionOperationIsValidToken) {
+        transitionOut->hasValidResult = true;
+        transitionOut->validResult = hasCachedRegistration;
+    }
+    return __FXCFControlNotifyTransitionCopyCached(
+        allocator,
+        hasCachedRegistration ? cached : NULL,
+        transitionOut,
+        errorOut
+    );
+}
+
+Boolean _FXCFControlNotifyTransitionInit(
+    CFAllocatorRef allocator,
+    enum _FXCFControlNotifyTransitionOperation operation,
+    const struct _FXCFControlNotifyOutcome *outcome,
+    const struct _FXCFControlNotifyCachedRegistration *cached,
+    Boolean hasCachedRegistration,
+    struct _FXCFControlNotifyTransition *transitionOut,
+    struct _FXCFControlPacketError *errorOut
+) {
+    const struct _FXCFControlNotifyRegistrationView *remote = NULL;
+    CFStringRef bindingID = NULL;
+    Boolean changed = false;
+
+    if (transitionOut == NULL) {
+        __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "transitionOut is NULL");
+        return false;
+    }
+
+    memset(transitionOut, 0, sizeof(*transitionOut));
+    transitionOut->operation = operation;
+
+    if (outcome == NULL) {
+        __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "notify outcome is NULL");
+        return false;
+    }
+    if (operation == _FXCFControlNotifyTransitionOperationInvalid) {
+        __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "notify transition operation is invalid");
+        return false;
+    }
+    if (hasCachedRegistration && cached == NULL) {
+        __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "cached registration flag set without cached registration");
+        return false;
+    }
+
+    transitionOut->statusFamily = outcome->statusFamily;
+
+    if (outcome->kind == _FXCFControlNotifyOutcomeKindError) {
+        return __FXCFControlNotifyTransitionHandleError(
+            allocator,
+            operation,
+            outcome,
+            cached,
+            hasCachedRegistration,
+            transitionOut,
+            errorOut
+        );
+    }
+
+    switch (operation) {
+        case _FXCFControlNotifyTransitionOperationRegistrationStore:
+        case _FXCFControlNotifyTransitionOperationRegistrationUpdate:
+            if (outcome->kind != _FXCFControlNotifyOutcomeKindRegistration || !outcome->hasRegistration) {
+                __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "notify transition store/update requires registration outcome");
+                return false;
+            }
+            transitionOut->action = _FXCFControlNotifyTransitionActionStore;
+            transitionOut->hasRegistration = true;
+            return __FXCFControlNotifyCachedRegistrationInitFromView(
+                allocator,
+                &outcome->registration,
+                &transitionOut->registration,
+                errorOut
+            );
+
+        case _FXCFControlNotifyTransitionOperationCheck:
+            if (!hasCachedRegistration) {
+                __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "notify check transition requires cached registration");
+                return false;
+            }
+            if (outcome->kind != _FXCFControlNotifyOutcomeKindCheck || !outcome->hasRegistration || !outcome->hasGeneration || !outcome->hasChanged) {
+                __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "notify check transition requires check outcome");
+                return false;
+            }
+            remote = &outcome->registration;
+            bindingID = remote->bindingID != NULL ? remote->bindingID : cached->bindingID;
+            changed = outcome->changed && (cached->firstCheckPending || outcome->generation > cached->lastSeenGeneration);
+            transitionOut->action = _FXCFControlNotifyTransitionActionMerge;
+            transitionOut->hasRegistration = true;
+            transitionOut->hasChangedResult = true;
+            transitionOut->changedResult = changed;
+            return __FXCFControlNotifyCachedRegistrationAssign(
+                allocator,
+                remote->sessionID,
+                remote->scope,
+                remote->name,
+                bindingID,
+                remote->token,
+                __FXCFControlMax3(remote->lastSeenGeneration, cached->lastSeenGeneration, outcome->generation),
+                remote->firstCheckPending && cached->firstCheckPending,
+                &transitionOut->registration,
+                errorOut
+            );
+
+        case _FXCFControlNotifyTransitionOperationCancel:
+            if (!hasCachedRegistration) {
+                __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "notify cancel transition requires cached registration");
+                return false;
+            }
+            if (outcome->kind != _FXCFControlNotifyOutcomeKindCancel || !outcome->hasCanceled) {
+                __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "notify cancel transition requires cancel outcome");
+                return false;
+            }
+            transitionOut->action = _FXCFControlNotifyTransitionActionDiscard;
+            if (!__FXCFControlNotifyTransitionCopyReleasedBindingID(cached, transitionOut)) {
+                __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "failed to retain released binding ID");
+                return false;
+            }
+            return true;
+
+        case _FXCFControlNotifyTransitionOperationGetState:
+            if (!hasCachedRegistration) {
+                __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "notify get_state transition requires cached registration");
+                return false;
+            }
+            if (outcome->kind != _FXCFControlNotifyOutcomeKindNameState) {
+                __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "notify get_state transition requires name_state outcome");
+                return false;
+            }
+            transitionOut->action = _FXCFControlNotifyTransitionActionKeep;
+            return __FXCFControlNotifyTransitionCopyCached(allocator, cached, transitionOut, errorOut);
+
+        case _FXCFControlNotifyTransitionOperationIsValidToken:
+            if (!hasCachedRegistration) {
+                __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "notify is_valid_token transition requires cached registration");
+                return false;
+            }
+            if (outcome->kind != _FXCFControlNotifyOutcomeKindValidity || !outcome->hasValid) {
+                __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "notify is_valid_token transition requires validity outcome");
+                return false;
+            }
+            transitionOut->hasValidResult = true;
+            transitionOut->validResult = outcome->valid;
+            if (outcome->valid) {
+                transitionOut->action = _FXCFControlNotifyTransitionActionKeep;
+                return __FXCFControlNotifyTransitionCopyCached(allocator, cached, transitionOut, errorOut);
+            }
+            transitionOut->action = _FXCFControlNotifyTransitionActionDiscard;
+            if (!__FXCFControlNotifyTransitionCopyReleasedBindingID(cached, transitionOut)) {
+                __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "failed to retain released binding ID");
+                return false;
+            }
+            return true;
+
+        default:
+            __FXCFControlPacketSetError(errorOut, _FXCFControlPacketErrorInvalidPacket, 0, "unsupported notify transition operation");
+            return false;
+    }
+}
+
+static Boolean __FXCFControlNotifyTransitionAppendRegistrationJSON(
+    struct __FXCFTextBuffer *buffer,
+    const struct _FXCFControlNotifyCachedRegistration *registration
+) {
+    Boolean needsComma = false;
+
+    if (buffer == NULL || registration == NULL) {
+        return false;
+    }
+
+    return
+        __FXCFTextBufferAppendCString(buffer, "{") &&
+        __FXCFControlRequestRouteAppendOptionalStringJSON(buffer, "binding_id", registration->bindingID, &needsComma) &&
+        __FXCFTextBufferAppendJSONFieldPrefix(buffer, "first_check_pending", &needsComma) &&
+        __FXCFTextBufferAppendCString(buffer, registration->firstCheckPending ? "true" : "false") &&
+        __FXCFTextBufferAppendJSONFieldPrefix(buffer, "last_seen_generation", &needsComma) &&
+        __FXCFTextBufferAppendFormat(buffer, "%ld", (long)registration->lastSeenGeneration) &&
+        __FXCFControlNotifyOutcomeAppendRequiredStringJSON(buffer, "name", registration->name, &needsComma) &&
+        __FXCFControlNotifyOutcomeAppendRequiredStringJSON(buffer, "scope", registration->scope, &needsComma) &&
+        __FXCFControlNotifyOutcomeAppendRequiredStringJSON(buffer, "session_id", registration->sessionID, &needsComma) &&
+        __FXCFTextBufferAppendJSONFieldPrefix(buffer, "token", &needsComma) &&
+        __FXCFTextBufferAppendFormat(buffer, "%ld", (long)registration->token) &&
+        __FXCFTextBufferAppendCString(buffer, "}");
+}
+
+char *_FXCFControlNotifyTransitionCopyCanonicalJSON(const struct _FXCFControlNotifyTransition *transition) {
+    struct __FXCFTextBuffer buffer = {0};
+    const char *operationText = NULL;
+    const char *actionText = NULL;
+    const char *statusFamilyText = NULL;
+    Boolean needsComma = false;
+    char *result = NULL;
+
+    if (transition == NULL) {
+        return NULL;
+    }
+
+    operationText = __FXCFControlNotifyTransitionOperationText(transition->operation);
+    actionText = __FXCFControlNotifyTransitionActionText(transition->action);
+    statusFamilyText = __FXCFControlNotifyStatusFamilyText(transition->statusFamily);
+
+    if (!__FXCFTextBufferAppendCString(&buffer, "{") ||
+        !__FXCFTextBufferAppendJSONFieldPrefix(&buffer, "action", &needsComma) ||
+        !__FXCFTextBufferAppendJSONString(&buffer, actionText) ||
+        !__FXCFTextBufferAppendJSONFieldPrefix(&buffer, "operation", &needsComma) ||
+        !__FXCFTextBufferAppendJSONString(&buffer, operationText) ||
+        !__FXCFTextBufferAppendJSONFieldPrefix(&buffer, "status_family", &needsComma) ||
+        !__FXCFTextBufferAppendJSONString(&buffer, statusFamilyText)) {
+        __FXCFTextBufferFree(&buffer);
+        return NULL;
+    }
+
+    if (transition->hasRegistration) {
+        if (!__FXCFTextBufferAppendJSONFieldPrefix(&buffer, "registration", &needsComma) ||
+            !__FXCFControlNotifyTransitionAppendRegistrationJSON(&buffer, &transition->registration)) {
+            __FXCFTextBufferFree(&buffer);
+            return NULL;
+        }
+    }
+    if (transition->releasedBindingID != NULL) {
+        if (!__FXCFControlNotifyOutcomeAppendRequiredStringJSON(&buffer, "released_binding_id", transition->releasedBindingID, &needsComma)) {
+            __FXCFTextBufferFree(&buffer);
+            return NULL;
+        }
+    }
+    if (transition->hasChangedResult) {
+        if (!__FXCFTextBufferAppendJSONFieldPrefix(&buffer, "changed_result", &needsComma) ||
+            !__FXCFTextBufferAppendCString(&buffer, transition->changedResult ? "true" : "false")) {
+            __FXCFTextBufferFree(&buffer);
+            return NULL;
+        }
+    }
+    if (transition->hasValidResult) {
+        if (!__FXCFTextBufferAppendJSONFieldPrefix(&buffer, "valid_result", &needsComma) ||
+            !__FXCFTextBufferAppendCString(&buffer, transition->validResult ? "true" : "false")) {
+            __FXCFTextBufferFree(&buffer);
+            return NULL;
+        }
+    }
+    if (!__FXCFTextBufferAppendCString(&buffer, "}")) {
+        __FXCFTextBufferFree(&buffer);
+        return NULL;
+    }
+
+    result = __FXCFTextBufferDetach(&buffer);
+    __FXCFTextBufferFree(&buffer);
+    return result;
+}
+
+char *_FXCFControlNotifyTransitionCopySummary(const struct _FXCFControlNotifyTransition *transition) {
+    const char *operationText = NULL;
+    const char *actionText = NULL;
+    const char *statusFamilyText = NULL;
+    size_t size = 0u;
+    char *result = NULL;
+    char *releasedBindingText = NULL;
+
+    if (transition == NULL) {
+        return NULL;
+    }
+
+    operationText = __FXCFControlNotifyTransitionOperationText(transition->operation);
+    actionText = __FXCFControlNotifyTransitionActionText(transition->action);
+    statusFamilyText = __FXCFControlNotifyStatusFamilyText(transition->statusFamily);
+
+    if (transition->releasedBindingID != NULL) {
+        releasedBindingText = __FXCFControlPacketCopyCString(transition->releasedBindingID);
+        if (releasedBindingText == NULL) {
+            return NULL;
+        }
+    }
+
+    size = 160u + (releasedBindingText != NULL ? strlen(releasedBindingText) : 0u);
+    result = (char *)calloc(size, sizeof(char));
+    if (result == NULL) {
+        free(releasedBindingText);
+        return NULL;
+    }
+
+    if (transition->hasChangedResult && transition->hasRegistration) {
+        snprintf(result, size, "notify transition %s %s token=%ld changed=%s last_seen=%ld status=%s",
+            operationText,
+            actionText,
+            (long)transition->registration.token,
+            transition->changedResult ? "true" : "false",
+            (long)transition->registration.lastSeenGeneration,
+            statusFamilyText);
+    } else if (transition->hasValidResult) {
+        snprintf(result, size, "notify transition %s %s valid=%s status=%s",
+            operationText,
+            actionText,
+            transition->validResult ? "true" : "false",
+            statusFamilyText);
+    } else if (transition->hasRegistration) {
+        snprintf(result, size, "notify transition %s %s token=%ld status=%s",
+            operationText,
+            actionText,
+            (long)transition->registration.token,
+            statusFamilyText);
+    } else if (releasedBindingText != NULL) {
+        snprintf(result, size, "notify transition %s %s release=%s status=%s",
+            operationText,
+            actionText,
+            releasedBindingText,
+            statusFamilyText);
+    } else {
+        snprintf(result, size, "notify transition %s %s status=%s",
+            operationText,
+            actionText,
+            statusFamilyText);
+    }
+
+    free(releasedBindingText);
+    return result;
+}
+
 static Boolean __FXCFControlResponseAppendSuccessEnvelopeJSON(struct __FXCFTextBuffer *buffer, const struct _FXCFControlResponse *response) {
     enum _FXCFControlValueKind kind = _FXCFControlPacketValueKind(response->result);
     const char *kindText = __FXCFControlValueKindText(kind);

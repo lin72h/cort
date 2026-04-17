@@ -61,12 +61,15 @@ defmodule WorkflowSelfcheck do
       {"subset7c expected builder", fn -> subset7c_expected_builder_check!(repo_root, artifacts_root) end},
       {"subset7d expected builder", fn -> subset7d_expected_builder_check!(repo_root, artifacts_root) end},
       {"subset7e expected builder", fn -> subset7e_expected_builder_check!(repo_root, artifacts_root) end},
+      {"subset7f expected builder", fn -> subset7f_expected_builder_check!(repo_root, artifacts_root) end},
       {"subset7a cases header builder", fn -> subset7a_cases_header_builder_check!(repo_root, artifacts_root) end},
+      {"subset7f cases header builder", fn -> subset7f_cases_header_builder_check!(repo_root, artifacts_root) end},
       {"subset7a compare tool", fn -> subset7a_compare_check!(repo_root) end},
       {"subset7b compare tool", fn -> subset7b_compare_check!(repo_root) end},
       {"subset7c compare tool", fn -> subset7c_compare_check!(repo_root) end},
       {"subset7d compare tool", fn -> subset7d_compare_check!(repo_root) end},
       {"subset7e compare tool", fn -> subset7e_compare_check!(repo_root) end},
+      {"subset7f compare tool", fn -> subset7f_compare_check!(repo_root) end},
       {"subset1 MX compare artifact wrapper", fn -> subset1_mx_compare_artifact_check!(repo_root, artifacts_root) end},
       {"subset1b MX compare artifact wrapper", fn -> subset1b_mx_compare_artifact_check!(repo_root, artifacts_root) end},
       {"subset2a MX compare artifact wrapper", fn -> subset2a_mx_compare_artifact_check!(repo_root, artifacts_root) end},
@@ -82,6 +85,7 @@ defmodule WorkflowSelfcheck do
       {"subset7c FX make compare wrapper", fn -> subset7c_make_compare_check!(repo_root, artifacts_root) end},
       {"subset7d FX make compare wrapper", fn -> subset7d_make_compare_check!(repo_root, artifacts_root) end},
       {"subset7e FX make compare wrapper", fn -> subset7e_make_compare_check!(repo_root, artifacts_root) end},
+      {"subset7f FX make compare wrapper", fn -> subset7f_make_compare_check!(repo_root, artifacts_root) end},
       {"subset3a FX make compare wrapper", fn -> subset3a_make_compare_check!(repo_root, artifacts_root) end},
       {"subset1 FX compare artifact wrapper", fn -> subset1_compare_artifact_check!(repo_root, artifacts_root) end},
       {"subset2a FX compare artifact wrapper", fn -> subset2a_compare_artifact_check!(repo_root, artifacts_root) end},
@@ -419,6 +423,26 @@ defmodule WorkflowSelfcheck do
     run_cmd!("diff", ["-u", expected_path, output_path], cd: repo_root, expect_exit: 0)
   end
 
+  defp subset7f_cases_header_builder_check!(repo_root, artifacts_root) do
+    output_path = Path.join([artifacts_root, "subset7f_notify_transition_cases.h"])
+    expected_path = Path.join(repo_root, "cort-fx/tests/generated/subset7f_notify_transition_cases.h")
+
+    run_cmd!(
+      Path.join(repo_root, "tools/run_elixir.sh"),
+      [
+        Path.join(repo_root, "tools/build_subset7f_notify_transition_cases_header.exs"),
+        "--scenarios",
+        Path.join(repo_root, "fixtures/control/subset7f_notify_state_transition_cases_v1.json"),
+        "--output",
+        output_path
+      ],
+      cd: repo_root,
+      expect_exit: 0
+    )
+
+    run_cmd!("diff", ["-u", expected_path, output_path], cd: repo_root, expect_exit: 0)
+  end
+
   defp subset7a_compare_check!(repo_root) do
     expected_path = Path.join(repo_root, "fixtures/control/subset7a_control_packet_expected_v1.json")
 
@@ -591,6 +615,28 @@ defmodule WorkflowSelfcheck do
     run_cmd!("diff", ["-u", expected_path, output_path], cd: repo_root, expect_exit: 0)
   end
 
+  defp subset7f_expected_builder_check!(repo_root, artifacts_root) do
+    output_path = Path.join([artifacts_root, "subset7f_notify_state_transition_expected_v1.json"])
+    expected_path = Path.join(repo_root, "fixtures/control/subset7f_notify_state_transition_expected_v1.json")
+
+    run_cmd!(
+      Path.join(repo_root, "tools/run_elixir.sh"),
+      [
+        Path.join(repo_root, "tools/build_subset7f_notify_transition_expected.exs"),
+        "--outcomes",
+        Path.join(repo_root, "fixtures/control/subset7e_notify_client_outcome_expected_v1.json"),
+        "--scenarios",
+        Path.join(repo_root, "fixtures/control/subset7f_notify_state_transition_cases_v1.json"),
+        "--output",
+        output_path
+      ],
+      cd: repo_root,
+      expect_exit: 0
+    )
+
+    run_cmd!("diff", ["-u", expected_path, output_path], cd: repo_root, expect_exit: 0)
+  end
+
   defp subset7e_compare_check!(repo_root) do
     expected_path = Path.join(repo_root, "fixtures/control/subset7e_notify_client_outcome_expected_v1.json")
 
@@ -611,6 +657,28 @@ defmodule WorkflowSelfcheck do
     ensure_contains!(output, "- blockers: 0")
     ensure_contains!(output, "- warnings: 0")
     ensure_contains!(output, "`response.notify.post.success` | match")
+  end
+
+  defp subset7f_compare_check!(repo_root) do
+    expected_path = Path.join(repo_root, "fixtures/control/subset7f_notify_state_transition_expected_v1.json")
+
+    output =
+      run_cmd!(
+        Path.join(repo_root, "tools/run_elixir.sh"),
+        [
+          Path.join(repo_root, "tools/compare_subset7f_control_notify_transition_json.exs"),
+          "--fx-json",
+          expected_path,
+          "--expected-json",
+          expected_path
+        ],
+        cd: repo_root,
+        expect_exit: 0
+      )
+
+    ensure_contains!(output, "- blockers: 0")
+    ensure_contains!(output, "- warnings: 0")
+    ensure_contains!(output, "`notify.transition.registration.store.check` | match")
   end
 
   defp subset1_mx_compare_artifact_check!(repo_root, artifacts_root) do
@@ -822,7 +890,8 @@ defmodule WorkflowSelfcheck do
       {"subset7b_control_envelope_fx.json", Path.join([artifacts_root, "cort-fx", "build", "out", "subset7b_control_envelope_fx.json"])},
       {"subset7c_control_request_route_fx.json", Path.join([artifacts_root, "cort-fx", "build", "out", "subset7c_control_request_route_fx.json"])},
       {"subset7d_control_response_profile_fx.json", Path.join([artifacts_root, "cort-fx", "build", "out", "subset7d_control_response_profile_fx.json"])},
-      {"subset7e_notify_client_outcome_fx.json", Path.join([artifacts_root, "cort-fx", "build", "out", "subset7e_notify_client_outcome_fx.json"])}
+      {"subset7e_notify_client_outcome_fx.json", Path.join([artifacts_root, "cort-fx", "build", "out", "subset7e_notify_client_outcome_fx.json"])},
+      {"subset7f_notify_state_transition_fx.json", Path.join([artifacts_root, "cort-fx", "build", "out", "subset7f_notify_state_transition_fx.json"])}
     ]
 
     Enum.each(shared_pairs, fn {shared_rel, built_path} ->
@@ -1382,6 +1451,34 @@ defmodule WorkflowSelfcheck do
 
     ensure_contains!(output, "- warnings: 0")
     ensure_contains!(File.read!(report_path), "`response.notify.post.success` | match")
+  end
+
+  defp subset7f_make_compare_check!(repo_root, artifacts_root) do
+    json_path = Path.join([artifacts_root, "cort-fx", "build", "out", "subset7f_notify_state_transition_fx.json"])
+    report_path = Path.join([artifacts_root, "cort-fx", "build", "out", "subset7f_notify_state_transition_fx_vs_expected_report.md"])
+
+    output =
+      run_cmd!(
+        "make",
+        [
+          "compare-subset7f-with-expected",
+          "NOTIFY_TRANSITION_EXPECTED_JSON=#{Path.join(repo_root, "fixtures/control/subset7f_notify_state_transition_expected_v1.json")}"
+        ],
+        cd: Path.join(repo_root, "cort-fx"),
+        env: [{"CORT_ARTIFACTS_ROOT", artifacts_root}],
+        expect_exit: 0
+      )
+
+    unless File.exists?(json_path) do
+      raise RuntimeError, "missing notify transition compare input at #{json_path}"
+    end
+
+    unless File.exists?(report_path) do
+      raise RuntimeError, "missing compare report at #{report_path}"
+    end
+
+    ensure_contains!(output, "- warnings: 0")
+    ensure_contains!(File.read!(report_path), "`notify.transition.registration.store.check` | match")
   end
 
   defp subset2a_compare_artifact_check!(repo_root, artifacts_root) do

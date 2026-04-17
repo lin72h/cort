@@ -88,6 +88,24 @@ enum _FXCFControlNotifyOutcomeKind {
     _FXCFControlNotifyOutcomeKindValidity = 7
 };
 
+enum _FXCFControlNotifyTransitionOperation {
+    _FXCFControlNotifyTransitionOperationInvalid = 0,
+    _FXCFControlNotifyTransitionOperationRegistrationStore = 1,
+    _FXCFControlNotifyTransitionOperationRegistrationUpdate = 2,
+    _FXCFControlNotifyTransitionOperationCheck = 3,
+    _FXCFControlNotifyTransitionOperationCancel = 4,
+    _FXCFControlNotifyTransitionOperationGetState = 5,
+    _FXCFControlNotifyTransitionOperationIsValidToken = 6
+};
+
+enum _FXCFControlNotifyTransitionAction {
+    _FXCFControlNotifyTransitionActionInvalid = 0,
+    _FXCFControlNotifyTransitionActionStore = 1,
+    _FXCFControlNotifyTransitionActionMerge = 2,
+    _FXCFControlNotifyTransitionActionDiscard = 3,
+    _FXCFControlNotifyTransitionActionKeep = 4
+};
+
 enum _FXCFControlPacketErrorKind {
     _FXCFControlPacketErrorNone = 0,
     _FXCFControlPacketErrorMissingKey = 1,
@@ -206,6 +224,29 @@ struct _FXCFControlNotifyOutcome {
     Boolean valid;
 };
 
+struct _FXCFControlNotifyCachedRegistration {
+    CFStringRef sessionID;
+    CFStringRef scope;
+    CFStringRef name;
+    CFStringRef bindingID;
+    CFIndex token;
+    CFIndex lastSeenGeneration;
+    Boolean firstCheckPending;
+};
+
+struct _FXCFControlNotifyTransition {
+    enum _FXCFControlNotifyTransitionOperation operation;
+    enum _FXCFControlNotifyTransitionAction action;
+    enum _FXCFControlNotifyStatusFamily statusFamily;
+    Boolean hasRegistration;
+    struct _FXCFControlNotifyCachedRegistration registration;
+    CFStringRef releasedBindingID;
+    Boolean hasChangedResult;
+    Boolean changedResult;
+    Boolean hasValidResult;
+    Boolean validResult;
+};
+
 Boolean _FXCFControlPacketIsBinaryPlist(CFDataRef payload);
 
 Boolean _FXCFControlPacketDecodeEnvelope(
@@ -262,6 +303,25 @@ Boolean _FXCFControlNotifyOutcomeInit(
 void _FXCFControlNotifyOutcomeClear(struct _FXCFControlNotifyOutcome *outcome);
 char *_FXCFControlNotifyOutcomeCopyCanonicalJSON(const struct _FXCFControlNotifyOutcome *outcome);
 char *_FXCFControlNotifyOutcomeCopySummary(const struct _FXCFControlNotifyOutcome *outcome);
+void _FXCFControlNotifyCachedRegistrationClear(struct _FXCFControlNotifyCachedRegistration *registration);
+Boolean _FXCFControlNotifyCachedRegistrationInitCopy(
+    CFAllocatorRef allocator,
+    const struct _FXCFControlNotifyCachedRegistration *source,
+    struct _FXCFControlNotifyCachedRegistration *registrationOut,
+    struct _FXCFControlPacketError *errorOut
+);
+Boolean _FXCFControlNotifyTransitionInit(
+    CFAllocatorRef allocator,
+    enum _FXCFControlNotifyTransitionOperation operation,
+    const struct _FXCFControlNotifyOutcome *outcome,
+    const struct _FXCFControlNotifyCachedRegistration *cached,
+    Boolean hasCachedRegistration,
+    struct _FXCFControlNotifyTransition *transitionOut,
+    struct _FXCFControlPacketError *errorOut
+);
+void _FXCFControlNotifyTransitionClear(struct _FXCFControlNotifyTransition *transition);
+char *_FXCFControlNotifyTransitionCopyCanonicalJSON(const struct _FXCFControlNotifyTransition *transition);
+char *_FXCFControlNotifyTransitionCopySummary(const struct _FXCFControlNotifyTransition *transition);
 char *_FXCFControlPacketCopyCanonicalJSON(CFTypeRef value);
 char *_FXCFControlPacketCopyAcceptedSummary(CFDictionaryRef packet, enum _FXCFControlPacketKind kind);
 char *_FXCFControlRequestCopyEnvelopeJSON(const struct _FXCFControlRequest *request);

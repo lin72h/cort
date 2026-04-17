@@ -1,4 +1,4 @@
-# cort-fx Subset 0, 1A, 1B, 2A, 3A, 7A, 7B, 7C, 7D, And 7E Proof
+# cort-fx Subset 0, 1A, 1B, 2A, 3A, 7A, 7B, 7C, 7D, 7E, And 7F Proof
 
 This directory holds the temporary standalone `cort-fx` proof for CORT
 Subset 0, Subset 1A, Subset 1B, Subset 2A, Subset 3A, and Subset 7A:
@@ -21,6 +21,8 @@ Subset 0, Subset 1A, Subset 1B, Subset 2A, Subset 3A, and Subset 7A:
   summaries on top of the proven response envelope surface
 - Subset 7E: internal notify-client outcome extraction and notify status-family
   mapping on top of the proven response-profile surface
+- Subset 7F: internal notify cached-registration transition policy on top of
+  the proven notify outcome surface
 
 The active 3A coordination documents live in:
 
@@ -62,6 +64,12 @@ The Subset 7E docs live in:
 - `../docs/cort-subset7e-control-notify-outcome-contract.md`
 - `../docs/cort-subset7e-source-audit-and-readiness.md`
 - `../docs/cort-subset7e-validation-workflow.md`
+
+The Subset 7F docs live in:
+
+- `../docs/cort-subset7f-notify-state-transition-contract.md`
+- `../docs/cort-subset7f-source-audit-and-readiness.md`
+- `../docs/cort-subset7f-validation-workflow.md`
 
 The shared imported packet corpora live in:
 
@@ -345,11 +353,23 @@ The 7E notify-client outcome slice is implemented with:
 - `tests/subset7e_control_notify_outcome_support.h`
 - `../tools/build_subset7e_notify_client_expected.exs`
 
+The 7F notify state-transition slice is implemented with:
+
+- `src/FXCFControlPacket.c`
+- `src/FXCFControlPacket.h`
+- `tests/control_notify_transition_tests.c`
+- `tests/cort_subset7f_control_notify_transition_fx.c`
+- `tests/subset7f_control_notify_transition_support.h`
+- `tests/generated/subset7f_notify_transition_cases.h`
+- `../tools/build_subset7f_notify_transition_expected.exs`
+- `../tools/build_subset7f_notify_transition_cases_header.exs`
+
 Shared handoff artifact:
 
 - `../subset7a_control_packet_fx.json`
 - `../subset7d_control_response_profile_fx.json`
 - `../subset7e_notify_client_outcome_fx.json`
+- `../subset7f_notify_state_transition_fx.json`
 - Subset 1A compare wrapper can compare that FX JSON against MX and preserve a
   dedicated handoff artifact run
 - shared handoff artifacts may also be committed at repo root for MX
@@ -359,7 +379,8 @@ Shared handoff artifact:
   `subset7a_control_packet_fx.json`, `subset7b_control_envelope_fx.json`,
   `subset7c_control_request_route_fx.json`, and
   `subset7d_control_response_profile_fx.json`, and
-  `subset7e_notify_client_outcome_fx.json`
+  `subset7e_notify_client_outcome_fx.json`, and
+  `subset7f_notify_state_transition_fx.json`
 - Subset 2A compare wrapper can compare a real FX container JSON against MX and
   preserve a dedicated handoff artifact run once the FX artifact exists
 - Subset 3A compare wrapper can compare a real FX binary-plist JSON against MX

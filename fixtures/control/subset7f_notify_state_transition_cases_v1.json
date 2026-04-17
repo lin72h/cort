@@ -1,0 +1,195 @@
+{
+  "version": 1,
+  "format": "CORT Subset 7F notify state transition scenarios",
+  "derived_from": [
+    "fixtures/control/subset7e_notify_client_outcome_expected_v1.json"
+  ],
+  "cases": [
+    {
+      "name": "notify.transition.cancel.discard_binding",
+      "outcome_case": "response.notify.cancel.success",
+      "operation": "cancel",
+      "cached_registration": {
+        "binding_id": "binding-alpha",
+        "first_check_pending": true,
+        "last_seen_generation": 0,
+        "name": "com.launchx.fixture.fd.new",
+        "scope": "local",
+        "session_id": "session-fd",
+        "token": 77
+      }
+    },
+    {
+      "name": "notify.transition.check.merge.binding_preserved",
+      "outcome_case": "response.notify.check.changed.success",
+      "operation": "check",
+      "cached_registration": {
+        "binding_id": "binding-alpha",
+        "first_check_pending": false,
+        "last_seen_generation": 3,
+        "name": "com.launchx.fixture.check",
+        "scope": "local",
+        "session_id": "session-alpha",
+        "token": 42
+      }
+    },
+    {
+      "name": "notify.transition.check.merge.initial_pending",
+      "outcome_case": "response.notify.check.changed.success",
+      "operation": "check",
+      "cached_registration": {
+        "first_check_pending": true,
+        "last_seen_generation": 0,
+        "name": "com.launchx.fixture.check",
+        "scope": "local",
+        "session_id": "session-alpha",
+        "token": 42
+      }
+    },
+    {
+      "name": "notify.transition.check.merge.stale_generation",
+      "outcome_case": "response.notify.check.cluster.changed.success",
+      "operation": "check",
+      "cached_registration": {
+        "first_check_pending": false,
+        "last_seen_generation": 2,
+        "name": "com.launchx.fixture.check",
+        "scope": "cluster",
+        "session_id": "session-cluster",
+        "token": 43
+      }
+    },
+    {
+      "name": "notify.transition.check.unchanged_keeps_generation",
+      "outcome_case": "response.notify.check.unchanged.success",
+      "operation": "check",
+      "cached_registration": {
+        "first_check_pending": false,
+        "last_seen_generation": 0,
+        "name": "com.launchx.fixture.check",
+        "scope": "cluster",
+        "session_id": "session-cluster",
+        "token": 43
+      }
+    },
+    {
+      "name": "notify.transition.error.invalid_request.keep_get_state",
+      "outcome_case": "response.notify.invalid_scope.failure",
+      "operation": "get_state",
+      "cached_registration": {
+        "first_check_pending": false,
+        "last_seen_generation": 4,
+        "name": "com.launchx.fixture.check",
+        "scope": "local",
+        "session_id": "session-alpha",
+        "token": 42
+      }
+    },
+    {
+      "name": "notify.transition.error.invalid_request.keep_validity",
+      "outcome_case": "response.notify.invalid_scope.failure",
+      "operation": "is_valid_token",
+      "cached_registration": {
+        "first_check_pending": false,
+        "last_seen_generation": 4,
+        "name": "com.launchx.fixture.check",
+        "scope": "local",
+        "session_id": "session-alpha",
+        "token": 42
+      }
+    },
+    {
+      "name": "notify.transition.error.invalid_token.discard_check",
+      "outcome_case": "response.notify.invalid_token.failure",
+      "operation": "check",
+      "cached_registration": {
+        "binding_id": "binding-alpha",
+        "first_check_pending": false,
+        "last_seen_generation": 4,
+        "name": "com.launchx.fixture.check",
+        "scope": "local",
+        "session_id": "session-alpha",
+        "token": 42
+      }
+    },
+    {
+      "name": "notify.transition.error.invalid_token.discard_update",
+      "outcome_case": "response.notify.invalid_token.failure",
+      "operation": "registration_update",
+      "cached_registration": {
+        "binding_id": "binding-alpha",
+        "first_check_pending": true,
+        "last_seen_generation": 0,
+        "name": "com.launchx.fixture.signal",
+        "scope": "local",
+        "session_id": "session-signal",
+        "token": 51
+      }
+    },
+    {
+      "name": "notify.transition.error.invalid_token.discard_validity",
+      "outcome_case": "response.notify.invalid_token.failure",
+      "operation": "is_valid_token",
+      "cached_registration": {
+        "binding_id": "binding-alpha",
+        "first_check_pending": false,
+        "last_seen_generation": 4,
+        "name": "com.launchx.fixture.check",
+        "scope": "local",
+        "session_id": "session-alpha",
+        "token": 42
+      }
+    },
+    {
+      "name": "notify.transition.get_state.keep_on_success",
+      "outcome_case": "response.notify.get_state.success",
+      "operation": "get_state",
+      "cached_registration": {
+        "first_check_pending": false,
+        "last_seen_generation": 4,
+        "name": "com.launchx.fixture.check",
+        "scope": "local",
+        "session_id": "session-alpha",
+        "token": 42
+      }
+    },
+    {
+      "name": "notify.transition.registration.store.check",
+      "outcome_case": "response.notify.registration.check.success",
+      "operation": "registration_store"
+    },
+    {
+      "name": "notify.transition.registration.store.file_descriptor",
+      "outcome_case": "response.notify.registration.file_descriptor.success",
+      "operation": "registration_store"
+    },
+    {
+      "name": "notify.transition.registration.update.resume_replaces_cached",
+      "outcome_case": "response.notify.resume.success",
+      "operation": "registration_update",
+      "cached_registration": {
+        "binding_id": "binding-old",
+        "first_check_pending": false,
+        "last_seen_generation": 9,
+        "name": "com.launchx.fixture.signal",
+        "scope": "local",
+        "session_id": "session-signal",
+        "token": 51
+      }
+    },
+    {
+      "name": "notify.transition.validity.false.discard",
+      "outcome_case": "response.notify.is_valid_token.false",
+      "operation": "is_valid_token",
+      "cached_registration": {
+        "binding_id": "binding-alpha",
+        "first_check_pending": false,
+        "last_seen_generation": 4,
+        "name": "com.launchx.fixture.check",
+        "scope": "local",
+        "session_id": "session-alpha",
+        "token": 42
+      }
+    }
+  ]
+}
