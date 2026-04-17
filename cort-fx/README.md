@@ -1,7 +1,7 @@
-# cort-fx Subset 0, 1A, 1B, 2A, And 3A Proof
+# cort-fx Subset 0, 1A, 1B, 2A, 3A, And 7A Proof
 
 This directory holds the temporary standalone `cort-fx` proof for CORT
-Subset 0, Subset 1A, Subset 1B, Subset 2A, and Subset 3A:
+Subset 0, Subset 1A, Subset 1B, Subset 2A, Subset 3A, and Subset 7A:
 
 - Subset 0: runtime and ownership core
 - Subset 1A: immutable scalar core without `CFString`
@@ -11,6 +11,8 @@ Subset 0, Subset 1A, Subset 1B, Subset 2A, and Subset 3A:
   semantics for plist-valid object graphs
 - Subset 3A: bounded binary-plist core read/write work on top of the proven
   runtime, scalar, string, and container surface
+- Subset 7A: control-packet decode and rejection compatibility against the
+  imported Swift packet corpora
 
 The active 3A coordination documents live in:
 
@@ -20,8 +22,8 @@ The active 3A coordination documents live in:
 - `../docs/cort-subset3a-fx-implementation-plan.md`
 - `../docs/cort-subset3a-fixture-corpus.md`
 
-The next planned slice after this proof is Subset 7A control-packet decode
-compatibility on top of the proven plist surface.
+Subset 7A control-packet decode compatibility now lives on top of the proven
+plist surface.
 
 The Subset 7A docs live in:
 
@@ -111,6 +113,10 @@ Implemented:
 - `CFErrorGetCode`
 - `CFPropertyListCreateData`
 - `CFPropertyListCreateWithData`
+- binary plist core for bool, int, real, date, data, string, array, and
+  dictionary with string keys
+- internal control-packet decode and rejection compatibility for the imported
+  request/response packet corpora
 
 Explicitly not implemented here:
 
@@ -122,6 +128,10 @@ Explicitly not implemented here:
 - BlocksRuntime integration
 - Objective-C bridge behavior
 - Swift runtime allocation
+- broader plist tag families beyond the bounded 3A surface
+- mutable parse/write modes beyond the bounded 3A surface
+- packet encode parity
+- transport/session behavior beyond the bounded decode/rejection surface
 
 ## Provenance
 
@@ -159,12 +169,14 @@ This builds under `../wip-cort-gpt-artifacts/cort-fx/build/` by default:
 - `bin/string_core_tests`
 - `bin/container_core_tests`
 - `bin/bplist_core_tests`
+- `bin/control_packet_tests`
 - `bin/c_consumer_smoke`
 - `bin/subset0_public_compare_fx`
 - `bin/subset1_scalar_core_fx`
 - `bin/subset1b_cfstring_fx`
 - `bin/subset2a_container_fx`
 - `bin/subset3a_bplist_fx`
+- `bin/subset7a_control_packet_fx`
 
 ## Verification Targets
 
@@ -176,10 +188,13 @@ make compare-fx
 make compare-subset1a-fx
 make compare-subset1b-fx
 make compare-subset2a-fx
+make compare-subset3a-fx
+make compare-subset7a-fx
 make compare-subset1a-with-mx
 make compare-subset1b-with-mx
 make compare-subset2a-with-mx
 make compare-subset3a-with-mx
+make compare-subset7a-with-expected
 make artifact-run
 make artifact-subset1a-compare
 make artifact-subset2a-compare
@@ -210,12 +225,29 @@ What they enforce:
   `../wip-cort-gpt-artifacts/cort-fx/build/out/subset2a_container_fx.json`
 - FX binary-plist probe emits
   `../wip-cort-gpt-artifacts/cort-fx/build/out/subset3a_bplist_fx.json`
+- FX control-packet probe emits
+  `../wip-cort-gpt-artifacts/cort-fx/build/out/subset7a_control_packet_fx.json`
+- FX control-packet compare emits
+  `../wip-cort-gpt-artifacts/cort-fx/build/out/subset7a_control_packet_fx_vs_expected_report.md`
+
+The 7A packet slice is implemented with:
+
+- `tests/control_packet_tests.c`
+- `tests/cort_subset7a_control_packet_fx.c`
+- `tests/subset7a_control_packet_support.h`
+- `tests/generated/subset7a_control_packet_cases.h`
+- `../tools/build_subset7a_control_packet_cases_header.exs`
+
+Shared handoff artifact:
+
+- `../subset7a_control_packet_fx.json`
 - Subset 1A compare wrapper can compare that FX JSON against MX and preserve a
   dedicated handoff artifact run
 - shared handoff artifacts may also be committed at repo root for MX
   consumption, including `subset0_public_compare_fx.json`,
   `subset1_scalar_core_fx.json`, `subset1b_cfstring_fx.json`,
-  `subset2a_container_fx.json`, and `subset3a_bplist_fx.json`
+  `subset2a_container_fx.json`, `subset3a_bplist_fx.json`, and
+  `subset7a_control_packet_fx.json`
 - Subset 2A compare wrapper can compare a real FX container JSON against MX and
   preserve a dedicated handoff artifact run once the FX artifact exists
 - Subset 3A compare wrapper can compare a real FX binary-plist JSON against MX

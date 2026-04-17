@@ -1,0 +1,663 @@
+{
+  "probe": "subset7a_control_packet_decode",
+  "format": "CORT FX Subset 7A control packet probe",
+  "results": [
+    {
+      "name": "request.control.capabilities",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"capabilities\",\"params\":{},\"protocol_version\":1,\"service\":\"control\"}",
+      "alternate_value_text": "accept request service=control method=capabilities"
+    },
+    {
+      "name": "request.control.health",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"health\",\"params\":{},\"protocol_version\":1,\"service\":\"control\"}",
+      "alternate_value_text": "accept request service=control method=health"
+    },
+    {
+      "name": "request.diagnostics.snapshot",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"snapshot\",\"params\":{},\"protocol_version\":1,\"service\":\"diagnostics\"}",
+      "alternate_value_text": "accept request service=diagnostics method=snapshot"
+    },
+    {
+      "name": "request.missing_method",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"key\":\"method\",\"type\":\"missing_key\"}",
+      "alternate_value_text": "reject request missing_key method"
+    },
+    {
+      "name": "request.missing_protocol_version",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"key\":\"protocol_version\",\"type\":\"missing_key\"}",
+      "alternate_value_text": "reject request missing_key protocol_version"
+    },
+    {
+      "name": "request.missing_service",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"key\":\"service\",\"type\":\"missing_key\"}",
+      "alternate_value_text": "reject request missing_key service"
+    },
+    {
+      "name": "request.notify.cancel.expected_session",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"cancel\",\"params\":{\"expected_session_id\":\"session-alpha\",\"token\":42},\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "accept request service=notify method=cancel"
+    },
+    {
+      "name": "request.notify.check.expected_session",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"check\",\"params\":{\"expected_session_id\":\"session-alpha\",\"token\":42},\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "accept request service=notify method=check"
+    },
+    {
+      "name": "request.notify.get_state.expected_session",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"get_state\",\"params\":{\"expected_session_id\":\"session-alpha\",\"token\":42},\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "accept request service=notify method=get_state"
+    },
+    {
+      "name": "request.notify.is_valid_token.expected_session",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"is_valid_token\",\"params\":{\"expected_session_id\":\"session-alpha\",\"token\":42},\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "accept request service=notify method=is_valid_token"
+    },
+    {
+      "name": "request.notify.list_names",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"list_names\",\"params\":{},\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "accept request service=notify method=list_names"
+    },
+    {
+      "name": "request.notify.post.cluster",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"post\",\"params\":{\"name\":\"com.launchx.fixture.check\",\"scope\":\"cluster\"},\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "accept request service=notify method=post"
+    },
+    {
+      "name": "request.notify.post.default_scope",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"post\",\"params\":{\"name\":\"com.launchx.fixture.check\"},\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "accept request service=notify method=post"
+    },
+    {
+      "name": "request.notify.post.local",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"post\",\"params\":{\"name\":\"com.launchx.fixture.check\",\"scope\":\"local\"},\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "accept request service=notify method=post"
+    },
+    {
+      "name": "request.notify.prepare_file_descriptor_delivery.reuse",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"prepare_file_descriptor_delivery\",\"params\":{\"client_registration_id\":\"binding-alpha\",\"name\":\"com.launchx.fixture.fd\",\"reuse_existing_binding\":true,\"scope\":\"local\"},\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "accept request service=notify method=prepare_file_descriptor_delivery"
+    },
+    {
+      "name": "request.notify.prepare_file_descriptor_delivery.reuse.default_scope",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"prepare_file_descriptor_delivery\",\"params\":{\"client_registration_id\":\"binding-alpha\",\"name\":\"com.launchx.fixture.fd\",\"reuse_existing_binding\":true},\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "accept request service=notify method=prepare_file_descriptor_delivery"
+    },
+    {
+      "name": "request.notify.register_check.cluster",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"register_check\",\"params\":{\"name\":\"com.launchx.fixture.check\",\"scope\":\"cluster\"},\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "accept request service=notify method=register_check"
+    },
+    {
+      "name": "request.notify.register_check.default_scope",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"register_check\",\"params\":{\"name\":\"com.launchx.fixture.check\"},\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "accept request service=notify method=register_check"
+    },
+    {
+      "name": "request.notify.register_check.local",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"register_check\",\"params\":{\"name\":\"com.launchx.fixture.check\",\"scope\":\"local\"},\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "accept request service=notify method=register_check"
+    },
+    {
+      "name": "request.notify.register_dispatch.default_scope",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"register_dispatch\",\"params\":{\"name\":\"com.launchx.fixture.dispatch\",\"queue_name\":\"main\"},\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "accept request service=notify method=register_dispatch"
+    },
+    {
+      "name": "request.notify.register_file_descriptor.new_binding",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"register_file_descriptor\",\"params\":{\"client_registration_id\":\"binding-alpha\",\"name\":\"com.launchx.fixture.fd.new\",\"scope\":\"local\"},\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "accept request service=notify method=register_file_descriptor"
+    },
+    {
+      "name": "request.notify.register_file_descriptor.new_binding.default_scope",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"register_file_descriptor\",\"params\":{\"client_registration_id\":\"binding-alpha\",\"name\":\"com.launchx.fixture.fd.new\"},\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "accept request service=notify method=register_file_descriptor"
+    },
+    {
+      "name": "request.notify.register_file_descriptor.reuse",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"register_file_descriptor\",\"params\":{\"client_registration_id\":\"binding-alpha\",\"name\":\"com.launchx.fixture.fd\",\"reuse_existing_binding\":true,\"scope\":\"local\"},\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "accept request service=notify method=register_file_descriptor"
+    },
+    {
+      "name": "request.notify.register_signal.default_scope",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"register_signal\",\"params\":{\"name\":\"com.launchx.fixture.signal\",\"signal\":30},\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "accept request service=notify method=register_signal"
+    },
+    {
+      "name": "request.notify.register_signal.targeted",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"register_signal\",\"params\":{\"name\":\"com.launchx.fixture.signal\",\"scope\":\"local\",\"signal\":30,\"target_pid\":4321},\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "accept request service=notify method=register_signal"
+    },
+    {
+      "name": "request.notify.resume.expected_session",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"resume\",\"params\":{\"expected_session_id\":\"session-fd\",\"token\":77},\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "accept request service=notify method=resume"
+    },
+    {
+      "name": "request.notify.set_state.expected_session",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"set_state\",\"params\":{\"expected_session_id\":\"session-alpha\",\"state\":-1,\"token\":42},\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "accept request service=notify method=set_state"
+    },
+    {
+      "name": "request.notify.suspend.expected_session",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"method\":\"suspend\",\"params\":{\"expected_session_id\":\"session-alpha\",\"token\":42},\"protocol_version\":1,\"service\":\"notify\"}",
+      "alternate_value_text": "accept request service=notify method=suspend"
+    },
+    {
+      "name": "request.params_not_object",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"key\":\"params\",\"type\":\"missing_key\"}",
+      "alternate_value_text": "reject request missing_key params"
+    },
+    {
+      "name": "request.root_not_dictionary",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"detail\":\"root property list must be a dictionary\",\"type\":\"invalid_packet\"}",
+      "alternate_value_text": "reject request invalid_packet root property list must be a dictionary"
+    },
+    {
+      "name": "request.unsupported_version",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "request",
+      "success": true,
+      "primary_value_text": "{\"type\":\"unsupported_version\",\"version\":99}",
+      "alternate_value_text": "reject request unsupported_version 99"
+    },
+    {
+      "name": "response.control.capabilities.notify.enabled",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"feature_flags\":[\"control_socket_bootstrap\",\"userspace_jobs\",\"seqpacket_control\",\"native_process_lifecycle_v1\",\"native_spawn_setup_v1\",\"launchctl_wrapper_v1\",\"userspace_notify\",\"notify_registry_v1\"],\"supports_cluster_overlay\":false,\"supports_launchctl_wrapper\":true,\"supports_native_macos_passthrough\":false,\"supports_notify_fast_path\":false,\"supports_userspace_jobs\":true,\"supports_userspace_notify\":true},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.control.health.healthy",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"job_persistence\":{\"dirty\":false,\"last_attempted_at\":\"nil\",\"last_error\":\"nil\",\"last_persisted_at\":\"nil\",\"retry_scheduled\":false,\"state\":\"healthy\"},\"notify_fast_path\":{\"dirty\":false,\"last_attempted_at\":\"nil\",\"last_error\":\"nil\",\"last_persisted_at\":\"nil\",\"retry_scheduled\":false,\"state\":\"healthy\"},\"notify_persistence\":{\"dirty\":false,\"last_attempted_at\":\"nil\",\"last_error\":\"nil\",\"last_persisted_at\":\"nil\",\"retry_scheduled\":false,\"state\":\"healthy\"},\"observed_at\":{\"$date\":\"2026-04-16T12:00:00Z\"},\"reasons\":[],\"state\":\"healthy\"},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.control.health.notify_persistence.degraded",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"job_persistence\":{\"dirty\":false,\"last_attempted_at\":{\"$date\":\"2026-04-16T12:00:01Z\"},\"last_error\":\"nil\",\"last_persisted_at\":{\"$date\":\"2026-04-16T12:00:02Z\"},\"retry_scheduled\":false,\"state\":\"healthy\"},\"notify_fast_path\":{\"dirty\":false,\"last_attempted_at\":{\"$date\":\"2026-04-16T12:00:01Z\"},\"last_error\":\"nil\",\"last_persisted_at\":{\"$date\":\"2026-04-16T12:00:02Z\"},\"retry_scheduled\":false,\"state\":\"healthy\"},\"notify_persistence\":{\"dirty\":true,\"last_attempted_at\":{\"$date\":\"2026-04-16T12:00:01Z\"},\"last_error\":\"simulated_notify_disk_full\",\"last_persisted_at\":\"nil\",\"retry_scheduled\":true,\"state\":\"degraded\"},\"observed_at\":{\"$date\":\"2026-04-16T12:00:00Z\"},\"reasons\":[{\"component\":\"notify_persistence\",\"issue\":\"persistence_retry_pending\",\"last_error\":\"simulated_notify_disk_full\"}],\"state\":\"degraded\"},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.control.health.notify_persistence.recovered",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"job_persistence\":{\"dirty\":false,\"last_attempted_at\":{\"$date\":\"2026-04-16T12:00:05Z\"},\"last_error\":\"nil\",\"last_persisted_at\":{\"$date\":\"2026-04-16T12:00:06Z\"},\"retry_scheduled\":false,\"state\":\"healthy\"},\"notify_fast_path\":{\"dirty\":false,\"last_attempted_at\":{\"$date\":\"2026-04-16T12:00:05Z\"},\"last_error\":\"nil\",\"last_persisted_at\":{\"$date\":\"2026-04-16T12:00:06Z\"},\"retry_scheduled\":false,\"state\":\"healthy\"},\"notify_persistence\":{\"dirty\":false,\"last_attempted_at\":{\"$date\":\"2026-04-16T12:00:05Z\"},\"last_error\":\"nil\",\"last_persisted_at\":{\"$date\":\"2026-04-16T12:00:06Z\"},\"retry_scheduled\":false,\"state\":\"healthy\"},\"observed_at\":{\"$date\":\"2026-04-16T12:00:06Z\"},\"reasons\":[],\"state\":\"healthy\"},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.diagnostics.snapshot.notify_enabled.healthy",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"capabilities\":{\"feature_flags\":[\"userspace_notify\",\"notify_registry_v1\"],\"supports_cluster_overlay\":false,\"supports_launchctl_wrapper\":false,\"supports_native_macos_passthrough\":false,\"supports_notify_fast_path\":true,\"supports_userspace_jobs\":true,\"supports_userspace_notify\":true},\"daemon\":{\"cluster_enabled\":false,\"control_socket_path\":\"/tmp/launchx-fixture.sock\",\"daemon_id\":\"daemon-fixture\",\"hostname\":\"fixture-host\",\"node_id\":\"launchx-swift@fixture-host\",\"notify_fast_path_enabled\":true,\"runtime_mode\":\"standalone\",\"started_at\":{\"$date\":\"2026-04-16T12:00:06Z\"},\"version\":\"dev-fixture\"},\"health\":{\"job_persistence\":{\"dirty\":false,\"last_attempted_at\":\"nil\",\"last_error\":\"nil\",\"last_persisted_at\":\"nil\",\"retry_scheduled\":false,\"state\":\"healthy\"},\"notify_fast_path\":{\"dirty\":false,\"last_attempted_at\":\"nil\",\"last_error\":\"nil\",\"last_persisted_at\":\"nil\",\"retry_scheduled\":false,\"state\":\"healthy\"},\"notify_persistence\":{\"dirty\":false,\"last_attempted_at\":\"nil\",\"last_error\":\"nil\",\"last_persisted_at\":\"nil\",\"retry_scheduled\":false,\"state\":\"healthy\"},\"observed_at\":{\"$date\":\"2026-04-16T12:00:06Z\"},\"reasons\":[],\"state\":\"healthy\"},\"jobs\":[],\"notify_names\":[{\"generation\":4,\"last_posted_at\":{\"$date\":\"2026-04-16T12:00:01Z\"},\"name\":\"com.launchx.fixture.check\",\"scope\":\"local\",\"state\":7,\"updated_at\":{\"$date\":\"2026-04-16T12:00:06Z\"}}]},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.diagnostics.snapshot.notify_fast_path.degraded",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"capabilities\":{\"feature_flags\":[\"userspace_notify\",\"notify_registry_v1\"],\"supports_cluster_overlay\":false,\"supports_launchctl_wrapper\":false,\"supports_native_macos_passthrough\":false,\"supports_notify_fast_path\":true,\"supports_userspace_jobs\":true,\"supports_userspace_notify\":true},\"daemon\":{\"cluster_enabled\":false,\"control_socket_path\":\"/tmp/launchx-fixture.sock\",\"daemon_id\":\"daemon-fixture\",\"hostname\":\"fixture-host\",\"node_id\":\"launchx-swift@fixture-host\",\"notify_fast_path_enabled\":true,\"runtime_mode\":\"standalone\",\"started_at\":{\"$date\":\"2026-04-16T12:00:00Z\"},\"version\":\"dev-fixture\"},\"health\":{\"job_persistence\":{\"dirty\":false,\"last_attempted_at\":{\"$date\":\"2026-04-16T12:00:01Z\"},\"last_error\":\"nil\",\"last_persisted_at\":{\"$date\":\"2026-04-16T12:00:02Z\"},\"retry_scheduled\":false,\"state\":\"healthy\"},\"notify_fast_path\":{\"dirty\":true,\"last_attempted_at\":{\"$date\":\"2026-04-16T12:00:01Z\"},\"last_error\":\"simulated_fast_path_error\",\"last_persisted_at\":\"nil\",\"retry_scheduled\":true,\"state\":\"degraded\"},\"notify_persistence\":{\"dirty\":false,\"last_attempted_at\":{\"$date\":\"2026-04-16T12:00:01Z\"},\"last_error\":\"nil\",\"last_persisted_at\":{\"$date\":\"2026-04-16T12:00:02Z\"},\"retry_scheduled\":false,\"state\":\"healthy\"},\"observed_at\":{\"$date\":\"2026-04-16T12:00:00Z\"},\"reasons\":[{\"component\":\"notify_fast_path\",\"issue\":\"fast_path_retry_pending\",\"last_error\":\"simulated_fast_path_error\"}],\"state\":\"degraded\"},\"jobs\":[],\"notify_names\":[{\"generation\":4,\"last_posted_at\":{\"$date\":\"2026-04-16T12:00:01Z\"},\"name\":\"com.launchx.fixture.check\",\"scope\":\"local\",\"state\":7,\"updated_at\":{\"$date\":\"2026-04-16T12:00:03Z\"}}]},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.diagnostics.snapshot.notify_fast_path.recovered",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"capabilities\":{\"feature_flags\":[\"userspace_notify\",\"notify_registry_v1\"],\"supports_cluster_overlay\":false,\"supports_launchctl_wrapper\":false,\"supports_native_macos_passthrough\":false,\"supports_notify_fast_path\":true,\"supports_userspace_jobs\":true,\"supports_userspace_notify\":true},\"daemon\":{\"cluster_enabled\":false,\"control_socket_path\":\"/tmp/launchx-fixture.sock\",\"daemon_id\":\"daemon-fixture\",\"hostname\":\"fixture-host\",\"node_id\":\"launchx-swift@fixture-host\",\"notify_fast_path_enabled\":true,\"runtime_mode\":\"standalone\",\"started_at\":{\"$date\":\"2026-04-16T12:00:00Z\"},\"version\":\"dev-fixture\"},\"health\":{\"job_persistence\":{\"dirty\":false,\"last_attempted_at\":{\"$date\":\"2026-04-16T12:00:05Z\"},\"last_error\":\"nil\",\"last_persisted_at\":{\"$date\":\"2026-04-16T12:00:06Z\"},\"retry_scheduled\":false,\"state\":\"healthy\"},\"notify_fast_path\":{\"dirty\":false,\"last_attempted_at\":{\"$date\":\"2026-04-16T12:00:05Z\"},\"last_error\":\"nil\",\"last_persisted_at\":{\"$date\":\"2026-04-16T12:00:06Z\"},\"retry_scheduled\":false,\"state\":\"healthy\"},\"notify_persistence\":{\"dirty\":false,\"last_attempted_at\":{\"$date\":\"2026-04-16T12:00:05Z\"},\"last_error\":\"nil\",\"last_persisted_at\":{\"$date\":\"2026-04-16T12:00:06Z\"},\"retry_scheduled\":false,\"state\":\"healthy\"},\"observed_at\":{\"$date\":\"2026-04-16T12:00:06Z\"},\"reasons\":[],\"state\":\"healthy\"},\"jobs\":[],\"notify_names\":[{\"generation\":4,\"last_posted_at\":{\"$date\":\"2026-04-16T12:00:01Z\"},\"name\":\"com.launchx.fixture.check\",\"scope\":\"local\",\"state\":7,\"updated_at\":{\"$date\":\"2026-04-16T12:00:06Z\"}}]},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.error_missing_code",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"key\":\"error.code\",\"type\":\"missing_key\"}",
+      "alternate_value_text": "reject response missing_key error.code"
+    },
+    {
+      "name": "response.error_missing_error",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"key\":\"error\",\"type\":\"missing_key\"}",
+      "alternate_value_text": "reject response missing_key error"
+    },
+    {
+      "name": "response.error_missing_message",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"key\":\"error.message\",\"type\":\"missing_key\"}",
+      "alternate_value_text": "reject response missing_key error.message"
+    },
+    {
+      "name": "response.missing_protocol_version",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"key\":\"protocol_version\",\"type\":\"missing_key\"}",
+      "alternate_value_text": "reject response missing_key protocol_version"
+    },
+    {
+      "name": "response.missing_status",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"key\":\"status\",\"type\":\"missing_key\"}",
+      "alternate_value_text": "reject response missing_key status"
+    },
+    {
+      "name": "response.notify.cancel.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"canceled\":true,\"registration\":{\"created_at\":{\"$date\":\"2026-04-16T12:00:04Z\"},\"delivery_method\":\"check\",\"delivery_state\":\"active\",\"first_check_pending\":false,\"last_checked_at\":{\"$date\":\"2026-04-16T12:00:05Z\"},\"last_seen_generation\":4,\"local_transport_binding_id\":\"nil\",\"local_transport_handle\":\"nil\",\"name\":\"com.launchx.fixture.check\",\"pending_generation\":\"nil\",\"queue_name\":\"nil\",\"scope\":\"local\",\"session_id\":\"session-alpha\",\"signal\":\"nil\",\"suspend_depth\":0,\"target_pid\":\"nil\",\"token\":42,\"valid\":false}},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.notify.check.changed.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"changed\":true,\"current_state\":7,\"generation\":4,\"registration\":{\"created_at\":{\"$date\":\"2026-04-16T12:00:04Z\"},\"delivery_method\":\"check\",\"delivery_state\":\"active\",\"first_check_pending\":false,\"last_checked_at\":{\"$date\":\"2026-04-16T12:00:05Z\"},\"last_seen_generation\":4,\"local_transport_binding_id\":\"nil\",\"local_transport_handle\":\"nil\",\"name\":\"com.launchx.fixture.check\",\"pending_generation\":\"nil\",\"queue_name\":\"nil\",\"scope\":\"local\",\"session_id\":\"session-alpha\",\"signal\":\"nil\",\"suspend_depth\":0,\"target_pid\":\"nil\",\"token\":42,\"valid\":true}},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.notify.check.cluster.changed.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"changed\":true,\"current_state\":29,\"generation\":1,\"registration\":{\"created_at\":{\"$date\":\"2026-04-16T12:00:04Z\"},\"delivery_method\":\"check\",\"delivery_state\":\"active\",\"first_check_pending\":false,\"last_checked_at\":{\"$date\":\"2026-04-16T12:00:11Z\"},\"last_seen_generation\":1,\"local_transport_binding_id\":\"nil\",\"local_transport_handle\":\"nil\",\"name\":\"com.launchx.fixture.check\",\"pending_generation\":\"nil\",\"queue_name\":\"nil\",\"scope\":\"cluster\",\"session_id\":\"session-cluster\",\"signal\":\"nil\",\"suspend_depth\":0,\"target_pid\":\"nil\",\"token\":43,\"valid\":true}},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.notify.check.unchanged.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"changed\":false,\"current_state\":29,\"generation\":0,\"registration\":{\"created_at\":{\"$date\":\"2026-04-16T12:00:04Z\"},\"delivery_method\":\"check\",\"delivery_state\":\"active\",\"first_check_pending\":false,\"last_checked_at\":{\"$date\":\"2026-04-16T12:00:06Z\"},\"last_seen_generation\":0,\"local_transport_binding_id\":\"nil\",\"local_transport_handle\":\"nil\",\"name\":\"com.launchx.fixture.check\",\"pending_generation\":\"nil\",\"queue_name\":\"nil\",\"scope\":\"cluster\",\"session_id\":\"session-cluster\",\"signal\":\"nil\",\"suspend_depth\":0,\"target_pid\":\"nil\",\"token\":43,\"valid\":true}},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.notify.get_state.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"name\":{\"generation\":4,\"last_posted_at\":{\"$date\":\"2026-04-16T12:00:06Z\"},\"name\":\"com.launchx.fixture.check\",\"scope\":\"local\",\"state\":-1,\"updated_at\":{\"$date\":\"2026-04-16T12:00:05Z\"}},\"state\":-1},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.notify.invalid_reuse.failure",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"error\":{\"code\":\"notify_failed\",\"message\":\"notify_failed(invalid_client_registration_id(nil))\"},\"protocol_version\":1,\"status\":\"error\"}",
+      "alternate_value_text": "accept response status=error code=notify_failed"
+    },
+    {
+      "name": "response.notify.invalid_scope.failure",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"error\":{\"code\":\"invalid_request\",\"message\":\"invalid_request(invalid scope remote)\"},\"protocol_version\":1,\"status\":\"error\"}",
+      "alternate_value_text": "accept response status=error code=invalid_request"
+    },
+    {
+      "name": "response.notify.invalid_signal.failure",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"error\":{\"code\":\"notify_failed\",\"message\":\"notify_failed(invalid_signal(0))\"},\"protocol_version\":1,\"status\":\"error\"}",
+      "alternate_value_text": "accept response status=error code=notify_failed"
+    },
+    {
+      "name": "response.notify.invalid_token.failure",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"error\":{\"code\":\"notify_failed\",\"message\":\"notify_failed(invalid_token(42))\"},\"protocol_version\":1,\"status\":\"error\"}",
+      "alternate_value_text": "accept response status=error code=notify_failed"
+    },
+    {
+      "name": "response.notify.is_valid_token.false",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"valid\":false},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.notify.list_names.scoped",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":[{\"generation\":4,\"last_posted_at\":{\"$date\":\"2026-04-16T12:00:06Z\"},\"name\":\"com.launchx.fixture.check\",\"scope\":\"local\",\"state\":-1,\"updated_at\":{\"$date\":\"2026-04-16T12:00:05Z\"}},{\"generation\":1,\"last_posted_at\":{\"$date\":\"2026-04-16T12:00:08Z\"},\"name\":\"com.launchx.fixture.check\",\"scope\":\"cluster\",\"state\":29,\"updated_at\":{\"$date\":\"2026-04-16T12:00:08Z\"}}],\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.notify.missing_dispatch_queue.failure",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"error\":{\"code\":\"invalid_request\",\"message\":\"invalid_request(missing queue_name)\"},\"protocol_version\":1,\"status\":\"error\"}",
+      "alternate_value_text": "accept response status=error code=invalid_request"
+    },
+    {
+      "name": "response.notify.missing_name.failure",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"error\":{\"code\":\"invalid_request\",\"message\":\"invalid_request(missing name)\"},\"protocol_version\":1,\"status\":\"error\"}",
+      "alternate_value_text": "accept response status=error code=invalid_request"
+    },
+    {
+      "name": "response.notify.post.cluster.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"delivered_tokens\":[],\"generation\":1,\"name\":{\"generation\":1,\"last_posted_at\":{\"$date\":\"2026-04-16T12:00:11Z\"},\"name\":\"com.launchx.fixture.check\",\"scope\":\"cluster\",\"state\":29,\"updated_at\":{\"$date\":\"2026-04-16T12:00:11Z\"}},\"posted_at\":{\"$date\":\"2026-04-16T12:00:11Z\"}},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.notify.post.dispatch.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"delivered_tokens\":[],\"generation\":1,\"name\":{\"generation\":1,\"last_posted_at\":{\"$date\":\"2026-04-16T12:00:10Z\"},\"name\":\"com.launchx.fixture.dispatch\",\"scope\":\"local\",\"state\":0,\"updated_at\":{\"$date\":\"2026-04-16T12:00:10Z\"}},\"posted_at\":{\"$date\":\"2026-04-16T12:00:10Z\"}},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.notify.post.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"delivered_tokens\":[42],\"generation\":5,\"name\":{\"generation\":5,\"last_posted_at\":{\"$date\":\"2026-04-16T12:00:06Z\"},\"name\":\"com.launchx.fixture.check\",\"scope\":\"local\",\"state\":7,\"updated_at\":{\"$date\":\"2026-04-16T12:00:06Z\"}},\"posted_at\":{\"$date\":\"2026-04-16T12:00:06Z\"}},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.notify.registration.check.cluster.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"registration\":{\"created_at\":{\"$date\":\"2026-04-16T12:00:04Z\"},\"delivery_method\":\"check\",\"delivery_state\":\"active\",\"first_check_pending\":true,\"last_checked_at\":\"nil\",\"last_seen_generation\":0,\"local_transport_binding_id\":\"nil\",\"local_transport_handle\":\"nil\",\"name\":\"com.launchx.fixture.check\",\"pending_generation\":\"nil\",\"queue_name\":\"nil\",\"scope\":\"cluster\",\"session_id\":\"session-cluster\",\"signal\":\"nil\",\"suspend_depth\":0,\"target_pid\":\"nil\",\"token\":43,\"valid\":true}},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.notify.registration.check.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"registration\":{\"created_at\":{\"$date\":\"2026-04-16T12:00:04Z\"},\"delivery_method\":\"check\",\"delivery_state\":\"active\",\"first_check_pending\":true,\"last_checked_at\":\"nil\",\"last_seen_generation\":0,\"local_transport_binding_id\":\"nil\",\"local_transport_handle\":\"nil\",\"name\":\"com.launchx.fixture.check\",\"pending_generation\":\"nil\",\"queue_name\":\"nil\",\"scope\":\"local\",\"session_id\":\"session-alpha\",\"signal\":\"nil\",\"suspend_depth\":0,\"target_pid\":\"nil\",\"token\":42,\"valid\":true}},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.notify.registration.dispatch.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"registration\":{\"created_at\":{\"$date\":\"2026-04-16T12:00:09Z\"},\"delivery_method\":\"dispatch\",\"delivery_state\":\"active\",\"first_check_pending\":true,\"last_checked_at\":\"nil\",\"last_seen_generation\":0,\"local_transport_binding_id\":\"nil\",\"local_transport_handle\":\"nil\",\"name\":\"com.launchx.fixture.dispatch\",\"pending_generation\":\"nil\",\"queue_name\":\"main\",\"scope\":\"local\",\"session_id\":\"session-dispatch\",\"signal\":\"nil\",\"suspend_depth\":0,\"target_pid\":\"nil\",\"token\":88,\"valid\":true}},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.notify.registration.file_descriptor.reuse.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"registration\":{\"created_at\":{\"$date\":\"2026-04-16T12:00:08Z\"},\"delivery_method\":\"file_descriptor\",\"delivery_state\":\"active\",\"first_check_pending\":true,\"last_checked_at\":\"nil\",\"last_seen_generation\":0,\"local_transport_binding_id\":\"binding-alpha\",\"local_transport_handle\":\"/tmp/launchx-notify-fixture.sock\",\"name\":\"com.launchx.fixture.fd\",\"pending_generation\":\"nil\",\"queue_name\":\"nil\",\"scope\":\"local\",\"session_id\":\"session-fd\",\"signal\":\"nil\",\"suspend_depth\":0,\"target_pid\":\"nil\",\"token\":78,\"valid\":true}},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.notify.registration.file_descriptor.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"registration\":{\"created_at\":{\"$date\":\"2026-04-16T12:00:07Z\"},\"delivery_method\":\"file_descriptor\",\"delivery_state\":\"active\",\"first_check_pending\":true,\"last_checked_at\":\"nil\",\"last_seen_generation\":0,\"local_transport_binding_id\":\"binding-alpha\",\"local_transport_handle\":\"/tmp/launchx-notify-fixture.sock\",\"name\":\"com.launchx.fixture.fd.new\",\"pending_generation\":\"nil\",\"queue_name\":\"nil\",\"scope\":\"local\",\"session_id\":\"session-fd\",\"signal\":\"nil\",\"suspend_depth\":0,\"target_pid\":\"nil\",\"token\":77,\"valid\":true}},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.notify.registration.signal.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"registration\":{\"created_at\":{\"$date\":\"2026-04-16T12:00:07Z\"},\"delivery_method\":\"signal\",\"delivery_state\":\"active\",\"first_check_pending\":true,\"last_checked_at\":\"nil\",\"last_seen_generation\":0,\"local_transport_binding_id\":\"nil\",\"local_transport_handle\":\"nil\",\"name\":\"com.launchx.fixture.signal\",\"pending_generation\":\"nil\",\"queue_name\":\"nil\",\"scope\":\"local\",\"session_id\":\"session-signal\",\"signal\":30,\"suspend_depth\":0,\"target_pid\":4321,\"token\":51,\"valid\":true}},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.notify.resume.failed_after_pending_suspend",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"created_at\":{\"$date\":\"2026-04-16T12:00:07Z\"},\"delivery_method\":\"file_descriptor\",\"delivery_state\":\"failed_after_pending_suspend\",\"first_check_pending\":true,\"last_checked_at\":\"nil\",\"last_seen_generation\":0,\"local_transport_binding_id\":\"binding-alpha\",\"local_transport_handle\":\"/tmp/launchx-notify-fixture.sock\",\"name\":\"com.launchx.fixture.fd.new\",\"pending_generation\":5,\"queue_name\":\"nil\",\"scope\":\"local\",\"session_id\":\"session-fd\",\"signal\":\"nil\",\"suspend_depth\":0,\"target_pid\":\"nil\",\"token\":77,\"valid\":true},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.notify.resume.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"created_at\":{\"$date\":\"2026-04-16T12:00:07Z\"},\"delivery_method\":\"signal\",\"delivery_state\":\"active\",\"first_check_pending\":true,\"last_checked_at\":\"nil\",\"last_seen_generation\":0,\"local_transport_binding_id\":\"nil\",\"local_transport_handle\":\"nil\",\"name\":\"com.launchx.fixture.signal\",\"pending_generation\":\"nil\",\"queue_name\":\"nil\",\"scope\":\"local\",\"session_id\":\"session-signal\",\"signal\":30,\"suspend_depth\":0,\"target_pid\":4321,\"token\":51,\"valid\":true},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.notify.set_state.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"name\":{\"generation\":4,\"last_posted_at\":{\"$date\":\"2026-04-16T12:00:06Z\"},\"name\":\"com.launchx.fixture.check\",\"scope\":\"local\",\"state\":-1,\"updated_at\":{\"$date\":\"2026-04-16T12:00:05Z\"}},\"state\":-1},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.notify.suspend.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"created_at\":{\"$date\":\"2026-04-16T12:00:04Z\"},\"delivery_method\":\"check\",\"delivery_state\":\"active\",\"first_check_pending\":false,\"last_checked_at\":{\"$date\":\"2026-04-16T12:00:05Z\"},\"last_seen_generation\":4,\"local_transport_binding_id\":\"nil\",\"local_transport_handle\":\"nil\",\"name\":\"com.launchx.fixture.check\",\"pending_generation\":\"nil\",\"queue_name\":\"nil\",\"scope\":\"local\",\"session_id\":\"session-alpha\",\"signal\":\"nil\",\"suspend_depth\":1,\"target_pid\":\"nil\",\"token\":42,\"valid\":true},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.ok_missing_result",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"key\":\"result\",\"type\":\"missing_key\"}",
+      "alternate_value_text": "reject response missing_key result"
+    },
+    {
+      "name": "response.scalar_coverage.success",
+      "classification": "required",
+      "validation_mode": "accept",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"protocol_version\":1,\"result\":{\"array\":[1,\"two\",true],\"bool_false\":false,\"bool_true\":true,\"data\":{\"$data_utf8\":\"launchx\"},\"date\":{\"$date\":\"2026-04-16T12:00:00Z\"},\"double\":3.5,\"integer\":-42,\"object\":{\"nested\":\"value\"},\"string\":\"hello\"},\"status\":\"ok\"}",
+      "alternate_value_text": "accept response status=ok"
+    },
+    {
+      "name": "response.unsupported_status",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"detail\":\"unsupported status partial\",\"type\":\"invalid_packet\"}",
+      "alternate_value_text": "reject response invalid_packet unsupported status partial"
+    },
+    {
+      "name": "response.unsupported_version",
+      "classification": "required",
+      "validation_mode": "reject",
+      "kind": "response",
+      "success": true,
+      "primary_value_text": "{\"type\":\"unsupported_version\",\"version\":99}",
+      "alternate_value_text": "reject response unsupported_version 99"
+    }
+  ]
+}

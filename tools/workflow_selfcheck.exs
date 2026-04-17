@@ -57,6 +57,7 @@ defmodule WorkflowSelfcheck do
       {"subset2a compare tool", fn -> subset2a_compare_check!(repo_root) end},
       {"subset3a compare tool", fn -> subset3a_compare_check!(repo_root) end},
       {"subset7a expected builder", fn -> subset7a_expected_builder_check!(repo_root, artifacts_root) end},
+      {"subset7a cases header builder", fn -> subset7a_cases_header_builder_check!(repo_root, artifacts_root) end},
       {"subset7a compare tool", fn -> subset7a_compare_check!(repo_root) end},
       {"subset1 MX compare artifact wrapper", fn -> subset1_mx_compare_artifact_check!(repo_root, artifacts_root) end},
       {"subset1b MX compare artifact wrapper", fn -> subset1b_mx_compare_artifact_check!(repo_root, artifacts_root) end},
@@ -68,6 +69,7 @@ defmodule WorkflowSelfcheck do
       {"subset1 FX make compare wrapper", fn -> subset1_make_compare_check!(repo_root, artifacts_root) end},
       {"subset1b FX make compare wrapper", fn -> subset1b_make_compare_check!(repo_root, artifacts_root) end},
       {"subset2a FX make compare wrapper", fn -> subset2a_make_compare_check!(repo_root, artifacts_root) end},
+      {"subset7a FX make compare wrapper", fn -> subset7a_make_compare_check!(repo_root, artifacts_root) end},
       {"subset3a FX make compare wrapper", fn -> subset3a_make_compare_check!(repo_root, artifacts_root) end},
       {"subset1 FX compare artifact wrapper", fn -> subset1_compare_artifact_check!(repo_root, artifacts_root) end},
       {"subset2a FX compare artifact wrapper", fn -> subset2a_compare_artifact_check!(repo_root, artifacts_root) end},
@@ -379,6 +381,32 @@ defmodule WorkflowSelfcheck do
     run_cmd!("diff", ["-u", expected_path, output_path], cd: repo_root, expect_exit: 0)
   end
 
+  defp subset7a_cases_header_builder_check!(repo_root, artifacts_root) do
+    output_path = Path.join([artifacts_root, "subset7a_control_packet_cases.h"])
+    expected_path = Path.join(repo_root, "cort-fx/tests/generated/subset7a_control_packet_cases.h")
+
+    run_cmd!(
+      Path.join(repo_root, "tools/run_elixir.sh"),
+      [
+        Path.join(repo_root, "tools/build_subset7a_control_packet_cases_header.exs"),
+        "--accept-payload",
+        Path.join(repo_root, "fixtures/control/bplist_packet_corpus_v1.json"),
+        "--accept-source",
+        Path.join(repo_root, "fixtures/control/bplist_packet_corpus_v1.source.json"),
+        "--reject-payload",
+        Path.join(repo_root, "fixtures/control/bplist_packet_rejection_corpus_v1.json"),
+        "--expected",
+        Path.join(repo_root, "fixtures/control/subset7a_control_packet_expected_v1.json"),
+        "--output",
+        output_path
+      ],
+      cd: repo_root,
+      expect_exit: 0
+    )
+
+    run_cmd!("diff", ["-u", expected_path, output_path], cd: repo_root, expect_exit: 0)
+  end
+
   defp subset7a_compare_check!(repo_root) do
     expected_path = Path.join(repo_root, "fixtures/control/subset7a_control_packet_expected_v1.json")
 
@@ -560,6 +588,7 @@ defmodule WorkflowSelfcheck do
           Path.join([artifacts_root, "cort-fx", "build", "out", "subset1b_cfstring_fx.json"]),
           Path.join([artifacts_root, "cort-fx", "build", "out", "subset2a_container_fx.json"]),
           Path.join([artifacts_root, "cort-fx", "build", "out", "subset3a_bplist_fx.json"]),
+          Path.join([artifacts_root, "cort-fx", "build", "out", "subset7a_control_packet_fx.json"]),
           Path.join([artifacts_root, "cort-fx", "build", "subset3a-exported-symbols.txt"])
         ] do
       unless File.exists?(path) do
@@ -573,6 +602,7 @@ defmodule WorkflowSelfcheck do
     ensure_contains!(output, "PASS string_core_tests")
     ensure_contains!(output, "PASS container_core_tests")
     ensure_contains!(output, "PASS bplist_core_tests")
+    ensure_contains!(output, "PASS control_packet_tests")
     ensure_contains!(output, "PASS c_consumer_smoke")
   end
 
@@ -1015,6 +1045,34 @@ defmodule WorkflowSelfcheck do
 
     ensure_contains!(output, "- warnings: 0")
     ensure_contains!(File.read!(report_path), "`cfarray_createcopy_borrowed_get` | match")
+  end
+
+  defp subset7a_make_compare_check!(repo_root, artifacts_root) do
+    json_path = Path.join([artifacts_root, "cort-fx", "build", "out", "subset7a_control_packet_fx.json"])
+    report_path = Path.join([artifacts_root, "cort-fx", "build", "out", "subset7a_control_packet_fx_vs_expected_report.md"])
+
+    output =
+      run_cmd!(
+        "make",
+        [
+          "compare-subset7a-with-expected",
+          "EXPECTED_JSON=#{Path.join(repo_root, "fixtures/control/subset7a_control_packet_expected_v1.json")}"
+        ],
+        cd: Path.join(repo_root, "cort-fx"),
+        env: [{"CORT_ARTIFACTS_ROOT", artifacts_root}],
+        expect_exit: 0
+      )
+
+    unless File.exists?(json_path) do
+      raise RuntimeError, "missing packet compare input at #{json_path}"
+    end
+
+    unless File.exists?(report_path) do
+      raise RuntimeError, "missing compare report at #{report_path}"
+    end
+
+    ensure_contains!(output, "- warnings: 0")
+    ensure_contains!(File.read!(report_path), "`request.control.health` | match")
   end
 
   defp subset2a_compare_artifact_check!(repo_root, artifacts_root) do

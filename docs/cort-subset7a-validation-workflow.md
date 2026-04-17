@@ -40,6 +40,7 @@ Derived expected semantic corpus:
 Tools:
 
 - `tools/build_subset7a_control_packet_expected.exs`
+- `tools/build_subset7a_control_packet_cases_header.exs`
 - `tools/compare_subset7a_control_packet_json.exs`
 - `tools/sync_subset7a_control_corpora.sh`
 
@@ -75,29 +76,51 @@ Default output:
 This build step is deterministic and should be rerun whenever the imported
 source corpora change.
 
-## Future FX Probe Shape
+## FX Probe Shape
 
-The future FX packet probe should emit:
+The FX packet probe emits:
 
 - `../wip-cort-gpt-artifacts/cort-fx/build/out/subset7a_control_packet_fx.json`
 
-Optional shared handoff artifact:
+Shared handoff artifact:
 
 - `../subset7a_control_packet_fx.json`
 
-The probe should use the imported generated packet corpora as decode inputs:
+The FX packet probe and packet tests use a generated header built from the
+imported corpora and derived expected semantics:
+
+- `tools/build_subset7a_control_packet_cases_header.exs`
+- `cort-fx/tests/generated/subset7a_control_packet_cases.h`
+
+The generated header is built from:
 
 - `fixtures/control/bplist_packet_corpus_v1.json`
+- `fixtures/control/bplist_packet_corpus_v1.source.json`
 - `fixtures/control/bplist_packet_rejection_corpus_v1.json`
+- `fixtures/control/subset7a_control_packet_expected_v1.json`
 
-And emit one result row per case in the format defined by:
+The FX packet tests and JSON probe live in:
+
+- `cort-fx/tests/control_packet_tests.c`
+- `cort-fx/tests/cort_subset7a_control_packet_fx.c`
+- `cort-fx/tests/subset7a_control_packet_support.h`
+
+The probe emits one result row per case in the format defined by:
 
 - `fixtures/control/subset7a_control_packet_expected_v1.json`
 
-## Future FX Compare
+Local FX commands:
 
-Once FX emits a Subset 7A probe artifact, compare it against the derived
-expected semantic corpus with:
+```sh
+cd cort-fx
+make compare-subset7a-fx
+make compare-subset7a-with-expected
+```
+
+## FX Compare
+
+FX compares the packet probe artifact against the derived expected semantic
+corpus with:
 
 ```sh
 tools/run_elixir.sh tools/compare_subset7a_control_packet_json.exs \
@@ -106,7 +129,7 @@ tools/run_elixir.sh tools/compare_subset7a_control_packet_json.exs \
   --output /path/to/subset7a_control_packet_fx_vs_expected_report.md
 ```
 
-Expected future report output:
+Default compare report output:
 
 - `../wip-cort-gpt-artifacts/cort-fx/build/out/subset7a_control_packet_fx_vs_expected_report.md`
 
@@ -138,14 +161,17 @@ tools/run_elixir.sh tools/workflow_selfcheck.exs
 Subset 7A selfcheck coverage should prove:
 
 - the imported-source builder regenerates the committed expected corpus
+- the packet-case header builder regenerates the committed generated header
 - the 7A compare tool reports `0` blockers on identical inputs
+- the FX make compare wrapper emits the expected packet compare report
 
 ## Recommended Order
 
 1. Refresh or confirm the imported shared corpora in `fixtures/control/`.
 2. Regenerate `subset7a_control_packet_expected_v1.json`.
 3. Review the expected corpus diff if the corpora changed.
-4. Only then start the future FX decode-only packet probe.
-5. Compare the future FX probe output against the expected corpus.
-6. Only after a clean compare should the packet lane consider encode parity or
+4. Regenerate `cort-fx/tests/generated/subset7a_control_packet_cases.h`.
+5. Run the FX decode-only packet probe.
+6. Compare the FX probe output against the expected corpus.
+7. Only after a clean compare should the packet lane consider encode parity or
    transport integration work.
